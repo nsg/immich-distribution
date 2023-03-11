@@ -5,7 +5,18 @@
 export PGDATA="$SNAP_COMMON/pgsql/data"
 
 if [ ! -e "$PGDATA" ]; then
-    drop_privileges $SNAP/usr/local/pgsql/bin/initdb
+    # This is a new install, configure
+    snapctl get database-password > /tmp/pwfile
+    drop_privileges $SNAP/usr/local/pgsql/bin/initdb --auth-host=md5 --username postgres --pwfile=/tmp/pwfile
+    rm /tmp/pwfile
 fi
 
-drop_privileges $SNAP/usr/local/pgsql/bin/postgres 
+(
+    while ! $SNAP/usr/local/pgsql/bin/pg_isready; do
+        sleep 1
+    done
+    
+    drop_privileges $SNAP/usr/local/pgsql/bin/createdb --username=postgres immich
+) &
+
+drop_privileges $SNAP/usr/local/pgsql/bin/postgres

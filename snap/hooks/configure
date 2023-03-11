@@ -1,4 +1,13 @@
 #!/bin/bash
 
-mkdir -p $SNAP_COMMON/{pgsql,logs,redis}
-chown snap_daemon:snap_daemon $SNAP_COMMON/{pgsql,logs}
+random_string() {
+    cat /dev/urandom | tr -dc '[:alpha:]' | fold -w ${1:-20} | head -n 1
+}
+
+mkdir -p $SNAP_COMMON/{pgsql,redis}
+mkdir -p $SNAP_DATA/upload
+chown snap_daemon:snap_daemon $SNAP_COMMON/pgsql
+
+if [[ $(snapctl get database-password) == "" ]]; then
+    snapctl set database-password="$(random_string)"
+fi

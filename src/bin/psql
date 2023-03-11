@@ -1,0 +1,7 @@
+#!/bin/bash
+
+. $SNAP/bin/load-env
+
+export PGDATA="$SNAP_COMMON/pgsql/data"
+
+drop_privileges $SNAP/usr/local/pgsql/bin/psql -U postgres $@

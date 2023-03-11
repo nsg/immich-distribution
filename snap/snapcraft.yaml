@@ -13,9 +13,9 @@ system-usernames:
 
 apps:
   psql:
-    command: usr/local/pgsql/bin/psql
-    environment:
-      LD_LIBRARY_PATH: $SNAP/usr/local/pgsql/lib
+    command: bin/psql
+    plugs:
+      - network
 
   postgres:
     command: bin/postgres
@@ -29,12 +29,78 @@ apps:
     plugs:
       - network-bind
 
-parts:
-  server:
-    plugin: nil
+  immich-server:
+    command: bin/immich-server
+    plugs:
+      - network-bind
+      - network
+    environment:
+      NODE_ENV: "production"
+  #     DB_HOSTNAME: "127.0.0.1"
+  #     DB_USERNAME: "postgres"
+  #     DB_PASSWORD: "postgres"
+  #     DB_DATABASE_NAME: "immich"
+  #     #DB_PORT: 5432
+  #     REDIS_HOSTNAME: "127.0.0.1"
+  #     # REDIS_PORT=6379
+  #     # REDIS_DBINDEX=0
+  #     # REDIS_PASSWORD=
+  #     # REDIS_SOCKET=
+  #     UPLOAD_LOCATION: "$SNAP_DATA/upload"
+  #     REVERSE_GEOCODING_PRECISION: "3"
+  #     IMMICH_WEB_URL: "http://127.0.0.1:3000"
+  #     IMMICH_SERVER_URL: "http://127.0.0.1:3001"
+  #     IMMICH_MACHINE_LEARNING_URL: "http://127.0.0.1:3003"
+  #     #IMMICH_API_URL_EXTERNAL=http://localhost:3001
 
-  microservices:
+parts:
+
+  #
+  # This part downloads a binary release of node
+  #
+  node:
     plugin: nil
+    override-build: |
+      if [ ! -f "$SNAPCRAFT_PART_INSTALL/bin/node" ]; then
+        curl -s https://nodejs.org/dist/v16.19.1/node-v16.19.1-linux-x64.tar.gz \
+        | tar xzf - -C "$SNAPCRAFT_PART_INSTALL" --no-same-owner --strip-components=1
+      fi
+
+  #
+  # I have overridden the entire build stage, it's based on the commands
+  # provided in the Immich Server Dockerfile.
+  #
+  # "npm run build" builds:
+  # * server
+  # * microservices
+  # * cli
+  #
+  # https://github.com/immich-app/immich/blob/main/server/Dockerfile
+  #
+  server:
+    plugin: npm
+    npm-node-version: "16.19.1"
+    source: https://github.com/immich-app/immich.git
+    source-tag: v1.50.1
+    source-subdir: server
+    override-build: |
+      cd server
+      npm ci
+      npm run build
+      npm prune --omit=dev --omit=optional
+      mkdir -p $SNAPCRAFT_PART_INSTALL/usr/src/app
+      cp -r node_modules $SNAPCRAFT_PART_INSTALL/usr/src/app
+      cp -r dist $SNAPCRAFT_PART_INSTALL/usr/src/app
+      cp -r bin $SNAPCRAFT_PART_INSTALL/usr/src/app
+      cp start-server.sh start-microservices.sh $SNAPCRAFT_PART_INSTALL/usr/src/app
+    stage-packages:
+      - libc-ares2
+      - libicu66
+      - libnghttp2-14
+      - libnode64
+      - libuv1
+    after:
+      - node
 
   machine-learning:
     plugin: nil
@@ -55,14 +121,19 @@ parts:
       - bin/redis-server
 
   postgres:
-    source: https://ftp.postgresql.org/pub/source/v14.6/postgresql-14.6.tar.bz2
+    source: https://ftp.postgresql.org/pub/source/v15.2/postgresql-15.2.tar.bz2
     plugin: make
     build-packages:
       - libreadline-dev
       - zlib1g-dev
+      - uuid-dev
     override-build: |
-      ./configure
+      ./configure --enable-thread-safety --with-uuid=e2fs --with-gnu-ld
       snapcraftctl build
+      cd contrib
+      make
+      make install DESTDIR=$SNAPCRAFT_PART_INSTALL
+
 
   scripts:
     source: src
