@@ -1,0 +1,9 @@
+#!/bin/bash
+
+. $SNAP/bin/load-env
+
+export PUBLIC_IMMICH_SERVER_URL=$IMMICH_SERVER_URL
+export PUBLIC_IMMICH_API_URL_EXTERNAL=$IMMICH_API_URL_EXTERNAL
+
+cd $SNAP/usr/src/web
+node build/index.js

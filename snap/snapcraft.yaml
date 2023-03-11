@@ -59,6 +59,14 @@ apps:
     environment:
       NODE_ENV: "production"
 
+  immich-web:
+    command: bin/immich-web
+    plugs:
+      - network-bind
+      - network
+    environment:
+      NODE_ENV: "production"
+
 parts:
 
   #
@@ -112,7 +120,22 @@ parts:
     plugin: nil
 
   web:
-    plugin: nil
+    plugin: npm
+    npm-node-version: "16.19.1"
+    source: https://github.com/immich-app/immich.git
+    source-tag: v1.50.1
+    source-subdir: web
+    override-build: |
+      cd web
+      npm ci
+      npm run build
+      npm prune --omit=dev
+      mkdir -p $SNAPCRAFT_PART_INSTALL/usr/src/web
+      cp -r node_modules $SNAPCRAFT_PART_INSTALL/usr/src/web
+      cp -r build $SNAPCRAFT_PART_INSTALL/usr/src/web
+      cp package.json package-lock.json $SNAPCRAFT_PART_INSTALL/usr/src/web
+    after:
+      - node
 
   redis:
     source: https://github.com/redis/redis.git

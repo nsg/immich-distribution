@@ -13,6 +13,11 @@ export DB_DATABASE_NAME="immich"
 export REDIS_HOSTNAME="127.0.0.1"
 export REVERSE_GEOCODING_PRECISION="3"
 
+IMMICH_WEB_URL="http://127.0.0.1:3000"
+IMMICH_SERVER_URL="http://127.0.0.1:3001"
+IMMICH_MACHINE_LEARNING_URL="http://127.0.0.1:3003"
+#IMMICH_API_URL_EXTERNAL=http://localhost:3001
+
 drop_privileges() {
     $SNAP/usr/bin/setpriv \
         --clear-groups \
