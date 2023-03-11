@@ -1,0 +1,71 @@
+name: immich-distribution
+base: core20
+version: '0.1'
+summary: experiment
+description: |
+  todo
+
+grade: devel
+confinement: strict
+
+system-usernames:
+  snap_daemon: shared
+
+apps:
+  psql:
+    command: usr/local/pgsql/bin/psql
+    environment:
+      LD_LIBRARY_PATH: $SNAP/usr/local/pgsql/lib
+
+  postgres:
+    command: bin/postgres
+    daemon: simple
+    plugs:
+      - network-bind
+
+  redis-server:
+    command: bin/redis-server $SNAP/etc/redis.conf
+    daemon: simple
+    plugs:
+      - network-bind
+
+parts:
+  server:
+    plugin: nil
+
+  microservices:
+    plugin: nil
+
+  machine-learning:
+    plugin: nil
+
+  web:
+    plugin: nil
+
+  redis:
+    source: https://github.com/redis/redis.git
+    source-tag: 7.0.9
+    plugin: make
+    build-packages:
+      - pkg-config
+    override-build: |
+      make
+      make PREFIX=$SNAPCRAFT_PART_INSTALL install
+    prime:
+      - bin/redis-server
+
+  postgres:
+    source: https://ftp.postgresql.org/pub/source/v14.6/postgresql-14.6.tar.bz2
+    plugin: make
+    build-packages:
+      - libreadline-dev
+      - zlib1g-dev
+    override-build: |
+      ./configure
+      snapcraftctl build
+
+  scripts:
+    source: src
+    plugin: dump
+    stage-packages:
+      - util-linux

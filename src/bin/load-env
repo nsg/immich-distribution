@@ -1,0 +1,14 @@
+#!/bin/bash
+
+export LD_LIBRARY_PATH="$SNAP/usr/local/pgsql/lib:$LD_LIBRARY_PATH"
+
+export LC_ALL="C"
+export LC_CTYPE="C"
+
+drop_privileges() {
+    $SNAP/usr/bin/setpriv \
+        --clear-groups \
+        --reuid snap_daemon \
+        --regid snap_daemon \
+        -- $@
+}

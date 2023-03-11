@@ -1,0 +1,11 @@
+#!/bin/bash
+
+. $SNAP/bin/load-env
+
+export PGDATA="$SNAP_COMMON/pgsql/data"
+
+if [ ! -e "$PGDATA" ]; then
+    drop_privileges $SNAP/usr/local/pgsql/bin/initdb
+fi
+
+drop_privileges $SNAP/usr/local/pgsql/bin/postgres 

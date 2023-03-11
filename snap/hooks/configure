@@ -1,0 +1,4 @@
+#!/bin/bash
+
+mkdir -p $SNAP_COMMON/{pgsql,logs,redis}
+chown snap_daemon:snap_daemon $SNAP_COMMON/{pgsql,logs}
