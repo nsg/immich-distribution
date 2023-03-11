@@ -16,8 +16,12 @@ This package will keep to the spirit of Immich, but I will similar but not ident
 ## Redis
 
 * Allows unauthorized connections
-* Only listen (and allows) connections from localhost
+* Only listens (and allows) connections from localhost
 
 ## Immich Services
 
-They are running at port 3000 (web), 3001 (server), 3002 (microservices) and 3003 (machine learning). 
+The services are running at port 3000 (web), 3001 (server), 3002 (microservices) and 3003 (machine learning). The snap do not provide a network namespace (like Docker) so another process/user on the same system could access these ports directly.
+
+## HAProxy
+
+I use [HAProxy](https://www.haproxy.org) to proxy the traffic to Immich Server and Immich Web. HAProxy Stats is enabled on [127.0.0.1:8080](http://127.0.0.1:8080).
