@@ -4,8 +4,7 @@ random_string() {
     cat /dev/urandom | tr -dc '[:alpha:]' | fold -w ${1:-20} | head -n 1
 }
 
-mkdir -p $SNAP_COMMON/{pgsql,redis}
-mkdir -p $SNAP_DATA/upload
+mkdir -p $SNAP_COMMON/{pgsql,redis,reverse-geocoding-dump,upload}
 chown snap_daemon:snap_daemon $SNAP_COMMON/pgsql
 
 if [[ $(snapctl get database-password) == "" ]]; then

@@ -11,6 +11,12 @@ confinement: strict
 system-usernames:
   snap_daemon: shared
 
+layout:
+  $SNAP/usr/src/app/.reverse-geocoding-dump:
+    symlink: $SNAP_COMMON/reverse-geocoding-dump
+  $SNAP/usr/src/app/upload:
+    symlink: $SNAP_COMMON/upload
+
 apps:
   psql:
     command: bin/psql
@@ -31,27 +37,27 @@ apps:
 
   immich-server:
     command: bin/immich-server
+    daemon: simple
+    after:
+      - redis-server
+      - postgres
     plugs:
       - network-bind
       - network
     environment:
       NODE_ENV: "production"
-  #     DB_HOSTNAME: "127.0.0.1"
-  #     DB_USERNAME: "postgres"
-  #     DB_PASSWORD: "postgres"
-  #     DB_DATABASE_NAME: "immich"
-  #     #DB_PORT: 5432
-  #     REDIS_HOSTNAME: "127.0.0.1"
-  #     # REDIS_PORT=6379
-  #     # REDIS_DBINDEX=0
-  #     # REDIS_PASSWORD=
-  #     # REDIS_SOCKET=
-  #     UPLOAD_LOCATION: "$SNAP_DATA/upload"
-  #     REVERSE_GEOCODING_PRECISION: "3"
-  #     IMMICH_WEB_URL: "http://127.0.0.1:3000"
-  #     IMMICH_SERVER_URL: "http://127.0.0.1:3001"
-  #     IMMICH_MACHINE_LEARNING_URL: "http://127.0.0.1:3003"
-  #     #IMMICH_API_URL_EXTERNAL=http://localhost:3001
+
+  immich-microservices:
+    command: bin/immich-microservices
+    daemon: simple
+    after:
+      - redis-server
+      - postgres
+    plugs:
+      - network-bind
+      - network
+    environment:
+      NODE_ENV: "production"
 
 parts:
 

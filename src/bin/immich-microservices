@@ -1,0 +1,6 @@
+#!/bin/bash
+
+. $SNAP/bin/load-env
+
+cd $SNAP/usr/src/app
+node dist/apps/microservices/apps/microservices/src/main
