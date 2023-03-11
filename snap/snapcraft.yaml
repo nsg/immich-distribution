@@ -61,11 +61,22 @@ apps:
 
   immich-web:
     command: bin/immich-web
+    daemon: simple
+    after:
+      - redis-server
+      - postgres
     plugs:
       - network-bind
       - network
     environment:
       NODE_ENV: "production"
+
+  haproxy:
+    command: bin/haproxy -W -f $SNAP/etc/haproxy.cfg -p $SNAP_DATA/haproxy.pid
+    daemon: simple
+    plugs:
+      - network-bind
+      - network
 
 parts:
 
@@ -163,6 +174,25 @@ parts:
       make
       make install DESTDIR=$SNAPCRAFT_PART_INSTALL
 
+  haproxy:
+    source: http://git.haproxy.org/git/haproxy-2.6.git
+    source-tag: v2.6.10
+    plugin: make
+    make-parameters:
+      - TARGET=linux-glibc
+      - USE_OPENSSL=1
+      - USE_ZLIB=1
+      - USE_PCRE=1
+    build-packages:
+      - build-essential
+      - libssl-dev
+      - libpcre3-dev
+      - libz-dev
+    stage:
+      - -usr/local/doc
+      - -usr/local/share
+    organize:
+      usr/local/sbin/haproxy: bin/haproxy
 
   scripts:
     source: src

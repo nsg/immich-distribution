@@ -17,3 +17,7 @@ This package will keep to the spirit of Immich, but I will similar but not ident
 
 * Allows unauthorized connections
 * Only listen (and allows) connections from localhost
+
+## Immich Services
+
+They are running at port 3000 (web), 3001 (server), 3002 (microservices) and 3003 (machine learning). 
