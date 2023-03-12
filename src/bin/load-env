@@ -27,3 +27,9 @@ drop_privileges() {
         --regid snap_daemon \
         -- $@
 }
+
+banner() {
+    echo "!!! NOTE: This is Immich Distribution. This is an unofficial" \
+        "community packaged distribution of the Immich software. For support," \
+        "or more information see https://github.com/nsg/immich-distribution"
+}

@@ -8,6 +8,8 @@ if [ -z $DB_PASSWORD ]; then
     exit 1
 fi
 
+banner
+
 cd $SNAP/usr/src/app
 node dist/apps/immich/apps/immich/src/main
 

@@ -2,5 +2,7 @@
 
 . $SNAP/bin/load-env
 
+banner
+
 cd $SNAP/usr/src/app
 node dist/apps/microservices/apps/microservices/src/main
