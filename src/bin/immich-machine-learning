@@ -1,0 +1,9 @@
+#!/bin/bash
+
+. $SNAP/bin/load-env
+. $SNAP/bin/activate
+
+# Relative paths to upload are sent via the API
+cd $SNAP_COMMON
+
+python $SNAP/bin/main.py

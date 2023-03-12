@@ -44,8 +44,6 @@ apps:
     plugs:
       - network-bind
       - network
-    environment:
-      NODE_ENV: "production"
 
   immich-microservices:
     command: bin/immich-microservices
@@ -56,8 +54,6 @@ apps:
     plugs:
       - network-bind
       - network
-    environment:
-      NODE_ENV: "production"
 
   immich-web:
     command: bin/immich-web
@@ -68,8 +64,16 @@ apps:
     plugs:
       - network-bind
       - network
-    environment:
-      NODE_ENV: "production"
+
+  immich-machine-learning:
+    command: bin/immich-machine-learning
+    daemon: simple
+    after:
+      - redis-server
+      - postgres
+    plugs:
+      - network-bind
+      - network
 
   haproxy:
     command: bin/haproxy -W -f $SNAP/etc/haproxy.cfg -p $SNAP_DATA/haproxy.pid
@@ -127,9 +131,6 @@ parts:
     after:
       - node
 
-  machine-learning:
-    plugin: nil
-
   web:
     plugin: npm
     npm-node-version: "16.19.1"
@@ -147,6 +148,22 @@ parts:
       cp package.json package-lock.json $SNAPCRAFT_PART_INSTALL/usr/src/web
     after:
       - node
+
+  machine-learning:
+    plugin: python
+    source: https://github.com/immich-app/immich.git
+    source-tag: v1.50.1
+    source-subdir: machine-learning
+    build-environment:
+      - SNAPCRAFT_PYTHON_VENV_INTERP_PATH: /root/parts/machine-learning/install/bin/python3
+    override-build: |
+      snapcraftctl build
+      pip install --pre torch  -f https://download.pytorch.org/whl/nightly/cpu/torch_nightly.html
+      pip install transformers tqdm numpy scikit-learn scipy nltk sentencepiece flask Pillow
+      pip install --no-deps sentence-transformers
+      cp machine-learning/src/*.py $SNAPCRAFT_PART_INSTALL/bin
+    stage-packages:
+      - libgomp1
 
   redis:
     source: https://github.com/redis/redis.git

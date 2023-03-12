@@ -5,6 +5,8 @@ export LD_LIBRARY_PATH="$SNAP/usr/local/pgsql/lib:$LD_LIBRARY_PATH"
 export LC_ALL="C"
 export LC_CTYPE="C"
 
+export NODE_ENV="production"
+
 export DB_HOSTNAME="127.0.0.1"
 export DB_USERNAME="postgres"
 export DB_PASSWORD="$(snapctl get database-password)"
@@ -13,10 +15,10 @@ export DB_DATABASE_NAME="immich"
 export REDIS_HOSTNAME="127.0.0.1"
 export REVERSE_GEOCODING_PRECISION="3"
 
-IMMICH_WEB_URL="http://127.0.0.1:3000"
-IMMICH_SERVER_URL="http://127.0.0.1:3001"
-IMMICH_MACHINE_LEARNING_URL="http://127.0.0.1:3003"
-#IMMICH_API_URL_EXTERNAL=http://localhost:3001
+export IMMICH_WEB_URL="http://127.0.0.1:3000"
+export IMMICH_SERVER_URL="http://127.0.0.1:3001"
+export IMMICH_MACHINE_LEARNING_URL="http://127.0.0.1:3003"
+export IMMICH_API_URL_EXTERNAL="http://localhost"
 
 drop_privileges() {
     $SNAP/usr/bin/setpriv \
