@@ -2,6 +2,12 @@
 
 . $SNAP/bin/load-env
 
+if [ -z $DB_PASSWORD ]; then
+    echo "DB_PASSWORD not set, server will not be started"
+    sleep 2
+    exit 1
+fi
+
 cd $SNAP/usr/src/app
 node dist/apps/immich/apps/immich/src/main
 
