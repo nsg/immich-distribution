@@ -34,33 +34,21 @@ Updates are automatic, this is a core concept of Snap. If you do not like this, 
 
 | Channel | Used for |
 | ------- | -------- |
-| stable  | The default channel, stable release, use this |
+| stable  | The default channel, stable release, **use this** |
 | candidate | I beleve this is stable, but it's released for testing for a few days |
-| beta | Help me to try out unreleased releases |
+| beta | Help me to try out new code |
 | edge | Development release, will break from time to time |
 
 Automatic updates from "candidate to candidate", "stable to stable" or "stable to candidate" should always work. Otherwise I consider it a bug. The snap may contain migration logic that makes hard to downgrade, this is not supported.
 
-## Postgres
+## Included software
 
-* Postgres only allows authorized connections over TCP.
-* To access the database without a password use `sudo immich-distribution.psql`.
-* Execute `sudo snap get immich-distribution database-password` to see the password, user is `postgres`.
-* Immich uses a database called `immich`.
-
-## Redis
-
-* Allows unauthorized connections
-* Only listens (and allows) connections from localhost
-
-## Immich Services
-
-The services are running at port 3000 (web), 3001 (server), 3002 (microservices) and 3003 (machine learning). The snap do not provide a network namespace (like Docker) so another process/user on the same system could access these ports directly.
-
-## HAProxy
-
-I use [HAProxy](https://www.haproxy.org) to proxy the traffic to Immich Server and Immich Web. HAProxy Stats is enabled on [127.0.0.1:8080](http://127.0.0.1:8080).
-
-## Machine Learning
-
-I need to contribute upstream fixes for this, this is running an development flask service. It's probably also a good idea to make this a real python package to it's possible to install it. That would also simplify the installation inside the snap.
+| Software | Note |
+| -------- | -------- |
+| Immich Server | This is the server component of Immich that provides Immich API |
+| Immich Microservices | This service provides background processing of assets for Immich Server |
+| Immich Machine Learning | Object detection and image classifier, provides and API for Immich |
+| Immich Web | The Immich web pages |
+| Postgres | Relational database used by Immich |
+| Redis | Fast key-value database used by Immich |
+| HAProxy | Service that proxies traffic to Immich web and server |
