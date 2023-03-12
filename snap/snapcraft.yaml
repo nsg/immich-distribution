@@ -1,7 +1,7 @@
 name: immich-distribution
 title: Immich Distribution
 base: core20
-version: '0.1'
+version: '1.50.1+dist0.1'
 summary: This is an Immich Distribution packaged inside a snap package.
 description: |
   This is an Immich Distribution packaged inside a snap package.
