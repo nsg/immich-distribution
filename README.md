@@ -52,3 +52,21 @@ Automatic updates from "candidate to candidate", "stable to stable" or "stable t
 | Postgres | Relational database used by Immich |
 | Redis | Fast key-value database used by Immich |
 | HAProxy | Service that proxies traffic to Immich web and server |
+
+## Contribute
+
+Feel free to contribute changes and open issues. I will happily merge changes that do not change the scope of this project. An easy way to help me are:
+
+* Use the software and report issues
+* Write well written issues with a lot of information, respond to follow up messages
+* Help other people
+
+## Backup
+
+Upstream Immich has the follow nice message on it's webpage. I concur, this is an new experimental package of an new fast moving software. Backup people! Do not blame me if this eats your data.
+
+> ⚠️ The project is under very active development. Expect bugs and changes. Do not use it as the only way to store your photos and videos!
+
+## License
+
+All files in this repository are released under the MIT license.  Upstream Immich is also licensed under the [MIT](https://github.com/immich-app/immich/blob/main/LICENSE) license.
