@@ -1,9 +1,15 @@
 name: immich-distribution
+title: Immich Distribution
 base: core20
 version: '0.1'
-summary: experiment
+summary: This is an Immich Distribution packaged inside a snap package.
 description: |
-  todo
+  This is an Immich Distribution packaged inside a snap package.
+  The package is inspired of the official Immich images. It will be
+  similar, but not identical with the official Docker-based
+  installation. It will ship the same software, but with limited
+  customability. Extra tools are included, they should be
+  non-intrusive and you can ignore them if you prefer.
 
 grade: devel
 confinement: strict
