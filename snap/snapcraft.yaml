@@ -13,6 +13,8 @@ description: |
 
 grade: devel
 confinement: strict
+architectures:
+  - amd64
 
 system-usernames:
   snap_daemon: shared
