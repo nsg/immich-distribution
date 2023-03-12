@@ -1,5 +1,11 @@
 # Immich Distribution
 
+> First an important mention, this is **NOT** an official package of [Immich](https://immich.app/). If you like to have Immich installed directly from the Immich project use the official [Docker images](https://immich.app/docs/install/docker-compose). Do not report bugs to upstream _unless_ you are sure that the same bug is present in the upstream images.
+
+![](/docs/immich-dist.png)
+
+## About this distribution
+
 This is an [Immich](https://immich.app/) Distribution packaged inside a [snap](https://snapcraft.io/docs). I have used the excellent [Nextcloud snap](https://github.com/nextcloud-snap/nextcloud-snap/) as an inspiration for this. This is still a work in progress and it's possible that I never finish this project.
 
 ## Design
