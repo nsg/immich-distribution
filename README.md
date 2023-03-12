@@ -2,7 +2,9 @@
 
 > First an important mention, this is **NOT** an official package of [Immich](https://immich.app/). If you like to have Immich installed directly from the Immich project use the official [Docker images](https://immich.app/docs/install/docker-compose). Do not report bugs to upstream _unless_ you are sure that the same bug is present in the upstream images.
 
-![](/docs/immich-dist.png)
+<p align="center">
+  <img src="docs/immich-dist.png">
+</p>
 
 ## About this distribution
 
