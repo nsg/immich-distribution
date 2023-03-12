@@ -95,10 +95,6 @@ apps:
       - network
 
 parts:
-
-  #
-  # This part downloads a binary release of node
-  #
   node:
     plugin: nil
     override-build: |
@@ -107,17 +103,19 @@ parts:
         | tar xzf - -C "$SNAPCRAFT_PART_INSTALL" --no-same-owner --strip-components=1
       fi
 
-  #
-  # I have overridden the entire build stage, it's based on the commands
-  # provided in the Immich Server Dockerfile.
-  #
-  # "npm run build" builds:
-  # * server
-  # * microservices
-  # * cli
-  #
-  # https://github.com/immich-app/immich/blob/main/server/Dockerfile
-  #
+  ffmpeg:
+    plugin: nil
+    stage-packages:
+      - ffmpeg
+      - libglu1-mesa
+      - freeglut3
+      - libpulse0
+      - libslang2
+    prime:
+      - -usr/share/doc
+      - -usr/share/man
+
+  # "npm run build" builds: server, microservices, cli
   server:
     plugin: npm
     npm-node-version: "16.19.1"
