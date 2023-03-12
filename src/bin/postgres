@@ -4,9 +4,15 @@
 
 export PGDATA="$SNAP_COMMON/pgsql/data"
 
+if [ -z $DB_PASSWORD ]; then
+    echo "DB_PASSWORD not set, postgres will not be started"
+    sleep 2
+    exit 1
+fi
+
 if [ ! -e "$PGDATA" ]; then
     # This is a new install, configure
-    snapctl get database-password > /tmp/pwfile
+    echo $DB_PASSWORD > /tmp/pwfile
     drop_privileges $SNAP/usr/local/pgsql/bin/initdb --auth-host=md5 --username postgres --pwfile=/tmp/pwfile
     rm /tmp/pwfile
 fi
