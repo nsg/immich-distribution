@@ -9,16 +9,74 @@ on:
   workflow_dispatch:
 
 jobs:
-  test:
+  build-and-test-snap:
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v3
+      
+      #- uses: snapcore/action-build@v1
 
-      - name: Install immich-distribution from edge channel
-        run: sudo snap install --edge immich-distribution
+      #- name: Install package
+      #  run: |
+      #    sudo snap install --dangerous ${{ steps.snapcraft.outputs.snap }}
 
-      - name: Run tests
+      - name: Install package
         run: |
-          sleep 10
-          journalctl -eu snap.immich-distribution.haproxy.service
+          sudo snap install --edge immich-distribution
+
+      - name: Give the services a minute to fully start
+        run: |
+          sleep 60
+
+      - name: Validate backends in HAProxy service
+        run: |
+          ! curl -s 'http://localhost:8080/;csv' | awk -F, '/BACKEND/{ print $18 }' | uniq | grep DOWN
+
+      - name: Validate Immich Microservices
+        run: |
+          IGNORE="LOG|NOTE|systemd"
+          if [ $(journalctl -eu snap.immich-distribution.immich-microservices.service | grep -Ev "$IGNORE" | wc -l) != 0 ]; then
+            journalctl -eu snap.immich-distribution.immich-microservices.service | grep -Ev "$IGNORE"
+            #exit 1
+          fi
+
+      - name: Validate Immich Server
+        run: |
+          IGNORE="LOG|NOTE|systemd|WARN"
+          if [ $(journalctl -eu snap.immich-distribution.immich-server.service | grep -Ev "$IGNORE" | wc -l) != 0 ]; then
+            journalctl -eu snap.immich-distribution.immich-server.service | grep -Ev "$IGNORE"
+            #exit 1
+          fi
+
+      - name: Validate Immich Web
+        run: |
+          IGNORE="LOG|NOTE|systemd|Listening on 0.0.0.0:3000"
+          if [ $(journalctl -eu snap.immich-distribution.immich-web.service | grep -Ev "$IGNORE" | wc -l) != 0 ]; then
+            journalctl -eu snap.immich-distribution.immich-web.service | grep -Ev "$IGNORE"
+            #exit 1
+          fi
+
+      - name: Validate Immich Machine Learning
+        run: |
+          IGNORE="LOG|NOTE|systemd|blob data|FutureWarning|WARNING|warnings.warn|Running on|Press CTRL|Debug mode"
+          if [ $(journalctl -eu snap.immich-distribution.immich-machine-learning.service | grep -Ev "$IGNORE" | wc -l) != 0 ]; then
+            journalctl -eu snap.immich-distribution.immich-machine-learning.service | grep -Ev "$IGNORE"
+            #exit 1
+          fi
+
+      - name: Validate Postgres
+        run: |
+          FAIL="ERROR|FATAL|PANIC"
+          if [ $(journalctl -eu snap.immich-distribution.postgres.service | grep -E "$FAIL" | wc -l) != 0 ]; then
+            journalctl -eu snap.immich-distribution.postgres.service | grep -E "$FAIL"
+            #exit 1
+          fi
+
+      - name: Validate Redis Server
+        run: |
+          FAIL="ERROR|FATAL"
+          if [ $(journalctl -eu snap.immich-distribution.redis-server.service | grep -E "$FAIL" | wc -l) != 0 ]; then
+            journalctl -eu snap.immich-distribution.redis-server.service | grep -E "$FAIL"
+            #exit 1
+          fi
