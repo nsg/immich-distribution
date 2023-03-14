@@ -15,9 +15,10 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Install snap
-        run: sudo snap install hello-world
+      - name: Install immich-distribution from edge channel
+        run: sudo snap install --edge immich-distribution
 
       - name: Run tests
         run: |
-          hello-world
+          sleep 10
+          journalctl -eu snap.immich-distribution.haproxy.service
