@@ -14,16 +14,15 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      
-      #- uses: snapcore/action-build@v1
-
-      #- name: Install package
-      #  run: |
-      #    sudo snap install --dangerous ${{ steps.snapcraft.outputs.snap }}
+      - uses: snapcore/action-build@v1
 
       - name: Install package
         run: |
-          sudo snap install --edge immich-distribution
+          sudo snap install --dangerous *.snap
+
+      # - name: Install package
+      #   run: |
+      #     sudo snap install --edge immich-distribution
 
       - name: Give the services a minute to fully start
         run: |
