@@ -2,6 +2,12 @@
 
 . $SNAP/bin/load-env
 
+if [ -z $DB_PASSWORD ]; then
+    echo "NOTE: DB_PASSWORD not set, server will not be started"
+    sleep 2
+    exit 1
+fi
+
 banner
 
 cd $SNAP/usr/src/app
