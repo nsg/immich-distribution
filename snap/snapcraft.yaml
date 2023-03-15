@@ -63,6 +63,7 @@ apps:
     after:
       - redis-server
       - postgres
+      - immich-server
     plugs:
       - network-bind
       - network
@@ -83,6 +84,7 @@ apps:
     after:
       - redis-server
       - postgres
+      - immich-server
     plugs:
       - network-bind
       - network
