@@ -32,7 +32,10 @@ jobs:
       #     sudo snap install --edge immich-distribution
 
       - name: Give the services time to fully start
-        run: sleep 60
+        run: |
+          while ! ./tests/test_haproxy.sh; do
+            sleep 1
+          done
 
       - name: Copy test assets to selenium container
         run: sudo cp -v ${{ github.workspace }}/tests/assets/* /var/snap/immich-distribution/current/
