@@ -18,8 +18,6 @@ jobs:
         options: --shm-size=2gb
         ports:
           - 4444:4444
-        volumes:
-          - ${{ github.workspace }}/assets:/assets
 
     steps:
       - uses: actions/checkout@v3
@@ -37,7 +35,7 @@ jobs:
         run: sleep 60
 
       - name: Copy test assets to selenium container
-        run: cp -v ${{ github.workspace }}/tests/assets/* ${{ github.workspace }}/assets
+        run: sudo cp -v ${{ github.workspace }}/tests/assets/* /var/snap/immich-distribution/current/
 
       - name: Install requirements
         run: pip install -r tests/requirements.txt

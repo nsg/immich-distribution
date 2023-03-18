@@ -15,12 +15,13 @@ This is an [Immich](https://immich.app/) Distribution packaged inside a [snap](h
 Immich [recommends](https://immich.app/docs/install/requirements) at least 2GB RAM (4 preferred) with 2 CPU cores (4 preferred). [Snapd requires](https://snapcraft.io/docs/installing-snapd) that you use Linux, Ubuntu is has it re-installed and is recommended. Only 64-bit x86 CPU:s are supported (amd64), ARM builds are possible but I do not build these packages because I have no ARM-based system with enough resources to test it. Finally you probably need a lot of free disk space, images are stored at `/var/snap`.
 
 ## Installation
+[![immich-distribution](https://snapcraft.io/immich-distribution/badge.svg)](https://snapcraft.io/immich-distribution)
 
 ```sh
-snap install <package name> # sample, not yet published to the store
+snap install immich-distribution # not yet published to stable
 ```
 
-When it's published to the [Snap Store](https://snapcraft.io/store) it's just a simple command away (sample above). The package is about 400MB in size so it can take a little while to install. Point your browser to port 80 to get started!
+The package is about 500MB in size so it can take a little while to install. Point your browser to port 80 to get started!
 
 ### Security
 

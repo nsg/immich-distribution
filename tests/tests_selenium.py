@@ -2,6 +2,7 @@
 
 import socket
 import time
+import subprocess
 from seleniumbase import BaseCase
 BaseCase.main(__name__, __file__)
 
@@ -13,38 +14,54 @@ def get_ip_address():
 
 class TestImmichWeb(BaseCase):
 
-    def immich(self):
-        self.open(f"http://{get_ip_address()}")
+    def immich(self, path=""):
+        self.open(f"http://{get_ip_address()}/{path}")
 
-    def register_or_login(self):
-        self.immich()
-
+    def register(self):
         # Welcome page, click button
         if "Welcome" in self.get_title():
             self.click("button")
 
-        if "Login" in self.get_title():
-            self.type("input[id='email']", "foo@example.com")
-            self.type("input[id='password']", "secret")
-            self.click("button")
-        else:
-            self.type("input[id='email']", "foo@example.com")
-            self.type("input[id='password']", "secret")
-            self.type("input[id='confirmPassword']", "secret")
-            self.type("input[id='firstName']", "Ture")
-            self.type("input[id='lastName']", "Test")
-            self.click("button")
+        self.type("input[id='email']", "foo@example.com")
+        self.type("input[id='password']", "secret")
+        self.type("input[id='confirmPassword']", "secret")
+        self.type("input[id='firstName']", "Ture")
+        self.type("input[id='lastName']", "Test")
+        self.click("button")
 
-    def test_click_getting_started_and_register(self):
-        self.register_or_login()
+    def login(self):
+        self.type("input[id='email']", "foo@example.com")
+        self.type("input[id='password']", "secret")
+        self.click("button")
 
-    def test_immich_log_in(self):
-        self.register_or_login()
+    def test_001_click_getting_started_and_register(self):
+        self.immich()
+        self.register()
+
+    def test_002_immich_log_in(self):
+        self.immich()
+        self.login()
         self.assert_title("Photos - Immich")
 
-    def x_test_immich_upload_image(self):
-        self.register_or_login()
-        #self.click("//section[1]/section/div/section/button[2]")
-        self.open_new_window()
-        self.open("file:///assets/minne.jpg")
-        time.sleep(5)
+    def test_010_immich_create_token_and_upload_file(self):
+        self.immich()
+        self.login()
+        time.sleep(2)
+        self.immich("user-settings")
+        self.click("/html/body/div/section[2]/section[2]/section/section/div[3]/div/button")
+        self.click("//button[.='New API Key']")
+        self.type("//input[@id='name']", "Selenium")
+        self.click("//button[.='Create']")
+        key = self.get_text("//textarea[@id='secret']")
+        self.click("//button[.='Done']")
+        upload = subprocess.run([
+            "immich-distribution.cli", "upload",
+            "--key", key,
+            "-d", "/var/snap/immich-distribution/current/",
+            "--yes"
+        ])
+        assert upload.returncode == 0
+        time.sleep(10)
+        self.immich("photos")
+        self.click("/html/body/div[1]/section[2]/section[2]/section/div[2]/div/section/div/div/div/div/img[1]")
+        time.sleep(2)
