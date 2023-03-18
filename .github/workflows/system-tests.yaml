@@ -12,6 +12,15 @@ jobs:
   build-and-test-snap:
     runs-on: ubuntu-latest
 
+    services:
+      selenium:
+        image: selenium/standalone-chrome:latest
+        options: --shm-size=2gb
+        ports:
+          - 4444:4444
+        volumes:
+          - ${{ github.workspace }}/assets:/assets
+
     steps:
       - uses: actions/checkout@v3
       - uses: snapcore/action-build@v1
@@ -24,9 +33,14 @@ jobs:
       #   run: |
       #     sudo snap install --edge immich-distribution
 
-      - name: Give the services a minute to fully start
-        run: |
-          sleep 60
+      - name: Give the services time to fully start
+        run: sleep 60
 
-      - name: Run tests
-        run: tests/run.sh
+      - name: Copy test assets to selenium container
+        run: cp -v ${{ github.workspace }}/tests/assets/* ${{ github.workspace }}/assets
+
+      - name: Install requirements
+        run: pip install -r tests/requirements.txt
+
+      - name: Run Selenium Tests
+        run: pytest tests/tests_selenium.py --server=127.0.0.1 --port=4444
