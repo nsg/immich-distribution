@@ -1,0 +1,14 @@
+#!/bin/bash
+
+. $SNAP/bin/load-env
+
+export IMMICH_TARGET_DIRECTORY="$SNAP_COMMON/import"
+
+cd $SNAP/usr/src/cli
+
+if [[ $1 == "upload" ]]; then
+    shift
+    node bin/index.js upload --server "$IMMICH_SERVER_URL" $@
+else
+    node bin/index.js $@
+fi
