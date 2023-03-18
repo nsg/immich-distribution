@@ -49,9 +49,36 @@ Automatic updates from "candidate to candidate", "stable to stable" or "stable t
 | Immich Microservices | This service provides background processing of assets for Immich Server |
 | Immich Machine Learning | Object detection and image classifier, provides and API for Immich |
 | Immich Web | The Immich web pages |
+| Immich CLI | A CLI tool for bulk upload to Immich |
 | Postgres | Relational database used by Immich |
 | Redis | Fast key-value database used by Immich |
 | HAProxy | Service that proxies traffic to Immich web and server |
+
+## CLI commands
+
+### immich-distribution.cli
+
+The below example will import all files in `current/` to Immich. No need to specify `--server`, that's added automatically.
+
+```sh
+immich-distribution.cli upload --key "mySecrEtKey" -d ~/snap/immich-distribution/current/
+```
+
+Note: The CLI is contained so it can't access files outside `/var/snap/immich-distribution` and `~/snap/immich-distribution/`.
+
+### immich-distribution.psql
+
+To connect to the database with psql, run the following command.
+
+```sh
+sudo immich-distribution.psql
+```
+
+To connect with an external tool, fetch the database password with `sudo snap get immich-distribution database-password` and connect normally.
+
+```sh
+psql -h 127.0.0.1 -U postgres
+```
 
 ## Contribute
 
