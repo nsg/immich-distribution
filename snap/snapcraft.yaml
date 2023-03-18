@@ -78,6 +78,11 @@ apps:
       - network-bind
       - network
 
+  cli:
+    command: bin/immich-cli
+    plugs:
+      - network
+
   immich-machine-learning:
     command: bin/immich-machine-learning
     daemon: simple
@@ -176,6 +181,21 @@ parts:
       cp machine-learning/src/*.py $SNAPCRAFT_PART_INSTALL/bin
     stage-packages:
       - libgomp1
+
+  cli:
+    plugin: npm
+    npm-node-version: "16.19.1"
+    source: https://github.com/immich-app/CLI.git
+    source-tag: v0.32.0
+    override-build: |
+      npm install
+      npm run build
+      mkdir -p $SNAPCRAFT_PART_INSTALL/usr/src/cli
+      cp -r node_modules $SNAPCRAFT_PART_INSTALL/usr/src/cli
+      cp -r bin $SNAPCRAFT_PART_INSTALL/usr/src/cli
+      cp package.json package-lock.json $SNAPCRAFT_PART_INSTALL/usr/src/cli
+    after:
+      - node
 
   redis:
     source: https://github.com/redis/redis.git
