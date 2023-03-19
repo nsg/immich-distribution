@@ -8,23 +8,16 @@ body:
     attributes:
       value: |
         ## What's a bug?
-        A bug is an error, flaw or fault in the design or operation that causes it to produce an incorrect or unexpected result, or to behave in unintended ways. For feature requests, support questions or general issues please [select an apropiate issue type](https://github.com/nsg/immich-distribution/issues/new/choose).
+        A bug is an error, flaw or fault in the design or operation that causes it to produce an incorrect or unexpected result, or to behave in unintended ways. For feature requests, support questions or general issues please [select an appropriate issue type](https://github.com/nsg/immich-distribution/issues/new/choose).
 
-  - type: checkboxes
-    id: upstream
-    attributes:
-      label: Docker Compose
-      description: |
-        The official (upstream) Immich installation is distributed via [docker-compose](https://immich.app/docs/install/docker-compose). Have you tried docker-compose.yml to see if this is an upstream problem, or is unique to this package (Immich Distribution)?.
-      options:
-        - label: This is an Immich Distribution specific bug
+        ## Docker Compose
+        The official (upstream) Immich installation is distributed via [docker-compose](https://immich.app/docs/install/docker-compose). Have you tried docker-compose.yml, or is unique to this package (Immich Distribution)? If the official installation images has the same bug, please [report the issue to Immich](https://github.com/immich-app/immich/issues). If you are uncertain, open an issue here and we will figure out it together.
 
   - type: textarea
     id: what-happened
     attributes:
       label: What happened?
-      description: Also tell us, what did you expect to happen?
+      description: Explain what happened and what did you expect to happen?
       placeholder: Tell us what you see!
-      value: "A well written text is easier for me to understand, and fix quickly."
     validations:
       required: true
