@@ -11,7 +11,35 @@ body:
         A bug is an error, flaw or fault in the design or operation that causes it to produce an incorrect or unexpected result, or to behave in unintended ways. For feature requests, support questions or general issues please [select an appropriate issue type](https://github.com/nsg/immich-distribution/issues/new/choose).
 
         ## Docker Compose
-        The official (upstream) Immich installation is distributed via [docker-compose](https://immich.app/docs/install/docker-compose). Have you tried docker-compose.yml, or is unique to this package (Immich Distribution)? If the official installation images has the same bug, please [report the issue to Immich](https://github.com/immich-app/immich/issues). If you are uncertain, open an issue here and we will figure out it together.
+        The official (upstream) Immich installation is distributed via [docker-compose](https://immich.app/docs/install/docker-compose). Have you tried docker-compose.yml, or is bug unique to this package (Immich Distribution)? If the official installation images has the same bug, please [report the issue to Immich](https://github.com/immich-app/immich/issues). If you are uncertain, open an issue here and we will figure out it together.
+
+  - type: dropdown
+    id: channel
+    attributes:
+      label: Channel
+      description: In what channel are you observing the problem?
+      options:
+        - stable (Default)
+        - candidate
+        - beta
+        - edge
+        - I have no idea
+    validations:
+      required: true
+
+  - type: dropdown
+    id: channel
+    attributes:
+      label: Channel
+      description: On what distribution are you observing the problem?
+      options:
+        - Ubuntu 22.04 LTS
+        - Ubuntu 20.04 LTS
+        - Ubuntu (other version)
+        - Other Linux (please specify)
+        - I have no idea
+    validations:
+      required: true
 
   - type: textarea
     id: what-happened
