@@ -2,7 +2,6 @@ name: Support request
 description: I need help with something
 title: "Please provide a good descriptive title"
 labels: ["question"]
-assignees: ["nsg"]
 body:
   - type: markdown
     attributes:
