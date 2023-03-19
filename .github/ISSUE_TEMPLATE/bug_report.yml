@@ -8,7 +8,7 @@ body:
     attributes:
       value: |
         ## What's a bug?
-        A bug is an error, flaw or fault in the design or operation that causes it to produce an incorrect or unexpected result, or to behave in unintended ways.
+        A bug is an error, flaw or fault in the design or operation that causes it to produce an incorrect or unexpected result, or to behave in unintended ways. For feature requests, support questions or general issues please [select the a apropiate issue type](https://github.com/nsg/immich-distribution/issues/new/choose).
 
   - type: checkboxes
     id: upstream
