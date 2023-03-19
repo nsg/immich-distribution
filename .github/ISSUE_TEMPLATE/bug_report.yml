@@ -6,7 +6,11 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thanks for taking the time to fill out this bug report!
+        ## What's a bug?
+        A bug is an error, flaw or fault in the design or operation that causes
+        it to produce an incorrect or unexpected result, or to behave in
+        unintended ways.
+
   - type: textarea
     id: what-happened
     attributes:
