@@ -83,6 +83,10 @@ To connect with an external tool, fetch the database password with `sudo snap ge
 psql -h 127.0.0.1 -U postgres
 ```
 
+## External Sync
+
+The sync service is an extension written to connect external synchronization services to Immich, like for example Syncthing or Nextcloud. For more information read [SYNC.md](SYNC.md).
+
 ## Contribute
 
 Feel free to contribute changes and open issues. I will happily merge changes that do not change the scope of this project. An easy way to help me are:

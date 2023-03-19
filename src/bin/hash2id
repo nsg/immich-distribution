@@ -1,0 +1,6 @@
+#!/bin/bash
+
+. $SNAP/bin/load-env
+
+H=$(echo $1 | tr -cd '[:digit:]a-f')
+echo "select id from assets where checksum = '\x$H'" | $SNAP/bin/psql -d immich -At

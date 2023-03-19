@@ -118,6 +118,15 @@ apps:
       - network-bind
       - network
 
+  sync:
+    command: bin/sync
+    daemon: simple
+    restart-delay: 10s
+    after:
+      - immich-server
+    plugs:
+      - network
+
 parts:
   node:
     plugin: nil
@@ -276,6 +285,9 @@ parts:
     plugin: dump
     stage-packages:
       - util-linux
+      - fswatch
+      - curl
+      - jq
 
   patches:
     source: patches

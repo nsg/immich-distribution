@@ -1,0 +1,4 @@
+#!/bin/bash
+
+. $SNAP/bin/load-env
+python3 $SNAP/bin/sync.py
