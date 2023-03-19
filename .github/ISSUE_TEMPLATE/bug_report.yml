@@ -1,5 +1,6 @@
 name: Bug Report
 description: Have you found something wrong with Immich, submit a bug report.
+title: "Please provide a good descriptive title"
 labels: ["bug"]
 body:
   - type: markdown
