@@ -2,14 +2,22 @@ name: Bug Report
 description: Have you found something wrong with Immich, submit a bug report.
 title: "Please provide a good descriptive title"
 labels: ["bug"]
+assignees: ["nsg"]
 body:
   - type: markdown
     attributes:
       value: |
         ## What's a bug?
-        A bug is an error, flaw or fault in the design or operation that causes
-        it to produce an incorrect or unexpected result, or to behave in
-        unintended ways.
+        A bug is an error, flaw or fault in the design or operation that causes it to produce an incorrect or unexpected result, or to behave in unintended ways.
+
+  - type: checkboxes
+    id: upstream
+    attributes:
+      label: Immich docker-compose.yml
+      description: |
+        I have tried docker-compose.yml and this problem is unique to Immich Distribution.
+      options:
+        - label: A Immich Distribution
 
   - type: textarea
     id: what-happened
@@ -17,6 +25,6 @@ body:
       label: What happened?
       description: Also tell us, what did you expect to happen?
       placeholder: Tell us what you see!
-      value: "A bug happened!"
+      value: "A well written text is easier for me to understand, and fix quickly."
     validations:
       required: true
