@@ -8,16 +8,16 @@ body:
     attributes:
       value: |
         ## What's a bug?
-        A bug is an error, flaw or fault in the design or operation that causes it to produce an incorrect or unexpected result, or to behave in unintended ways. For feature requests, support questions or general issues please [select the a apropiate issue type](https://github.com/nsg/immich-distribution/issues/new/choose).
+        A bug is an error, flaw or fault in the design or operation that causes it to produce an incorrect or unexpected result, or to behave in unintended ways. For feature requests, support questions or general issues please [select an apropiate issue type](https://github.com/nsg/immich-distribution/issues/new/choose).
 
   - type: checkboxes
     id: upstream
     attributes:
-      label: Immich docker-compose.yml
+      label: Docker Compose
       description: |
-        I have tried docker-compose.yml and this problem is unique to Immich Distribution.
+        The official (upstream) Immich installation is distributed via [docker-compose](https://immich.app/docs/install/docker-compose). Have you tried docker-compose.yml to see if this is an upstream problem, or is unique to this package (Immich Distribution)?.
       options:
-        - label: A Immich Distribution
+        - label: This is an Immich Distribution specific bug
 
   - type: textarea
     id: what-happened
