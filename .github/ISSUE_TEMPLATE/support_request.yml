@@ -1,0 +1,37 @@
+name: Support request
+description: I need help with something
+title: "Please provide a good descriptive title"
+labels: ["question"]
+assignees: ["nsg"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Support request
+        A support request is a question about the project, or help to undersand something related. For bugs, features requests or general issues please [select an appropriate issue type](https://github.com/nsg/immich-distribution/issues/new/choose).
+
+        ## Before you ask a question
+        * Search the [issues](https://github.com/nsg/immich-distribution/issues?q=is%3Aissue+label%3Aquestion) after similar questions.
+        * Read the [README](https://github.com/nsg/immich-distribution/blob/master/README.md)
+        * Read [Immich Documentation](https://immich.app/docs/overview/introduction)
+        
+        ## Topic
+        Keep an issue on topic, if you have several questions open several issues.
+
+        ## This projects scope
+        This project relies on upstream Immich releases. General Immich questions will probably be better to ask [Immich directly](https://immich.app/docs/overview/help).
+
+  - type: textarea
+    id: question
+    attributes:
+      label: Question
+      description: Please provide a well written question.
+      placeholder: Question
+    validations:
+      required: true
+
+  - type: markdown
+    attributes:
+      value: |
+        ## Thank you!
+        Thank you for using the software. Keep an eye on this issue for updates or additional questions.
