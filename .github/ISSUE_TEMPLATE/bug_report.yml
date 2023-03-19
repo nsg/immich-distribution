@@ -28,9 +28,9 @@ body:
       required: true
 
   - type: dropdown
-    id: channel
+    id: linux-distribution
     attributes:
-      label: Channel
+      label: Linux Distribution
       description: On what distribution are you observing the problem?
       options:
         - Ubuntu 22.04 LTS
