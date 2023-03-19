@@ -14,10 +14,10 @@ body:
         This project relies on upstream Immich releases. Changes to Immich will probably be better to [suggest to Immich directly](https://github.com/immich-app/immich/issues).
 
   - type: textarea
-    id: idea
+    id: problem
     attributes:
-      label: Idea
-      description: Is your feature request related to a problem? Please describe your idea.
+      label: The problem
+      description: Is your feature request related to a problem?
       placeholder: A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
     validations:
       required: true
