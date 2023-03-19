@@ -1,0 +1,8 @@
+name: Bug Report
+description: Have you found something wrong with Immich, submit a bug report.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report!
