@@ -1,0 +1,56 @@
+name: Feature request
+description: Suggest an idea for this project
+title: "Please provide a good descriptive title"
+labels: ["enhancement"]
+assignees: ["nsg"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## What's a feature request?
+        A feature request is an idea or suggestion that expands/adds a feature to the project. For bugs, support questions or general issues please [select an appropriate issue type](https://github.com/nsg/immich-distribution/issues/new/choose).
+
+        ## This projects scope
+        This project relies on upstream Immich releases. Changes to Immich will probably be better to [suggest to Immich directly](https://github.com/immich-app/immich/issues).
+
+  - type: textarea
+    id: idea
+    attributes:
+      label: Idea
+      description: Is your feature request related to a problem? Please describe your idea.
+      placeholder: A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Solution
+      description: Describe the solution you'd like
+      placeholder: A clear and concise description of what you want to happen.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives
+      description: Describe alternatives you've considered
+      placeholder: A clear and concise description of any alternative solutions or features you've considered.
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional content
+      description: Additional context
+      placeholder: Add any other context or screenshots about the feature request here.
+    validations:
+      required: false
+
+  - type: markdown
+    attributes:
+      value: |
+        ## Thank you!
+        Thank you for using the software. Keep an eye on this issue for updates or additional questions.
