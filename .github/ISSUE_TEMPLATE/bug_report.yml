@@ -49,3 +49,14 @@ body:
       placeholder: Tell us what you see!
     validations:
       required: true
+
+  - type: textarea
+    id: journald
+    attributes:
+      label: Provide logs from journalctl
+      description: |
+        Extract relevant logs from journalctl and provide them in the field below. To extract the last 100 log messages type `journalctl -eu 'snap.immich-distribution*' -n 100 > last-100-messages.txt`, provide the content of the file below.
+      placeholder: Provide logs!
+      render: bash
+    validations:
+      required: false
