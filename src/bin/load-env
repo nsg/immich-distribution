@@ -17,8 +17,10 @@ export REVERSE_GEOCODING_PRECISION="3"
 
 export IMMICH_WEB_URL="http://127.0.0.1:3000"
 export IMMICH_SERVER_URL="http://127.0.0.1:3001"
-export IMMICH_MACHINE_LEARNING_URL="http://127.0.0.1:3003"
 export IMMICH_API_URL_EXTERNAL="http://localhost"
+
+export IMMICH_MACHINE_LEARNING_URL="http://127.0.0.1:3003"
+export MACHINE_LEARNING_LOG_LEVEL="warning"
 
 export TYPESENSE_API_KEY="$(snapctl get typesense-key)"
 export TYPESENSE_DATA_DIR="$SNAP_COMMON/typesense"
