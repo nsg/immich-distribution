@@ -1,7 +1,7 @@
 name: immich-distribution
 title: Immich Distribution
 base: core20
-version: '1.50.1+dist0.1'
+version: '1.51.2+dist0.1'
 summary: This is an Immich Distribution packaged by the community.
 description: |
   This is an Immich Distribution packaged inside a snap package.
@@ -28,6 +28,8 @@ layout:
     symlink: $SNAP_COMMON/reverse-geocoding-dump
   $SNAP/usr/src/app/upload:
     symlink: $SNAP_COMMON/upload
+  $SNAP/usr/src/ml/upload:
+    symlink: $SNAP_COMMON/upload
 
 apps:
   psql:
@@ -38,21 +40,32 @@ apps:
   postgres:
     command: bin/postgres
     daemon: simple
+    restart-delay: 10s
     plugs:
       - network-bind
 
   redis-server:
     command: bin/redis-server $SNAP/etc/redis.conf
     daemon: simple
+    restart-delay: 10s
+    plugs:
+      - network-bind
+
+  typesense:
+    command: bin/typesense
+    daemon: simple
+    restart-delay: 10s
     plugs:
       - network-bind
 
   immich-server:
     command: bin/immich-server
     daemon: simple
+    restart-delay: 10s
     after:
       - redis-server
       - postgres
+      - typesense
     plugs:
       - network-bind
       - network
@@ -60,6 +73,7 @@ apps:
   immich-microservices:
     command: bin/immich-microservices
     daemon: simple
+    restart-delay: 10s
     after:
       - redis-server
       - postgres
@@ -71,9 +85,11 @@ apps:
   immich-web:
     command: bin/immich-web
     daemon: simple
+    restart-delay: 10s
     after:
       - redis-server
       - postgres
+      - immich-server
     plugs:
       - network-bind
       - network
@@ -86,6 +102,7 @@ apps:
   immich-machine-learning:
     command: bin/immich-machine-learning
     daemon: simple
+    restart-delay: 10s
     after:
       - redis-server
       - postgres
@@ -127,7 +144,7 @@ parts:
     plugin: npm
     npm-node-version: "16.19.1"
     source: https://github.com/immich-app/immich.git
-    source-tag: v1.50.1
+    source-tag: v1.51.2
     source-subdir: server
     override-build: |
       cd server
@@ -152,7 +169,7 @@ parts:
     plugin: npm
     npm-node-version: "16.19.1"
     source: https://github.com/immich-app/immich.git
-    source-tag: v1.50.1
+    source-tag: v1.51.2
     source-subdir: web
     override-build: |
       patch -p0 -i $SNAPCRAFT_PART_SRC/../../patches/src/001-version-announcement-box.patch -d $SNAPCRAFT_PART_BUILD
@@ -171,16 +188,19 @@ parts:
   machine-learning:
     plugin: python
     source: https://github.com/immich-app/immich.git
-    source-tag: v1.50.1
+    source-tag: v1.51.2
     source-subdir: machine-learning
     build-environment:
       - SNAPCRAFT_PYTHON_VENV_INTERP_PATH: /root/parts/machine-learning/install/bin/python3
     override-build: |
       snapcraftctl build
       pip install --pre torch  -f https://download.pytorch.org/whl/nightly/cpu/torch_nightly.html
-      pip install transformers tqdm numpy scikit-learn scipy nltk sentencepiece flask Pillow
+      pip install transformers tqdm numpy scikit-learn scipy nltk sentencepiece flask Pillow gunicorn
       pip install --no-deps sentence-transformers
-      cp machine-learning/src/*.py $SNAPCRAFT_PART_INSTALL/bin
+      mkdir -p $SNAPCRAFT_PART_INSTALL/usr/src/ml
+      cp -r machine-learning/src $SNAPCRAFT_PART_INSTALL/usr/src/ml
+      cp machine-learning/gunicorn.conf.py $SNAPCRAFT_PART_INSTALL/usr/src/ml
+      sed 's/^worker_tmp_dir.*/worker_tmp_dir = "\/tmp"/' -i $SNAPCRAFT_PART_INSTALL/usr/src/ml/gunicorn.conf.py
     stage-packages:
       - libgomp1
 
@@ -188,7 +208,7 @@ parts:
     plugin: npm
     npm-node-version: "16.19.1"
     source: https://github.com/immich-app/CLI.git
-    source-tag: v0.32.0
+    source-tag: v0.34.0
     override-build: |
       npm install
       npm run build
@@ -224,6 +244,12 @@ parts:
       cd contrib
       make
       make install DESTDIR=$SNAPCRAFT_PART_INSTALL
+
+  typesense:
+    source: https://dl.typesense.org/releases/0.24.0/typesense-server-0.24.0-linux-amd64.tar.gz
+    plugin: dump
+    organize:
+      typesense-server: bin/typesense-server
 
   haproxy:
     source: http://git.haproxy.org/git/haproxy-2.6.git

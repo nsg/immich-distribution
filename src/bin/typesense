@@ -1,0 +1,11 @@
+#!/bin/bash
+
+. $SNAP/bin/load-env
+
+if [ -z $TYPESENSE_API_KEY ]; then
+    echo "NOTE: TYPESENSE_API_KEY not set, typesense will not be started"
+    sleep 2
+    exit 1
+fi
+
+$SNAP/bin/typesense-server
