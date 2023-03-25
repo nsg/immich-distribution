@@ -28,6 +28,8 @@ layout:
     symlink: $SNAP_COMMON/reverse-geocoding-dump
   $SNAP/usr/src/app/upload:
     symlink: $SNAP_COMMON/upload
+  $SNAP/usr/src/ml/upload:
+    symlink: $SNAP_COMMON/upload
 
 apps:
   psql:
@@ -171,16 +173,19 @@ parts:
   machine-learning:
     plugin: python
     source: https://github.com/immich-app/immich.git
-    source-tag: v1.50.1
+    source-tag: v1.51.2
     source-subdir: machine-learning
     build-environment:
       - SNAPCRAFT_PYTHON_VENV_INTERP_PATH: /root/parts/machine-learning/install/bin/python3
     override-build: |
       snapcraftctl build
       pip install --pre torch  -f https://download.pytorch.org/whl/nightly/cpu/torch_nightly.html
-      pip install transformers tqdm numpy scikit-learn scipy nltk sentencepiece flask Pillow
+      pip install transformers tqdm numpy scikit-learn scipy nltk sentencepiece flask Pillow gunicorn
       pip install --no-deps sentence-transformers
-      cp machine-learning/src/*.py $SNAPCRAFT_PART_INSTALL/bin
+      mkdir -p $SNAPCRAFT_PART_INSTALL/usr/src/ml
+      cp -r machine-learning/src $SNAPCRAFT_PART_INSTALL/usr/src/ml
+      cp machine-learning/gunicorn.conf.py $SNAPCRAFT_PART_INSTALL/usr/src/ml
+      sed 's/^worker_tmp_dir.*/worker_tmp_dir = "\/tmp"/' -i $SNAPCRAFT_PART_INSTALL/usr/src/ml/gunicorn.conf.py
     stage-packages:
       - libgomp1
 

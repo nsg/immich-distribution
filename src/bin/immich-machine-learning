@@ -3,9 +3,10 @@
 . $SNAP/bin/load-env
 . $SNAP/bin/activate
 
+export PYTHONDONTWRITEBYTECODE=1
+export PYTHONUNBUFFERED=1
+
 banner
 
-# Relative paths to upload are sent via the API
-cd $SNAP_COMMON
-
-python $SNAP/bin/main.py
+cd $SNAP/usr/src/ml
+python3 $SNAP/bin/gunicorn src.main:server
