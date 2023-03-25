@@ -15,7 +15,7 @@ description: |
 
   This is **NOT** an official package. For support, open an issue on
   the link above.
-grade: devel
+grade: stable
 confinement: strict
 architectures:
   - amd64
