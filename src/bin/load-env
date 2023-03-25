@@ -21,6 +21,7 @@ export IMMICH_API_URL_EXTERNAL="http://localhost"
 
 export IMMICH_MACHINE_LEARNING_URL="http://127.0.0.1:3003"
 export MACHINE_LEARNING_LOG_LEVEL="warning"
+export MACHINE_LEARNING_IP="127.0.0.1"
 
 export TYPESENSE_API_KEY="$(snapctl get typesense-key)"
 export TYPESENSE_DATA_DIR="$SNAP_COMMON/typesense"
