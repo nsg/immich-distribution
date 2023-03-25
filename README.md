@@ -40,6 +40,8 @@ Updates are automatic, this is a core concept of Snap. If you do not like this, 
 | beta | Help me to try out new code |
 | edge | Development release, will break from time to time |
 
+![](/docs/channel-flow.png)
+
 Automatic updates from "candidate to candidate", "stable to stable" or "stable to candidate" should always work. Otherwise I consider it a bug. The snap may contain migration logic that makes hard to downgrade, this is not supported.
 
 ## Included software
