@@ -20,6 +20,11 @@ export IMMICH_SERVER_URL="http://127.0.0.1:3001"
 export IMMICH_MACHINE_LEARNING_URL="http://127.0.0.1:3003"
 export IMMICH_API_URL_EXTERNAL="http://localhost"
 
+export TYPESENSE_API_KEY="$(snapctl get typesense-key)"
+export TYPESENSE_DATA_DIR="$SNAP_COMMON/typesense"
+export TYPESENSE_API_ADDRESS="127.0.0.1"
+export TYPESENSE_HOST="127.0.0.1"
+
 drop_privileges() {
     $SNAP/usr/bin/setpriv \
         --clear-groups \

@@ -1,7 +1,7 @@
 name: immich-distribution
 title: Immich Distribution
 base: core20
-version: '1.50.1+dist0.1'
+version: '1.51.2+dist0.1'
 summary: This is an Immich Distribution packaged by the community.
 description: |
   This is an Immich Distribution packaged inside a snap package.
@@ -49,12 +49,19 @@ apps:
     plugs:
       - network-bind
 
+  typesense:
+    command: bin/typesense
+    daemon: simple
+    plugs:
+      - network-bind
+
   immich-server:
     command: bin/immich-server
     daemon: simple
     after:
       - redis-server
       - postgres
+      - typesense
     plugs:
       - network-bind
       - network
@@ -76,6 +83,7 @@ apps:
     after:
       - redis-server
       - postgres
+      - immich-server
     plugs:
       - network-bind
       - network
@@ -129,7 +137,7 @@ parts:
     plugin: npm
     npm-node-version: "16.19.1"
     source: https://github.com/immich-app/immich.git
-    source-tag: v1.50.1
+    source-tag: v1.51.2
     source-subdir: server
     override-build: |
       cd server
@@ -154,7 +162,7 @@ parts:
     plugin: npm
     npm-node-version: "16.19.1"
     source: https://github.com/immich-app/immich.git
-    source-tag: v1.50.1
+    source-tag: v1.51.2
     source-subdir: web
     override-build: |
       patch -p0 -i $SNAPCRAFT_PART_SRC/../../patches/src/001-version-announcement-box.patch -d $SNAPCRAFT_PART_BUILD
@@ -229,6 +237,12 @@ parts:
       cd contrib
       make
       make install DESTDIR=$SNAPCRAFT_PART_INSTALL
+
+  typesense:
+    source: https://dl.typesense.org/releases/0.24.0/typesense-server-0.24.0-linux-amd64.tar.gz
+    plugin: dump
+    organize:
+      typesense-server: bin/typesense-server
 
   haproxy:
     source: http://git.haproxy.org/git/haproxy-2.6.git
