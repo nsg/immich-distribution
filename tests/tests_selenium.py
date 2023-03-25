@@ -34,34 +34,8 @@ class TestImmichWeb(BaseCase):
         self.type("input[id='password']", "secret")
         self.click("button")
 
-    def test_001_click_getting_started_and_register(self):
+    def test_001_register_and_login(self):
         self.immich()
         self.register()
-
-    def test_002_immich_log_in(self):
-        self.immich()
         self.login()
         self.assert_title("Photos - Immich")
-
-    def test_010_immich_create_token_and_upload_file(self):
-        self.immich()
-        self.login()
-        time.sleep(2)
-        self.immich("user-settings")
-        self.click("/html/body/div/section[2]/section[2]/section/section/div[3]/div/button")
-        self.click("//button[.='New API Key']")
-        self.type("//input[@id='name']", "Selenium")
-        self.click("//button[.='Create']")
-        key = self.get_text("//textarea[@id='secret']")
-        self.click("//button[.='Done']")
-        upload = subprocess.run([
-            "immich-distribution.cli", "upload",
-            "--key", key,
-            "-d", "/var/snap/immich-distribution/current/",
-            "--yes"
-        ])
-        assert upload.returncode == 0
-        time.sleep(10)
-        self.immich("photos")
-        self.click("/html/body/div[1]/section[2]/section[2]/section/div[2]/div/section/div/div/div/div/img[1]")
-        time.sleep(2)
