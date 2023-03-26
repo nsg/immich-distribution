@@ -77,7 +77,9 @@ def watch_created(user_path, key):
 
     for line in iter(process.stdout.readline, ""):
         file_path = line.decode().strip()
-        if os.path.exists(file_path) and not re.search(r'/\.[^/]+$', file_path):
+        is_dir = os.path.isdir(file_path)
+        is_hidden = re.search(r'/\.[^/]+$', file_path)
+        if os.path.exists(file_path) and not is_dir and not is_hidden:
             h = hash_file(file_path)
             db['hash'][h] = file_path
             db['file'][hashlib.sha256(line).hexdigest()] = h
