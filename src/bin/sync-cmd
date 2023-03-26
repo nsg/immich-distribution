@@ -1,0 +1,9 @@
+#!/bin/bash
+
+if [ -z $SNAP ]; then
+    . src/bin/load-env
+else
+    . $SNAP/bin/load-env
+fi
+
+

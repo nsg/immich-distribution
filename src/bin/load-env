@@ -1,6 +1,14 @@
 #!/bin/bash
 
-export LD_LIBRARY_PATH="$SNAP/usr/local/pgsql/lib:$SNAP/usr/lib/x86_64-linux-gnu/pulseaudio:$LD_LIBRARY_PATH"
+snapctl() {
+    if [ -z $SNAP ]; then
+        sudo snap $1 immich-distribution $2
+    else
+        /usr/bin/snapctl $1 $2
+    fi
+}
+
+export LD_LIBRARY_PATH="$SNAP/usr/local/pgsql/lib:$SNAP/usr/lib/x86_64-linux-gnu/pulseaudio:$SNAP/usr/lib/x86_64-linux-gnu/libfswatch:$LD_LIBRARY_PATH"
 
 export LC_ALL="C"
 export LC_CTYPE="C"
@@ -18,6 +26,7 @@ export REVERSE_GEOCODING_PRECISION="3"
 export IMMICH_WEB_URL="http://127.0.0.1:3000"
 export IMMICH_SERVER_URL="http://127.0.0.1:3001"
 export IMMICH_API_URL_EXTERNAL="http://localhost"
+export IMMICH_SERVER_ADDRESS="$IMMICH_SERVER_URL" # CLI
 
 export IMMICH_MACHINE_LEARNING_URL="http://127.0.0.1:3003"
 export MACHINE_LEARNING_LOG_LEVEL="warning"
@@ -34,6 +43,18 @@ drop_privileges() {
         --reuid snap_daemon \
         --regid snap_daemon \
         -- $@
+}
+
+immich_server_ready() {
+    curl -s "$IMMICH_SERVER_URL/server-info/ping" -o /dev/null
+}
+
+immich_api() {
+    curl -s "$IMMICH_SERVER_URL/$2" -H 'Accept: application/json' -H "x-api-key: $1"
+}
+
+user_id() {
+    immich_api "$1" user/me | jq -r .id
 }
 
 banner() {

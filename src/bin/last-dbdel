@@ -1,0 +1,11 @@
+#!/bin/bash
+
+. $SNAP/bin/load-env
+
+echo "
+SELECT checksum
+FROM assets_delete_audits
+WHERE file_removed='false'
+ORDER BY changed_on desc
+LIMIT 1
+" | $SNAP/bin/psql -d immich -At | cut -c 3-
