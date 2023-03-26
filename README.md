@@ -83,6 +83,28 @@ To connect with an external tool, fetch the database password with `sudo snap ge
 psql -h 127.0.0.1 -U postgres
 ```
 
+### immich-distribution.backup
+
+```
+immich-distribution.backup [-d] [-a]
+
+-d	Backup database
+-a	Backup assets (images, videos, ...)
+```
+
+The recommended way to backup Immich is to do a database backup, and then manually backup the assets directly from `/var/snap/immich-distribution/common/upload`.
+
+### immich-distribution.import
+
+```
+immich-distribution.import [-d database-backup] [-a assets-backup]
+
+-d	FILE   Import a database backup
+-a	FILE   Import assets (images, videos, ...) from an asset backup
+```
+
+Note that this will DESTROY and OVERWRITE your current install!
+
 ## External Sync
 
 The sync service is an extension written to connect external synchronization services to Immich, like for example Syncthing or Nextcloud. For more information read [SYNC.md](SYNC.md).
