@@ -127,6 +127,12 @@ apps:
     plugs:
       - network
 
+  backup:
+    command: bin/backup
+
+  import:
+    command: bin/import
+
 parts:
   node:
     plugin: nil
@@ -288,6 +294,7 @@ parts:
       - fswatch
       - curl
       - jq
+      - xz-utils
 
   patches:
     source: patches

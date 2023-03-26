@@ -1,0 +1,47 @@
+#!/bin/bash
+
+. $SNAP/bin/load-env
+
+export PGDATA="$SNAP_COMMON/pgsql/data"
+
+TIME="$(date +%FT%H%M%S)"
+BACKUP_DB_FILE="$SNAP_COMMON/backups/immich_database_$TIME.sql.xz"
+BACKUP_AS_FILE="$SNAP_COMMON/backups/immich_assets_$TIME.tar.xz"
+
+usage() {
+    echo "$0 [-d] [-a]"
+    echo
+    echo -e "-d\tBackup database"
+    echo -e "-a\tBackup assets (images, videos, ...)"
+    echo
+    echo "The recommended way to backup Immich is to do a" \
+         "database backup, and then manually backup the" \
+         "assets directly from $SNAP_COMMON/upload"
+    exit 1
+}
+
+backup_database() {
+    echo "Creating database backup: $BACKUP_DB_FILE"
+    drop_privileges $SNAP/usr/local/pgsql/bin/pg_dump -U postgres --clean immich | xz > $BACKUP_DB_FILE
+}
+
+backup_assets() {
+    echo "Creating assets backup: $BACKUP_AS_FILE"
+    tar cJf "$BACKUP_AS_FILE" $SNAP_COMMON/upload
+}
+
+[ -z $1 ] && usage
+
+while getopts dah option; do
+    case "$option" in
+        d) 
+            backup_database
+            ;;
+        a)
+            backup_assets
+            ;;
+        *|h)
+            usage
+            ;;
+    esac
+done
