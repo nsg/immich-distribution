@@ -61,7 +61,11 @@ def hash_file(path):
 def load_hash_db(user_path):
     file = f"{user_path}/hash.db"
     if os.path.exists(file):
-        return json.load(open(file))
+        try:
+            return json.load(open(file))
+        except json.decoder.JSONDecodeError:
+            time.sleep(1)
+            return load_hash_db(user_path)
     else:
         return {"file": {}, "hash": {}}
 
