@@ -7,6 +7,7 @@ import requests
 import threading
 import json
 import hashlib
+import re
 
 SNAP = os.getenv("SNAP")
 SNAP_COMMON = os.getenv("SNAP_COMMON")
@@ -75,12 +76,14 @@ def watch_created(user_path, key):
     db = load_hash_db(user_path)
 
     for line in iter(process.stdout.readline, ""):
-        h = hash_file(line.decode().strip())
-        db['hash'][h] = line.decode().strip()
-        db['file'][hashlib.sha256(line).hexdigest()] = h
+        file_path = line.decode().strip()
+        if os.path.exists(file_path) and not re.search(r'/\.[^/]+$', file_path):
+            h = hash_file(file_path)
+            db['hash'][h] = file_path
+            db['file'][hashlib.sha256(line).hexdigest()] = h
 
-        upload(key, line.decode().strip())
-        write_hash_db(user_path, db)
+            upload(key, file_path)
+            write_hash_db(user_path, db)
 
 def watch_removed(user_path, key):
     command = ["fswatch", "--recursive", "--event", "Removed", user_path]
