@@ -55,6 +55,7 @@ Automatic updates from "candidate to candidate", "stable to stable" or "stable t
 | Immich CLI | A CLI tool for bulk upload to Immich |
 | Postgres | Relational database used by Immich |
 | Redis | Fast key-value database used by Immich |
+| Typesense | Search focused database used by Immich |
 | HAProxy | Service that proxies traffic to Immich web and server |
 
 ## CLI commands
@@ -74,13 +75,13 @@ Note: The CLI is contained so it can't access files outside `/var/snap/immich-di
 To connect to the database with psql, run the following command.
 
 ```sh
-sudo immich-distribution.psql
+sudo immich-distribution.psql -d immich
 ```
 
 To connect with an external tool, fetch the database password with `sudo snap get immich-distribution database-password` and connect normally.
 
 ```sh
-psql -h 127.0.0.1 -U postgres
+psql -h 127.0.0.1 -U postgres -d immich
 ```
 
 ### immich-distribution.backup
