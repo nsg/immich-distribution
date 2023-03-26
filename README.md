@@ -12,7 +12,7 @@ This is an [Immich](https://immich.app/) Distribution packaged inside a [snap](h
 
 ## Requirements
 
-Immich [recommends](https://immich.app/docs/install/requirements) at least 2GB RAM (4 preferred) with 2 CPU cores (4 preferred). [Snapd requires](https://snapcraft.io/docs/installing-snapd) that you use Linux, Ubuntu is has it re-installed and is recommended. Only 64-bit x86 CPU:s are supported (amd64), ARM builds are possible but I do not build these packages because I have no ARM-based system with enough resources to test it. Finally you probably need a lot of free disk space, images are stored at `/var/snap`.
+I recommend a minimun of 4GB RAM (6 or more preferred) with 2 CPU cores (more preferred). The machine learning components consumes a lot of RAM, and video trancoding can be heavy. [Snapd also requires](https://snapcraft.io/docs/installing-snapd) that you use Linux (Ubuntu recommended). Only 64-bit x86 CPU:s are supported (amd64). Finally you probably need a lot of free disk space, pictures are stored at `/var/snap`.
 
 ## Installation
 [![immich-distribution](https://snapcraft.io/immich-distribution/badge.svg)](https://snapcraft.io/immich-distribution)
