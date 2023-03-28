@@ -108,6 +108,7 @@ def watch_removed(user_path, key):
 def watch_db():
     while True:
         time.sleep(10)
+        remove_failed = False
         hash = subprocess.check_output([f"{SNAP}/bin/last-dbdel"]).decode().strip()
         if hash:
             db = load_hash_db(user_path)
@@ -115,8 +116,13 @@ def watch_db():
                 file_path = db['hash'][hash]
                 if os.path.exists(file_path):
                     print(f"Remove {file_path}", flush=True)
-                    os.remove(file_path)
-            subprocess.run(f"{SNAP}/bin/mark-dbdel {hash}", shell=True)
+                    try:
+                        os.remove(file_path)
+                    except PermissionError:
+                        remove_failed = True
+
+            if not remove_failed:
+                subprocess.run(f"{SNAP}/bin/mark-dbdel {hash}", shell=True)
 
 while not immich_server_ready():
     print("Server not ready", flush=True)
