@@ -1,27 +1,15 @@
 name: New version
 description: Report the release of a new Immich version
-title: "Immich X.Y.Z released / Immich CLI X.Y.Z released"
-labels: ["enhancement"]
+title: "Immich X.Y released"
+labels: ["enhancement", "new-version"]
 assignees: ["nsg"]
 body:
-  - type: dropdown
-    id: software
-    attributes:
-      label: Software
-      description: What software has a new version?
-      options:
-        - Immich
-        - Immich CLI
-        - Something else
-    validations:
-      required: true
-
   - type: textarea
     id: message
     attributes:
       label: Message
       description: Explain what to update, what version is released?
-      placeholder: Immich version X.Y.Z is released
+      placeholder: Immich version X.Y is released
     validations:
       required: true
 
