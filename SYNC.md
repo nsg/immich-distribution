@@ -1,5 +1,15 @@
 # Sync
 
+I created this service because I use Syncthing to synchronize pictures with my phone. I like to have the option to clean up and remove pictures on my phone (in my favorite image gallery app), in a file manager on my computer or inside Immich Web from a browser. This service solves that.
+
+This allows service allows me to:
+
+* Delete files in Immich Web (in a browser) and pictures disappear on my phone as well
+* Delete or add files in a file manager on my computer and they appear/disappear from both Immich and my phone
+* Delete or add files in an app of my choice on my phone, they appear/disappear from Immich
+
+## How it works
+
 This script will synchronize changes in `/var/snap/immich-distribution/common/sync/b281b4f0-a911-49b1-abf2-bf5eeecedb32` with the Immich user with a matching `USER ID`. You can find your ID in Account Settings.
 
 The service supports the following events:

@@ -106,7 +106,7 @@ immich-distribution.import [-d database-backup] [-a assets-backup]
 
 Note that this will DESTROY and OVERWRITE your current install!
 
-## External Sync
+## Folder Sync
 
 The sync service is an extension written to connect external synchronization services to Immich, like for example Syncthing or Nextcloud. For more information read [SYNC.md](SYNC.md).
 
