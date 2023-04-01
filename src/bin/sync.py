@@ -74,6 +74,13 @@ def write_hash_db(user_path, db):
     with open(file, "w") as outfile:
         outfile.write(json.dumps(db))
 
+def full_import(user_path, key):
+    time.sleep(60)
+    while True:
+        command = [f"{SNAP}/bin/immich-cli", "upload", "--key", key, "--yes", "--recursive", user_path]
+        subprocess.run(" ".join(command), shell=True)
+        time.sleep(86400)
+
 def watch_created(user_path, key):
     command = ["fswatch", "--recursive", "--event", "Created", user_path]
     process = subprocess.Popen(command, stdout=subprocess.PIPE)
@@ -139,3 +146,5 @@ for key in get_keys():
     t2.start()
     t3 = threading.Thread(target=watch_db)
     t3.start()
+    t4 = threading.Thread(target=full_import, args=(user_path, key))
+    t4.start()
