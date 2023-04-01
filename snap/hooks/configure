@@ -14,3 +14,8 @@ fi
 if [[ $(snapctl get typesense-key) == "" ]]; then
     snapctl set typesense-key="$(random_string)"
 fi
+
+# Restart services
+snapctl restart immich-distribution.postgres
+snapctl restart immich-distribution.typesense
+snapctl restart immich-distribution.sync
