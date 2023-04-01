@@ -140,6 +140,8 @@ subprocess.run([f"{SNAP}/bin/modify-db"], shell=True)
 for key in get_keys():
     user_id = get_userid(key)
     user_path = f"{SNAP_COMMON}/sync/{user_id}"
+    if not os.path.exists(user_path):
+        os.mkdir(user_path)
     t1 = threading.Thread(target=watch_created, args=(user_path, key))
     t1.start()
     t2 = threading.Thread(target=watch_removed, args=(user_path, key))
