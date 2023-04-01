@@ -1,7 +1,7 @@
 name: immich-distribution
 title: Immich Distribution
 base: core20
-version: '1.51.2+dist0.1'
+version: '1.52.1+dist0.1'
 summary: This is an Immich Distribution packaged by the community.
 description: |
   This is an Immich Distribution packaged inside a snap package.
@@ -159,7 +159,7 @@ parts:
     plugin: npm
     npm-node-version: "16.19.1"
     source: https://github.com/immich-app/immich.git
-    source-tag: v1.51.2
+    source-tag: v1.52.1
     source-subdir: server
     override-build: |
       cd server
@@ -184,7 +184,7 @@ parts:
     plugin: npm
     npm-node-version: "16.19.1"
     source: https://github.com/immich-app/immich.git
-    source-tag: v1.51.2
+    source-tag: v1.52.1
     source-subdir: web
     override-build: |
       patch -p0 -i $SNAPCRAFT_PART_SRC/../../patches/src/001-version-announcement-box.patch -d $SNAPCRAFT_PART_BUILD
@@ -203,7 +203,7 @@ parts:
   machine-learning:
     plugin: python
     source: https://github.com/immich-app/immich.git
-    source-tag: v1.51.2
+    source-tag: v1.52.1
     source-subdir: machine-learning
     build-environment:
       - SNAPCRAFT_PYTHON_VENV_INTERP_PATH: /root/parts/machine-learning/install/bin/python3
