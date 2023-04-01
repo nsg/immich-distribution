@@ -1,0 +1,127 @@
+HTTP/1.0 503 Service Unavailable
+Cache-Control: no-cache
+Connection: close
+Content-Type: text/html
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>Immich loading</title>
+        <style>
+            body {
+                background-color: #070707;
+                color: #ebe9e9;
+                font-family: Verdana, Geneva, Tahoma, sans-serif
+            }
+
+            main {
+                margin: auto;
+                padding: 2em;
+                width: 600px;
+            }
+
+            a, a:visited {
+                color: rgb(158, 158, 196);
+            }
+            
+            .backend-status {
+                background-color: #2c2c2c;
+            }
+            
+            .backend-status > div {
+                padding: 0.4em;
+            }
+
+            .backend-status > div > span {
+                float: right;
+            }
+
+            footer {
+                padding: 0.4em;
+                margin-top: 1em;
+            }
+        </style>
+    </head>
+    <body>
+        <main>
+            <h1>Immich loading ...</h1>
+
+            <div class="backend-status">
+                <div id="backend-be_server">
+                    Immich Server
+                    <span></span>
+                </div>
+                <div id="backend-be_web">
+                    Immich Web
+                    <span></span>
+                </div>
+                <div id="backend-be_microservices">
+                    Microservices
+                    <span></span>
+                </div>
+                <div id="backend-be_ml">
+                    Machine Learning
+                    <span></span>
+                </div>
+                <div id="backend-be_typesense">
+                    Typesense (Search Database)
+                    <span></span>
+                </div>
+                <div id="backend-be_postgres">
+                    Postgres (Relational Database)
+                    <span></span>
+                </div>
+                <div id="backend-be_redis">
+                    Redis (In-memory key-value database)
+                    <span></span>
+                </div>
+                <div id="backend-stats">
+                    HAProxy Stats
+                    <span></span>
+                </div>
+            </div>
+
+            <footer>
+                You see this page because Immich Web is not ready. Give it a minute to get ready.
+                You can inspect the <a href="/haproxy">HAProxy stats</a> page for more information.
+                The page should reload automatically when everything is ready.
+            </footer>
+        </main>
+
+        <script>
+            function do_request() {
+                const request = new Request("/haproxy/;csv")
+                fetch(request).then((response) => {
+                    if (response.status === 200) {
+                        return response.text()
+                    }
+                }).then((data) => {
+                    lines = data.split("\n")
+                    down_backends = 0
+                    lines.forEach(line => {
+                        ld = line.split(",")
+                        if (ld[1] == "BACKEND") {
+                            if (ld[17] == "UP") {
+                                document.querySelector("#backend-"+ld[0]+" span").innerHTML = '✅';
+                            } else {
+                                document.querySelector("#backend-"+ld[0]+" span").innerHTML = '⛔';
+                                down_backends = down_backends + 1
+                            }
+                        }
+
+                    });
+                    
+                    console.log(down_backends)
+                    if (down_backends < 1) {
+                        location.reload();
+                    }
+                })
+
+                setTimeout(do_request, 2000)
+            }
+
+            setTimeout(do_request, 500)
+        </script>
+    </body>
+</html>
