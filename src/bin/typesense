@@ -8,4 +8,4 @@ if [ -z $TYPESENSE_API_KEY ]; then
     exit 1
 fi
 
-$SNAP/bin/typesense-server 2>&1 | grep -Ev "raft_server.cpp:545|raft_server.h:60"
+$SNAP/bin/typesense-server 2>&1 | grep -Ev "raft_server.cpp:545|raft_server.h:60|Running GC for aborted requests"
