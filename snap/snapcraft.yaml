@@ -1,7 +1,7 @@
 name: immich-distribution
 title: Immich Distribution
 base: core20
-version: '1.52.1+dist0.1'
+adopt-info: server
 summary: This is an Immich Distribution packaged by the community.
 description: |
   This is an Immich Distribution packaged inside a snap package.
@@ -162,6 +162,7 @@ parts:
     source-tag: v1.52.1
     source-subdir: server
     override-build: |
+      snapcraftctl set-version "$(git describe --tags)-dist1"
       cd server
       npm ci
       npm run build
