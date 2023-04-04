@@ -18,10 +18,10 @@ I recommend a minimun of 4GB RAM (6 or more preferred) with 2 CPU cores (more pr
 [![immich-distribution](https://snapcraft.io/immich-distribution/badge.svg)](https://snapcraft.io/immich-distribution)
 
 ```sh
-snap install immich-distribution # not yet published to stable
+snap install immich-distribution
 ```
 
-The package is about 500MB in size so it can take a little while to install. Point your browser to port 80 to get started!
+The package is over 500MB in size so it can take a little while to install. Point your browser to port 80 to get started!
 
 ### Security
 
