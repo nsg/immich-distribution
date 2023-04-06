@@ -13,6 +13,24 @@ body:
     validations:
       required: true
 
+  - type: textarea
+    id: update-stages
+    attributes:
+      label: Stages
+      description: Please leave this list untouched, I use this list as a checklist
+      value: |
+        1. Read the [release notes](https://github.com/immich-app/immich/releases) and figure out if I need to do something.
+        2. Run `./update.sh old-tag new-tag` like `./update.sh v1.52.1 v1.53.0` to diff a few select files and make relevant changes.
+        3. Read Immich Discord to get a feeling if there is any critical bugs (and maybe wait for a dot release).
+        4. Build and test it locally.
+        5. Push it to a branch in a PR, let CI run it's tests.
+        6. Merge the PR, wait for snapcraft build service to do it's thing and release a build to edge channel.
+        7. Promote it to the beta channel and test to.
+        8. Promote it to candidate and live with it my self for an appropriate amount of time.
+        9. Promote it to stable.
+    validations:
+      required: true
+
   - type: markdown
     attributes:
       value: |
