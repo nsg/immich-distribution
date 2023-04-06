@@ -22,10 +22,12 @@ body:
         - [ ] Read the [release notes](https://github.com/immich-app/immich/releases) and figure out if I need to do something.
         - [ ] Run `./update.sh old-tag new-tag` like `./update.sh v1.52.1 v1.53.0` to diff a few select files and make relevant changes.
         - [ ] Read Immich Discord to get a feeling if there is any critical bugs (and maybe wait for a dot release).
+        - [ ] Check for new releases of the [Immich CLI](https://github.com/immich-app/CLI/releases).
         - [ ] Build and test it locally.
         - [ ] Push it to a branch in a PR, let CI run it's tests.
-        - [ ] Merge the PR, wait for snapcraft build service to do it's thing and release a build to edge channel.
-        - [ ] Promote it to the beta channel and test to.
+        - [ ] Merge the PR.
+        - [ ] Wait for snapcraft build service to do it's thing and release a build to edge channel.
+        - [ ] Promote it to the beta channel and test it.
         - [ ] Promote it to candidate and live with it my self for an appropriate amount of time.
         - [ ] Promote it to stable.
     validations:
