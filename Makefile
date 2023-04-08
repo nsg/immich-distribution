@@ -11,5 +11,8 @@ build:
 install:
 	sudo snap install --dangerous ${SNAP_FILE}
 
+shell:
+	multipass shell snapcraft-immich-distribution
+
 clean:
 	rm -rf SNAP_COMMON tests/latest_logs/ *.snap
