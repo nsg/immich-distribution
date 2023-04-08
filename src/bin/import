@@ -25,6 +25,8 @@ restore_assets() {
     tar -C "/" -xf "$1"
 }
 
+root_check
+
 [ -z $1 ] && usage
 
 while getopts d:a:h option; do
