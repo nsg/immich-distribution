@@ -133,6 +133,20 @@ apps:
   import:
     command: bin/import
 
+  register-lets-encrypt-account:
+    command: bin/acme-register
+    plugs:
+      - network
+
+  acme:
+    command: bin/acme
+    daemon: simple
+    restart-delay: 60s
+    timer: "00:00-24:00/2"
+    plugs:
+      - network
+      - network-bind
+
 parts:
   node:
     plugin: nil
@@ -286,6 +300,19 @@ parts:
       - -usr/local/share
     organize:
       usr/local/sbin/haproxy: bin/haproxy
+
+  acme:
+    source: https://github.com/ndilieto/uacme.git
+    source-tag: upstream/1.7.4
+    plugin: make
+    override-build: |
+      ./configure --disable-maintainer-mode --disable-docs
+      snapcraftctl build
+    build-packages:
+      - libcurl4-openssl-dev
+      - libgnutls28-dev
+    prime:
+      - usr/local/bin/uacme
 
   scripts:
     source: src

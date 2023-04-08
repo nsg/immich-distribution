@@ -1,0 +1,36 @@
+#!/bin/bash
+
+. $SNAP/bin/load-env
+
+ACME_METHOD=$1
+ACME_TYPE=$2
+ACME_IDENT=$3
+ACME_TOKEN=$4
+ACME_AUTH=$5
+
+ACME_CHALLENGE_PATH="$SNAP_COMMON/acme/challenge"
+ACME_CHALLENGE_PATH_FULL="${ACME_CHALLENGE_PATH}/$ACME_TOKEN"
+
+mkdir -p "$ACME_CHALLENGE_PATH"
+
+if [ "x$ACME_TYPE" != "xhttp-01" ]; then
+    echo "Error, only http-01 supported"
+    exit 1
+fi
+
+case "$1" in
+    begin)
+        printf "%s" "$ACME_AUTH" > "$ACME_CHALLENGE_PATH_FULL" || exit 1
+        ;;
+    done)
+        echo "Challenge succeded"
+        rm "$ACME_CHALLENGE_PATH_FULL"
+        ;;
+    failed)
+        echo "Failed challenge"
+        rm "$ACME_CHALLENGE_PATH_FULL"
+        ;;
+    *)
+        echo "Error, unkown method"
+        exit 1
+esac

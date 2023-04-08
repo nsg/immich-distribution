@@ -57,6 +57,7 @@ Automatic updates from "candidate to candidate", "stable to stable" or "stable t
 | Redis | Fast key-value database used by Immich |
 | Typesense | Search focused database used by Immich |
 | HAProxy | Service that proxies traffic to Immich web and server |
+| [uacme](https://github.com/ndilieto/uacme) | A Let's Encrypt ACME client used to checkout TLS certificates |
 
 ## CLI commands
 
@@ -105,6 +106,13 @@ immich-distribution.import [-d database-backup] [-a assets-backup]
 ```
 
 Note that this will DESTROY and OVERWRITE your current install!
+
+## Enable HTTP (Let's Encrypt)
+
+1. Make a Let's Encrypt Account by running `immich-distribution.register-lets-encrypt-account`
+2. Select a domain with `snap set immich-distribution acme-domain="immich.example.com"`
+
+This server needs to be available over port 80 on immich.example.com _before_ step 2 is executed.
 
 ## Folder Sync
 
