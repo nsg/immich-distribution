@@ -147,6 +147,12 @@ apps:
       - network
       - network-bind
 
+  issue-certificate:
+    command: bin/acme
+    plugs:
+      - network
+      - network-bind
+
 parts:
   node:
     plugin: nil
