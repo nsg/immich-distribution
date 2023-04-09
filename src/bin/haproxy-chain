@@ -1,0 +1,10 @@
+#!/bin/bash
+
+. $SNAP/bin/load-env
+
+mkdir -p $ACME_CONFIG_PATH/haproxy
+rm $ACME_CONFIG_PATH/haproxy/*.pem
+ln -s "$ACME_CONFIG_PATH/$ACME_DOMAIN/cert.pem" $ACME_CONFIG_PATH/haproxy/cert.pem
+ln -s "$ACME_CONFIG_PATH/private/$ACME_DOMAIN/key.pem" $ACME_CONFIG_PATH/haproxy/cert.pem.key
+
+exec $@
