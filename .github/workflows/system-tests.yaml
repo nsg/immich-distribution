@@ -38,4 +38,4 @@ jobs:
         run: pip install -r tests/requirements.txt
 
       - name: Run Selenium Tests
-        run: make -C tests
+        run: make ci -C tests
