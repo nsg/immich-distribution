@@ -109,11 +109,12 @@ Note that this will DESTROY and OVERWRITE your current install!
 
 ## Enable HTTP (Let's Encrypt)
 
-1. Make a Let's Encrypt Account by running `sudo immich-distribution.register-lets-encrypt-account`
-2. Select a domain with `sudo snap set immich-distribution acme-domain="immich.example.com"`
-3. Run `sudo immich-distribution.issue-certificate` to obtain the certificate
+1. Point a domain name that you control to the Immich server. I assume it's publically available and port 80 and 443 are open to the world.
+2. Set the domain with `sudo snap set immich-distribution acme-domain="immich.example.com"`
+3. Provide an email used by Let's Encrypt `sudo snap set immich-distribution acme-email="immich@example.com"`
+4. Make a Let's Encrypt Account and issue a certificate by running `sudo immich-distribution.lets-encrypt`
 
-This server needs to be available over port 80 on immich.example.com _before_ step 3 is executed.
+This server needs to be available over port 80 on immich.example.com _before_ step 4 is executed.
 
 ## Folder Sync
 

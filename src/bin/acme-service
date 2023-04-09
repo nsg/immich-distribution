@@ -1,0 +1,20 @@
+#!/bin/bash
+
+. $SNAP/bin/load-env
+
+if [ ! -e "${ACME_CONFIG_PATH}/certificates/${ACME_DOMAIN}.json" ]; then
+    exit 0
+fi
+
+if [ x$ACME_STAGING == xtrue ]; then
+    echo "Using the Let's Encrypt Staging Environment"
+fi
+
+$SNAP/bin/lego $(lego_staging_string) \
+    --path="$ACME_CONFIG_PATH" \
+    --email="$ACME_EMAIL" \
+    --domains="$ACME_DOMAIN" \
+    --http \
+    --http.port=":8081" \
+    renew \
+    --renew-hook="$SNAP/bin/renew-hook"

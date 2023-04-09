@@ -38,8 +38,17 @@ export TYPESENSE_API_ADDRESS="127.0.0.1"
 export TYPESENSE_HOST="127.0.0.1"
 
 export ACME_DOMAIN="$(snapctl get acme-domain)"
+export ACME_EMAIL="$(snapctl get acme-email)"
 export ACME_STAGING="$(snapctl get acme-staging)"
 export ACME_CONFIG_PATH="$SNAP_COMMON/acme"
+
+export HTTPS_ENABLED="$(snapctl get https-enabled)"
+
+if [ "x$HTTPS_ENABLED" == "xtrue" ]; then
+    export HAPROXY_HTTPS_FRONTEND_DATA=""
+else
+    export HAPROXY_HTTPS_FRONTEND_DATA="disabled"
+fi
 
 drop_privileges() {
     $SNAP/usr/bin/setpriv \
@@ -74,6 +83,6 @@ banner() {
         "or more information see https://github.com/nsg/immich-distribution"
 }
 
-uacme_staging_string() {
-    [ x$ACME_STAGING == xtrue ] && echo "--staging"
+lego_staging_string() {
+    [ x$ACME_STAGING == xtrue ] && echo "--server=https://acme-staging-v02.api.letsencrypt.org/directory"
 }

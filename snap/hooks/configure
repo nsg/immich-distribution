@@ -19,3 +19,4 @@ fi
 snapctl restart immich-distribution.postgres
 snapctl restart immich-distribution.typesense
 snapctl restart immich-distribution.sync
+snapctl restart immich-distribution.haproxy
