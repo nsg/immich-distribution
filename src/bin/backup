@@ -30,6 +30,8 @@ backup_assets() {
     tar cJf "$BACKUP_AS_FILE" $SNAP_COMMON/upload
 }
 
+root_check
+
 [ -z $1 ] && usage
 
 while getopts dah option; do

@@ -1,0 +1,33 @@
+#!/bin/bash
+
+. $SNAP/bin/load-env
+
+root_check
+
+if [ -z "$ACME_DOMAIN" ]; then
+    echo "Configure a domain with 'snap set immich-distribution acme-domain=\"example.com\"'"
+    exit 1
+fi
+
+if [ -z "$ACME_EMAIL" ]; then
+    echo "Configure a email adress with 'snap set immich-distribution acme-email=\"user@example.com\"'"
+    echo "The email will be used to setup a Let's Encrypt account."
+    exit 1
+fi
+
+if [ x$ACME_STAGING == xtrue ]; then
+    echo "Using the Let's Encrypt Staging Environment"
+fi
+
+$SNAP/bin/lego $(lego_staging_string) \
+    --path="$ACME_CONFIG_PATH" \
+    --email="$ACME_EMAIL" \
+    --domains="$ACME_DOMAIN" \
+    --http \
+    --http.port=":8081" \
+    run
+
+if [ -e "$ACME_CONFIG_PATH/certificates/$ACME_DOMAIN.crt" ]; then
+    snapctl set https-enabled="true"
+    snapctl restart immich-distribution.haproxy
+fi

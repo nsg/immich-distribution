@@ -19,6 +19,8 @@ grade: stable
 confinement: strict
 architectures:
   - amd64
+assumes:
+  - command-chain
 
 system-usernames:
   snap_daemon: shared
@@ -112,6 +114,8 @@ apps:
       - network
 
   haproxy:
+    command-chain:
+      - bin/haproxy-chain
     command: bin/haproxy -W -f $SNAP/etc/haproxy.cfg -p $SNAP_DATA/haproxy.pid
     daemon: simple
     plugs:
@@ -132,6 +136,21 @@ apps:
 
   import:
     command: bin/import
+
+  lets-encrypt:
+    command: bin/acme-init
+    plugs:
+      - network
+      - network-bind
+
+  acme:
+    command: bin/acme-service
+    daemon: simple
+    restart-delay: 60s
+    timer: "00:00-24:00/2"
+    plugs:
+      - network
+      - network-bind
 
 parts:
   node:
@@ -286,6 +305,17 @@ parts:
       - -usr/local/share
     organize:
       usr/local/sbin/haproxy: bin/haproxy
+
+  lego:
+    source: https://github.com/go-acme/lego.git
+    source-tag: v4.10.2
+    plugin: go
+    build-environment:
+      - GO111MODULE: "on"
+    override-build: |
+      make build
+      mkdir -p $SNAPCRAFT_PART_INSTALL/bin
+      cp dist/lego $SNAPCRAFT_PART_INSTALL/bin
 
   scripts:
     source: src

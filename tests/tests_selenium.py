@@ -38,4 +38,5 @@ class TestImmichWeb(BaseCase):
         self.immich()
         self.register()
         self.login()
+        time.sleep(20)
         self.assert_title("Photos - Immich")

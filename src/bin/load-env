@@ -37,6 +37,19 @@ export TYPESENSE_DATA_DIR="$SNAP_COMMON/typesense"
 export TYPESENSE_API_ADDRESS="127.0.0.1"
 export TYPESENSE_HOST="127.0.0.1"
 
+export ACME_DOMAIN="$(snapctl get acme-domain)"
+export ACME_EMAIL="$(snapctl get acme-email)"
+export ACME_STAGING="$(snapctl get acme-staging)"
+export ACME_CONFIG_PATH="$SNAP_COMMON/acme"
+
+export HTTPS_ENABLED="$(snapctl get https-enabled)"
+
+if [ "x$HTTPS_ENABLED" == "xtrue" ]; then
+    export HAPROXY_HTTPS_FRONTEND_DATA=""
+else
+    export HAPROXY_HTTPS_FRONTEND_DATA="disabled"
+fi
+
 drop_privileges() {
     $SNAP/usr/bin/setpriv \
         --clear-groups \
@@ -57,8 +70,19 @@ user_id() {
     immich_api "$1" user/me | jq -r .id
 }
 
+root_check() {
+    if [ x$UID != x0 ]; then
+        echo "You need to run this command as root (with sudo)"
+        exit 1
+    fi
+}
+
 banner() {
     echo "!!! NOTE: This is Immich Distribution. This is an unofficial" \
         "community packaged distribution of the Immich software. For support," \
         "or more information see https://github.com/nsg/immich-distribution"
+}
+
+lego_staging_string() {
+    [ x$ACME_STAGING == xtrue ] && echo "--server=https://acme-staging-v02.api.letsencrypt.org/directory"
 }

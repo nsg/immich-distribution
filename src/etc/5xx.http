@@ -76,6 +76,10 @@ Content-Type: text/html
                     Redis (In-memory key-value database)
                     <span></span>
                 </div>
+                <div id="backend-acme">
+                    ACME Challenge (Used by Let's Encrypt to issue a TLS certificate)
+                    <span></span>
+                </div>
                 <div id="backend-stats">
                     HAProxy Stats
                     <span></span>
