@@ -1,0 +1,15 @@
+# The URL the site will be built for
+base_url = "https://nsg.github.io/immich-distribution/"
+title = "Immich Distribution Docs"
+compile_sass = true
+build_search_index = true
+
+[markdown]
+highlight_code = true
+highlight_theme = "base16-ocean-light"
+
+[extra]
+logo = "/img/immich-dist.png"
+easydocs_logo_always_clickable = true
+easydocs_uglyurls = false
+easydocs_heading_threshold = 5

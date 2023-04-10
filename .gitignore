@@ -2,3 +2,4 @@
 /src/etc/5xx.html
 __pycache__
 *.bkp
+/docs/site/public/

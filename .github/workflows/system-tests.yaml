@@ -3,10 +3,23 @@ name: System Testing
 on:
   push:
     branches: [ "master" ]
+    paths-ignore:
+      - 'docs/**'
+      - '*.md'
+      - 'LICENSE'
+
   pull_request:
     branches: [ "master" ]
+    paths-ignore:
+      - 'docs/**'
+      - '*.md'
+      - 'LICENSE'
 
   workflow_dispatch:
+
+concurrency:
+  group: "tests"
+  cancel-in-progress: true
 
 jobs:
   build-and-test-snap:
