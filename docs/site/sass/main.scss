@@ -157,11 +157,24 @@ nav {
   img {
     width: 8em;
     padding: 1em 4em 2em 4em;
+
+    &:hover {
+      animation: rotation 300s infinite linear;
+    }
   }
 
   h1 {
     margin: 0;
     line-height: 1;
+  }
+}
+
+@keyframes rotation {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(359deg);
   }
 }
 
