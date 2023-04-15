@@ -3,29 +3,19 @@
 > First an important mention, this is **NOT** an official package of [Immich](https://immich.app/). If you like to have Immich installed directly from the Immich project use the official [Docker images](https://immich.app/docs/install/docker-compose). Do not report bugs to upstream _unless_ you are sure that the same bug is present in the upstream images.
 
 <p align="center">
-  <img src="docs/immich-dist.png">
+  <img src="docs/site/static/img/immich-dist-snap-gh.png">
 </p>
 
 ## About this distribution
 
 This is an [Immich](https://immich.app/) Distribution packaged inside a [snap](https://snapcraft.io/docs) package. I have used the excellent [Nextcloud snap](https://github.com/nextcloud-snap/nextcloud-snap/) as an inspiration for this. The package is inspired of the official Immich images. It will be similar, but not identical with the official Docker-based installation. It will ship the same software, but with limited customability. Extra tools are included, they should be non-intrusive and you can ignore them if you prefer.
 
-## Requirements
-
-I recommend a minimun of 4GB RAM (6 or more preferred) with 2 CPU cores (more preferred). The machine learning components consumes a lot of RAM, and video trancoding can be heavy. [Snapd also requires](https://snapcraft.io/docs/installing-snapd) that you use Linux (Ubuntu recommended). Only 64-bit x86 CPU:s are supported (amd64). Finally you probably need a lot of free disk space, pictures are stored at `/var/snap`.
+Please, see the [documentation](https://immich-distribution.nsg.cc/) for more information.
 
 ## Installation
 [![immich-distribution](https://snapcraft.io/immich-distribution/badge.svg)](https://snapcraft.io/immich-distribution)
 
-```sh
-snap install immich-distribution
-```
-
-The package is over 500MB in size so it can take a little while to install. Point your browser to port 80 to get started!
-
-### Security
-
-Immich processes are exposed on localhost. Dedicate a server, VM or container for Immich exclusively. I run this snap inside an [LXD container](https://linuxcontainers.org/lxd/introduction/) for better isolation.
+For detailed installation instructions with recommendations and hardware requirements see [the installation documentation](https://immich-distribution.nsg.cc/installation/install/). If you are in a hurry, just run `sudo snap install immich-distribution` to get started.
 
 ### Updates
 
