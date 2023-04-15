@@ -96,6 +96,10 @@ pre {
   code {
     background: transparent;
 
+    &:hover {
+      background-color: transparent;
+    }
+
     &::after {
       content: attr(data-lang);
       font-style: italic;
