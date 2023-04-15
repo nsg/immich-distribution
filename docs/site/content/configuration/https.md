@@ -38,8 +38,9 @@ Try to access the site via http**s**://my.domain.name, if it loads you are all d
 
 1. Verify that you can access Immich on port 80 over the internet.
 2. `.well-known/acme` needs to be routed to Immich.
-3. Check `journalctl -eu snap.immich-distribution.haproxy` possible errors.
+3. Check `journalctl -eu snap.immich-distribution.haproxy` for possible errors.
 4. Feel free to re-run `immich-distribution.lets-encrypt`, note that you will be rate limited if you execute this _to_ many times.
+5. For extended troubleshooting consider to enable the [Let's Encrypt staging environment](https://letsencrypt.org/docs/staging-environment/) with `sudo snap set immich-distribution acme-staging="true"`
 
 ## Disable HTTPS
 
