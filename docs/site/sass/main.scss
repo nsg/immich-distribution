@@ -48,6 +48,7 @@ h1 {
   font-size: 2em;
 }
 
+h1,
 h2,
 h3,
 h4 {
@@ -154,7 +155,8 @@ nav {
   width: 20rem;
 
   img {
-    width: 128px;
+    width: 8em;
+    padding: 1em 4em 2em 4em;
   }
 
   h1 {

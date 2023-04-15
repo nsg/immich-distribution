@@ -3,7 +3,7 @@ title = "Immich Distribution Documentation"
 insert_anchor_links = "right"
 +++
 
-## Immich Distribution Documentation
+# Immich Distribution Documentation
 
 [![immich-distribution](https://snapcraft.io/immich-distribution/badge.svg)](https://snapcraft.io/immich-distribution)
 
