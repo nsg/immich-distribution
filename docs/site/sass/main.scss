@@ -380,5 +380,15 @@ blockquote {
   padding: 0 20px;
 }
 
+.twowaygrid {
+  display: grid;
+  grid-template-columns: 3fr 1fr;
+
+  div {
+    text-align: right;
+    margin: auto;
+  }
+}
+
 @import "fabric-icons-inline";
 @import "search";

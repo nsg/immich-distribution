@@ -11,9 +11,18 @@ These pages contains documentation related to the [snap](https://snapcraft.io/do
 
 For more general information about this project see the [GitHub project](https://github.com/nsg/immich-distribution). This is also the place where you can suggest ideas, report bugs and overall keep yourself informed on what's going on with the project.
 
-## Install
+<div class="twowaygrid">
+    <div>
+        <img src="/img/immich-dist-snap.png" />
+    </div>
+    <div>
+        <a href="https://snapcraft.io/immich-distribution">
+            <img src="https://snapcraft.io/static/images/badges/en/snap-store-black.svg" alt="Get it from the Snap Store"/>
+        </a>
+    </div>
+</div>
 
-[![Get it from the Snap Store](https://snapcraft.io/static/images/badges/en/snap-store-black.svg)](https://snapcraft.io/immich-distribution)
+## Install
 
 ```sh
 sudo snap install immich-distribution
