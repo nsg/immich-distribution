@@ -12,7 +12,7 @@ if [ -d "$TMPDIR" ]; then
 fi
 
 vdiff() {
-    git diff $OLD_RELEASE_TAG $NEW_RELEASE_TAG -- $1
+    git diff -w $OLD_RELEASE_TAG $NEW_RELEASE_TAG -- $1
 }
 
 git clone $REPO_PATH $TMPDIR
@@ -34,6 +34,7 @@ CHECK_FILES="
     web/README.md
     web/entrypoint.sh
     web/Dockerfile
+    web/src/lib/components/shared-components/version-announcement-box.svelte
     nginx
     machine-learning/README.md
     machine-learning/Dockerfile
@@ -52,3 +53,16 @@ done
 for F in $CHECK_FILES; do
     vdiff "$F"
 done
+
+cd -
+if grep -q $OLD_RELEASE_TAG snap/snapcraft.yaml; then
+    echo
+    echo "Found the string $OLD_RELEASE_TAG in snapcraft.yaml"
+    echo
+fi
+
+if ! grep -q $NEW_RELEASE_TAG snap/snapcraft.yaml; then
+    echo
+    echo "The string $NEW_RELEASE_TAG was NOT found in snapcraft.yaml"
+    echo
+fi
