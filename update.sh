@@ -53,3 +53,16 @@ done
 for F in $CHECK_FILES; do
     vdiff "$F"
 done
+
+cd -
+if grep -q $OLD_RELEASE_TAG snap/snapcraft.yaml; then
+    echo
+    echo "Found the string $OLD_RELEASE_TAG in snapcraft.yaml"
+    echo
+fi
+
+if ! grep -q $NEW_RELEASE_TAG snap/snapcraft.yaml; then
+    echo
+    echo "The string $NEW_RELEASE_TAG was NOT found in snapcraft.yaml"
+    echo
+fi
