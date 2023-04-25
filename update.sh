@@ -34,6 +34,7 @@ CHECK_FILES="
     web/README.md
     web/entrypoint.sh
     web/Dockerfile
+    web/src/lib/components/shared-components/version-announcement-box.svelte
     nginx
     machine-learning/README.md
     machine-learning/Dockerfile
