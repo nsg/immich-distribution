@@ -12,7 +12,7 @@ if [ -d "$TMPDIR" ]; then
 fi
 
 vdiff() {
-    git diff $OLD_RELEASE_TAG $NEW_RELEASE_TAG -- $1
+    git diff -w $OLD_RELEASE_TAG $NEW_RELEASE_TAG -- $1
 }
 
 git clone $REPO_PATH $TMPDIR
