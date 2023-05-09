@@ -9,4 +9,4 @@ export PYTHONUNBUFFERED=1
 banner
 
 cd $SNAP/usr/src/ml
-python3 $SNAP/bin/gunicorn src.main:server | grep -v "GET /ping"
+python3 $SNAP/usr/src/ml/src/main.py | grep -v "GET /ping"

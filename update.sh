@@ -38,7 +38,6 @@ CHECK_FILES="
     nginx
     machine-learning/README.md
     machine-learning/Dockerfile
-    machine-learning/gunicorn.conf.py
     docker/example.env
     docker/docker-compose.yml
 "
