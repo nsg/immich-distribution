@@ -14,7 +14,7 @@ if [ -d "$TMPDIR" ]; then
 fi
 
 vdiff() {
-    git diff -w $OLD_RELEASE_TAG $NEW_RELEASE_TAG -- $1
+    git diff --color=always -w $OLD_RELEASE_TAG $NEW_RELEASE_TAG -- $1
 }
 
 git clone $REPO_PATH $TMPDIR
@@ -60,7 +60,7 @@ done
 
 for F in $CHECK_FILES; do
     vdiff "$F"
-done
+done | less -R
 
 cd -
 if grep -q $OLD_RELEASE_TAG snap/snapcraft.yaml; then
