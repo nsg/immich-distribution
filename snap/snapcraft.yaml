@@ -157,8 +157,8 @@ parts:
     plugin: nil
     override-build: |
       if [ ! -f "$SNAPCRAFT_PART_INSTALL/bin/node" ]; then
-        curl -s https://nodejs.org/dist/v16.19.1/node-v16.19.1-linux-x64.tar.gz \
-        | tar xzf - -C "$SNAPCRAFT_PART_INSTALL" --no-same-owner --strip-components=1
+        curl -s https://nodejs.org/dist/v18.16.0/node-v18.16.0-linux-x64.tar.xz \
+        | tar xJf - -C "$SNAPCRAFT_PART_INSTALL" --no-same-owner --strip-components=1
       fi
 
   ffmpeg:
@@ -176,7 +176,7 @@ parts:
   # "npm run build" builds: server, microservices, cli
   server:
     plugin: npm
-    npm-node-version: "16.19.1"
+    npm-node-version: "18.16.0"
     source: https://github.com/immich-app/immich.git
     source-tag: v1.55.1
     source-subdir: server
@@ -202,7 +202,7 @@ parts:
 
   web:
     plugin: npm
-    npm-node-version: "16.19.1"
+    npm-node-version: "18.16.0"
     source: https://github.com/immich-app/immich.git
     source-tag: v1.55.1
     source-subdir: web
@@ -239,7 +239,7 @@ parts:
 
   cli:
     plugin: npm
-    npm-node-version: "16.19.1"
+    npm-node-version: "18.16.0"
     source: https://github.com/immich-app/CLI.git
     source-tag: v0.36.0
     override-build: |
