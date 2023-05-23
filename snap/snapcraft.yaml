@@ -157,8 +157,8 @@ parts:
     plugin: nil
     override-build: |
       if [ ! -f "$SNAPCRAFT_PART_INSTALL/bin/node" ]; then
-        curl -s https://nodejs.org/dist/v16.19.1/node-v16.19.1-linux-x64.tar.gz \
-        | tar xzf - -C "$SNAPCRAFT_PART_INSTALL" --no-same-owner --strip-components=1
+        curl -s https://nodejs.org/dist/v18.16.0/node-v18.16.0-linux-x64.tar.xz \
+        | tar xJf - -C "$SNAPCRAFT_PART_INSTALL" --no-same-owner --strip-components=1
       fi
 
   ffmpeg:
@@ -176,9 +176,9 @@ parts:
   # "npm run build" builds: server, microservices, cli
   server:
     plugin: npm
-    npm-node-version: "16.19.1"
+    npm-node-version: "18.16.0"
     source: https://github.com/immich-app/immich.git
-    source-tag: v1.55.1
+    source-tag: v1.56.2
     source-subdir: server
     override-build: |
       snapcraftctl set-version "$(git describe --tags)-dist1"
@@ -197,14 +197,15 @@ parts:
       - libnghttp2-14
       - libnode64
       - libuv1
+      - libvips
     after:
       - node
 
   web:
     plugin: npm
-    npm-node-version: "16.19.1"
+    npm-node-version: "18.16.0"
     source: https://github.com/immich-app/immich.git
-    source-tag: v1.55.1
+    source-tag: v1.56.2
     source-subdir: web
     override-build: |
       patch -p0 -i $SNAPCRAFT_PART_SRC/../../patches/src/001-version-announcement-box.patch -d $SNAPCRAFT_PART_BUILD
@@ -223,15 +224,16 @@ parts:
   machine-learning:
     plugin: python
     source: https://github.com/immich-app/immich.git
-    source-tag: v1.55.1
+    source-tag: v1.56.2
     source-subdir: machine-learning
     build-environment:
       - SNAPCRAFT_PYTHON_VENV_INTERP_PATH: /root/parts/machine-learning/install/bin/python3
     override-build: |
       snapcraftctl build
-      pip install --pre torch  -f https://download.pytorch.org/whl/nightly/cpu/torch_nightly.html
+      pip install torch --index-url https://download.pytorch.org/whl/cpu
       pip install transformers tqdm numpy scikit-learn scipy nltk sentencepiece fastapi Pillow uvicorn[standard]
       pip install --no-deps sentence-transformers
+      pip install insightface onnxruntime
       mkdir -p $SNAPCRAFT_PART_INSTALL/usr/src/ml
       cp -r machine-learning/src $SNAPCRAFT_PART_INSTALL/usr/src/ml
     stage-packages:
@@ -239,7 +241,7 @@ parts:
 
   cli:
     plugin: npm
-    npm-node-version: "16.19.1"
+    npm-node-version: "18.16.0"
     source: https://github.com/immich-app/CLI.git
     source-tag: v0.36.0
     override-build: |

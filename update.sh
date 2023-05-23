@@ -7,21 +7,30 @@
 REPO_PATH="https://github.com/immich-app/immich.git"
 TMPDIR="$(mktemp -d)"
 
+set -eo pipefail
+
 if [ -d "$TMPDIR" ]; then
     trap "rm -rf $TMPDIR; echo \"$TMPDIR removed\"" EXIT
 fi
 
 vdiff() {
-    git diff -w $OLD_RELEASE_TAG $NEW_RELEASE_TAG -- $1
+    git diff --color=always -w $OLD_RELEASE_TAG $NEW_RELEASE_TAG -- $1
 }
 
 git clone $REPO_PATH $TMPDIR
-cd $TMPDIR
 
-OLD_RELEASE_TAG="$1"
+if [ -e $1 ]; then
+    OLD_RELEASE_TAG="$(grep -A4 '  server:' snap/snapcraft.yaml | awk '/source-tag/{ print $2 }')"
+    echo "Old release selected as: $OLD_RELEASE_TAG"
+else
+    OLD_RELEASE_TAG="$1"
+fi
+
+cd $TMPDIR
 
 if [ -z $2 ]; then
     NEW_RELEASE_TAG="$(git tag --sort=committerdate | tail -1)"
+    echo "New release selected as: $NEW_RELEASE_TAG"
 else
     NEW_RELEASE_TAG="$2"
 fi
@@ -51,7 +60,7 @@ done
 
 for F in $CHECK_FILES; do
     vdiff "$F"
-done
+done | less -R
 
 cd -
 if grep -q $OLD_RELEASE_TAG snap/snapcraft.yaml; then
