@@ -178,7 +178,7 @@ parts:
     plugin: npm
     npm-node-version: "18.16.0"
     source: https://github.com/immich-app/immich.git
-    source-tag: v1.56.2
+    source-tag: v1.57.1
     source-subdir: server
     override-build: |
       snapcraftctl set-version "$(git describe --tags)-dist1"
@@ -205,7 +205,7 @@ parts:
     plugin: npm
     npm-node-version: "18.16.0"
     source: https://github.com/immich-app/immich.git
-    source-tag: v1.56.2
+    source-tag: v1.57.1
     source-subdir: web
     override-build: |
       patch -p0 -i $SNAPCRAFT_PART_SRC/../../patches/src/001-version-announcement-box.patch -d $SNAPCRAFT_PART_BUILD
@@ -224,7 +224,7 @@ parts:
   machine-learning:
     plugin: python
     source: https://github.com/immich-app/immich.git
-    source-tag: v1.56.2
+    source-tag: v1.57.1
     source-subdir: machine-learning
     build-environment:
       - SNAPCRAFT_PYTHON_VENV_INTERP_PATH: /root/parts/machine-learning/install/bin/python3
