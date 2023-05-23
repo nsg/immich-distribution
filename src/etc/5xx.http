@@ -121,7 +121,7 @@ Content-Type: text/html
 
         <script>
             function do_request() {
-                const request = new Request("http://127.0.0.1/haproxy/;csv")
+                const request = new Request("/haproxy/;csv")
                 fetch(request).then((response) => {
                     if (response.status === 200) {
                         return response.text()
