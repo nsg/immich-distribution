@@ -1,0 +1,34 @@
+#!/bin/bash
+
+if [ -z $SNAP ]; then
+    . src/bin/sync
+else
+    . $SNAP/bin/sync
+fi
+
+block_sync_enabled
+block_immich_server_ready
+
+if [ ! -z $SNAP ]; then
+    while ! $SNAP/usr/local/pgsql/bin/pg_isready 2>&1 > /dev/null; do
+        echo "Postgres not ready yet, waiting ..."
+        sleep 2
+    done
+
+    cat $SNAP/etc/modify-db.sql | query_db
+fi
+
+for KEY in $(get_keys); do
+    USER_ID="$(user_id $KEY)"
+
+    if [ ! -z "$USER_ID" ]; then
+        USER_PATH="$SNAP_COMMON/sync/$USER_ID"
+        mkdir -p "$USER_PATH"
+
+        echo "Watching Immich database for deleted images ..."
+        while sleep 10; do
+            last_removed_files_immich_db "$USER_ID"
+        done
+    fi
+done
+wait

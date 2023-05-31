@@ -1,4 +1,102 @@
 #!/bin/bash
 
-. $SNAP/bin/load-env
-python3 $SNAP/bin/sync.py
+if [ -z $SNAP ]; then
+    . src/bin/load-env
+else
+    . $SNAP/bin/load-env
+fi
+
+export PGDATA="$SNAP_COMMON/pgsql/data"
+
+query_db() {
+    if [ -z $SNAP ]; then
+        cat - | sudo immich-distribution.psql -d immich $@
+    else
+        cat - | $SNAP/bin/psql -d immich $@
+    fi
+}
+
+last_removed_files_immich_db() {
+    echo "SELECT checksum
+        FROM assets_delete_audits
+        WHERE file_removed='false'
+        AND user_id='$1'
+        ORDER BY changed_on desc
+        LIMIT 1" | query_db -At | cut -c 3-
+}
+
+save_hash_to_db() {
+    local user="$1"
+    local path="$2"
+    local hash="$(echo $3 | tr -cd '[:digit:]a-f')"
+
+    echo "
+        INSERT INTO
+        assets_filesync_lookup(user_id, asset_path, checksum)
+        VALUES('$user','$path','$hash');
+    " | query_db
+}
+
+extract_user_id_from_path() {
+    echo "$1" | sed 's,.*/sync/,,' | sed 's,/.*,,'
+}
+
+extract_relative_path() {
+    echo "$1" | sed 's,.*/sync/[^/]*/,,'
+}
+
+upload() {
+    $SNAP/bin/immich-cli upload --key "$1" --yes "$2"
+}
+
+get_keys() {
+    snapctl get sync
+}
+
+sync_enabled() {
+    snapctl get sync-enabled | grep -q "true"
+}
+
+block_sync_enabled() {
+    while ! sync_enabled; do
+        sleep 3600
+    done
+
+    echo "Starting service..."
+}
+
+ignore_path() {
+    local name="$(basename "$1")"
+
+    [[ "${name:0:1}" == "." ]] && return 0
+    [ -d "$1" ] && return 0
+
+    return 1
+}
+
+watch_created() {
+    cat - | while read -r changed_path; do
+        if ! ignore_path "$changed_path"; then
+            file_hash="$(sha1sum "$changed_path")"
+            file_hash="${file_hash% *}"
+            user_id="$(extract_user_id_from_path "$changed_path")"
+            path="$(extract_relative_path "$changed_path")"
+
+            save_hash_to_db "$user_id" "$path" "$file_hash"
+
+            #upload "$KEY" "$changed_path"
+            # write file hash to db
+        fi
+    done
+}
+
+watch_removed() {
+    cat - | while read -r removed_path; do
+        if ! ignore_path "$removed_path"; then
+            echo REMOVED $removed_path
+
+            # Lookup files hash from db
+            # Ask Immich to remove the asset
+        fi
+    done
+}

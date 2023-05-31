@@ -1,12 +1,3 @@
-#!/bin/bash
-
-. $SNAP/bin/load-env
-
-query() {
-    cat - | $SNAP/bin/psql -d immich
-}
-
-echo '
 CREATE TABLE IF NOT EXISTS assets_delete_audits (
     id INT GENERATED ALWAYS AS IDENTITY,
     asset_id UUID NOT NULL,
@@ -15,9 +6,15 @@ CREATE TABLE IF NOT EXISTS assets_delete_audits (
     file_removed BOOLEAN DEFAULT FALSE,
     changed_on TIMESTAMP(6) NOT NULL
 );
-' | query
 
-echo '
+CREATE TABLE IF NOT EXISTS assets_filesync_lookup (
+    id INT GENERATED ALWAYS AS IDENTITY,
+    user_id VARCHAR(256) NULL,
+    asset_path TEXT NOT NULL,
+    checksum BYTEA,
+    UNIQUE(asset_path, checksum)
+);
+
 CREATE OR REPLACE FUNCTION log_assets_delete_audits()
     RETURNS TRIGGER
     LANGUAGE PLPGSQL
@@ -28,12 +25,9 @@ BEGIN
     VALUES(OLD.id, OLD."ownerId", OLD.checksum, NOW());
     RETURN OLD;
 END;
-$$
-' | query
+$$;
 
-echo '
 CREATE OR REPLACE TRIGGER trigger_assets_delete_audits
 BEFORE DELETE ON assets
 FOR EACH ROW
-EXECUTE PROCEDURE log_assets_delete_audits()
-' | query
+EXECUTE PROCEDURE log_assets_delete_audits();

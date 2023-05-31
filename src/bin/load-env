@@ -61,6 +61,12 @@ immich_server_ready() {
     curl -s "$IMMICH_SERVER_URL/server-info/ping" -o /dev/null
 }
 
+block_immich_server_ready() {
+    while ! immich_server_ready; do
+        sleep 2
+    done
+}
+
 immich_api() {
     curl -s "$IMMICH_SERVER_URL/$2" -H 'Accept: application/json' -H "x-api-key: $1"
 }

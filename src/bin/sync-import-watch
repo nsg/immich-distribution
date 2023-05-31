@@ -1,0 +1,27 @@
+#!/bin/bash
+
+if [ -z $SNAP ]; then
+    . src/bin/sync
+else
+    . $SNAP/bin/sync
+fi
+
+if ! immich_server_ready; then
+    echo "Folder sync disabled"
+    exit 0
+fi
+
+block_immich_server_ready
+
+for KEY in $(get_keys); do
+    USER_ID="$(user_id $KEY)"
+
+    if [ -z "$USER_ID" ]; then
+        USER_PATH="$SNAP_COMMON/sync/$USER_ID"
+        mkdir -p "$USER_PATH"
+
+        if [ ! -z $SNAP ]; then
+            $SNAP/bin/immich-cli upload --key "$KEY" --yes --recursive "$USER_PATH"
+        fi
+    fi
+done

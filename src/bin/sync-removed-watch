@@ -1,0 +1,25 @@
+#!/bin/bash
+
+if [ -z $SNAP ]; then
+    . src/bin/sync
+else
+    . $SNAP/bin/sync
+fi
+
+block_sync_enabled
+block_immich_server_ready
+
+for KEY in $(get_keys); do
+    USER_ID="$(user_id $KEY)"
+
+    if [ ! -z "$USER_ID" ]; then
+        USER_PATH="$SNAP_COMMON/sync/$USER_ID"
+        mkdir -p "$USER_PATH"
+
+        {
+            echo "Watch for removed events in $USER_PATH"
+            fswatch --recursive --event Removed "$USER_PATH" | watch_removed
+        } &
+    fi
+done
+wait
