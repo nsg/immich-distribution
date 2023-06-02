@@ -33,7 +33,11 @@ save_hash_to_db() {
     echo "
         INSERT INTO
         assets_filesync_lookup(user_id, asset_path, checksum)
-        VALUES('$user','$path','$hash');
+        VALUES('$user','$path',E'\\\\x$hash')
+        ON CONFLICT ON CONSTRAINT assets_filesync_lookup_asset_path_key DO
+            UPDATE SET checksum = E'\\\\x$hash'
+            WHERE assets_filesync_lookup.asset_path = '$path'
+            AND assets_filesync_lookup.user_id = '$user';
     " | query_db
 }
 
@@ -83,9 +87,7 @@ watch_created() {
             path="$(extract_relative_path "$changed_path")"
 
             save_hash_to_db "$user_id" "$path" "$file_hash"
-
-            #upload "$KEY" "$changed_path"
-            # write file hash to db
+            upload "$KEY" "$changed_path"
         fi
     done
 }
