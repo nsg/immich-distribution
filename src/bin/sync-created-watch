@@ -9,6 +9,20 @@ fi
 block_sync_enabled
 block_immich_server_ready
 
+watch_created() {
+    cat - | while read -r changed_path; do
+        if ! ignore_path "$changed_path"; then
+            file_hash="$(sha1sum "$changed_path")"
+            file_hash="${file_hash% *}"
+            user_id="$(extract_user_id_from_path "$changed_path")"
+            path="$(extract_relative_path "$changed_path")"
+
+            save_hash_to_db "$user_id" "$path" "$file_hash"
+            upload "$KEY" "$changed_path"
+        fi
+    done
+}
+
 for KEY in $(get_keys); do
     USER_ID="$(user_id $KEY)"
 
