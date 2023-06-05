@@ -16,13 +16,27 @@ query_db() {
     fi
 }
 
-last_removed_files_immich_db() {
-    echo "SELECT checksum
+last_removed_file_by_user_from_immich_db() {
+    echo "
+        SELECT assets_filesync_lookup.asset_path, assets_delete_audits.asset_id
         FROM assets_delete_audits
-        WHERE file_removed='false'
-        AND user_id='$1'
+        INNER JOIN assets_filesync_lookup
+        ON assets_delete_audits.checksum = assets_filesync_lookup.checksum
+        WHERE assets_filesync_lookup.user_id = '$1'
+        AND assets_delete_audits.file_removed = 'false'
         ORDER BY changed_on desc
-        LIMIT 1" | query_db -At | cut -c 3-
+        LIMIT 1
+    " | query_db -At
+}
+
+mark_file_as_removed_in_immich_db() {
+    local asset="$1"
+
+    echo "
+        UPDATE assets_delete_audits
+        SET file_removed = 'true'
+        WHERE asset_id = '$asset'
+    " | query_db
 }
 
 save_hash_to_db() {
@@ -34,11 +48,24 @@ save_hash_to_db() {
         INSERT INTO
         assets_filesync_lookup(user_id, asset_path, checksum)
         VALUES('$user','$path',E'\\\\x$hash')
-        ON CONFLICT ON CONSTRAINT assets_filesync_lookup_asset_path_key DO
+        ON CONFLICT (user_id, asset_path) DO
             UPDATE SET checksum = E'\\\\x$hash'
             WHERE assets_filesync_lookup.asset_path = '$path'
             AND assets_filesync_lookup.user_id = '$user';
     " | query_db
+}
+
+get_asset_by_path_from_db() {
+    local user="$1"
+    local path="$2"
+
+    echo "
+        SELECT assets.id FROM assets
+        INNER JOIN assets_filesync_lookup
+        ON assets.checksum = assets_filesync_lookup.checksum
+        WHERE assets_filesync_lookup.asset_path = '$path'
+        AND assets_filesync_lookup.user_id = '$user'
+    " | query_db -At
 }
 
 extract_user_id_from_path() {
@@ -50,7 +77,9 @@ extract_relative_path() {
 }
 
 upload() {
-    $SNAP/bin/immich-cli upload --key "$1" --yes "$2"
+    local key="$1"
+    shift
+    $SNAP/bin/immich-cli upload --key "$key" --yes "$@"
 }
 
 get_keys() {
@@ -95,10 +124,15 @@ watch_created() {
 watch_removed() {
     cat - | while read -r removed_path; do
         if ! ignore_path "$removed_path"; then
-            echo REMOVED $removed_path
-
-            # Lookup files hash from db
-            # Ask Immich to remove the asset
+            user_id="$(extract_user_id_from_path "$removed_path")"
+            path="$(extract_relative_path "$removed_path")"
+            asset_id="$(get_asset_by_path_from_db "$user_id" "$path")"
+            status="$(immich_delete_asset "$KEY" "$asset_id" | jq -r .[].status)"
+            if [ "x$status" == "xSUCCESS" ]; then
+                echo "Asset $asset_id removed from Immich (user $user_id, path $path)"
+            else
+                echo "ERROR: Asset $asset_id not removed from Immich (user $user_id, path $path)"
+            fi
         fi
     done
 }

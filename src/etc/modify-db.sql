@@ -10,9 +10,9 @@ CREATE TABLE IF NOT EXISTS assets_delete_audits (
 CREATE TABLE IF NOT EXISTS assets_filesync_lookup (
     id INT GENERATED ALWAYS AS IDENTITY,
     user_id VARCHAR(256) NULL,
-    asset_path TEXT NOT NULL UNIQUE,
+    asset_path TEXT NOT NULL,
     checksum BYTEA,
-    UNIQUE(asset_path, checksum)
+    UNIQUE(user_id, asset_path)
 );
 
 CREATE OR REPLACE FUNCTION log_assets_delete_audits()

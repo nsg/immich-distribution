@@ -19,16 +19,36 @@ if [ ! -z $SNAP ]; then
 fi
 
 for KEY in $(get_keys); do
-    USER_ID="$(user_id $KEY)"
+    {
+        USER_ID="$(user_id $KEY)"
 
-    if [ ! -z "$USER_ID" ]; then
-        USER_PATH="$SNAP_COMMON/sync/$USER_ID"
-        mkdir -p "$USER_PATH"
+        if [ ! -z "$USER_ID" ]; then
+            USER_PATH="$SNAP_COMMON/sync/$USER_ID"
+            mkdir -p "$USER_PATH"
 
-        echo "Watching Immich database for deleted images ..."
-        while sleep 10; do
-            last_removed_files_immich_db "$USER_ID"
-        done
-    fi
+            echo "Watching Immich database for deleted images ..."
+            while sleep 10; do
+                record="$(last_removed_file_by_user_from_immich_db "$USER_ID")"
+
+                if [ -z "$record" ]; then
+                    echo "No more records to process for user $USER_ID"
+                    continue
+                fi
+
+                file_path="$(echo "$record" | cut -d '|' -f 1)"
+                asset_id="$(echo "$record" | cut -d '|' -f 2)"
+
+                if [ -e "$USER_PATH/$file_path" ]; then
+                    echo "Deleting $USER_PATH/$file_path"
+                    if rm "$USER_PATH/$file_path"; then
+                        mark_file_as_removed_in_immich_db "$asset_id"
+                    fi
+                else
+                    echo "File $USER_PATH/$file_path already deleted. Set asset $asset_id as removed in database."
+                    mark_file_as_removed_in_immich_db "$asset_id"
+                fi
+            done
+        fi
+    } &
 done
 wait

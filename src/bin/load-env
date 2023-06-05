@@ -71,8 +71,21 @@ immich_api() {
     curl -s "$IMMICH_SERVER_URL/$2" -H 'Accept: application/json' -H "x-api-key: $1"
 }
 
+immich_api_delete() {
+    curl -s "$IMMICH_SERVER_URL/$2" -X DELETE -H "Accept: application/json" \
+        -H "Content-Type: application/json" -H "x-api-key: $1" \
+        -d "$3"
+}
+
 user_id() {
     immich_api "$1" user/me | jq -r .id
+}
+
+immich_delete_asset() {
+    local key="$1"
+    local asset_id="$2"
+
+    immich_api_delete "$key" "asset" '{"ids": ["'$asset_id'"]}'
 }
 
 root_check() {
