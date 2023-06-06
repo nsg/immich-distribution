@@ -123,7 +123,7 @@ apps:
       - network
 
   sync-import-watch:
-    command: bin/sync
+    command: bin/sync-import-watch
     daemon: simple
     restart-delay: 10s
     timer: "00:00-24:00/1"
