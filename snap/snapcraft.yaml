@@ -122,8 +122,36 @@ apps:
       - network-bind
       - network
 
-  sync:
-    command: bin/sync
+  sync-import-watch:
+    command: bin/sync-import-watch
+    daemon: simple
+    restart-delay: 10s
+    timer: "00:00-24:00/1"
+    after:
+      - immich-server
+    plugs:
+      - network
+
+  sync-removed-fs:
+    command: bin/sync-removed-watch
+    daemon: simple
+    restart-delay: 10s
+    after:
+      - immich-server
+    plugs:
+      - network
+
+  sync-created-fs:
+    command: bin/sync-created-watch
+    daemon: simple
+    restart-delay: 10s
+    after:
+      - immich-server
+    plugs:
+      - network
+
+  sync-database-watch:
+    command: bin/sync-database-watch
     daemon: simple
     restart-delay: 10s
     after:

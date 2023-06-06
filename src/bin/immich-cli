@@ -3,4 +3,4 @@
 . $SNAP/bin/load-env
 
 cd $SNAP/usr/src/cli
-node bin/index.js $@
+node bin/index.js "$@"

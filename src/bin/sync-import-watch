@@ -1,0 +1,31 @@
+#!/bin/bash
+
+if [ -z $SNAP ]; then
+    . src/bin/sync
+else
+    . $SNAP/bin/sync
+fi
+
+if [ -z $SNAP ]; then
+    echo "Abort: Only run this inside the snap"
+    exit 0
+fi
+
+if ! sync_enabled; then
+    echo "Folder sync disabled"
+    exit 0
+fi
+
+block_immich_server_ready
+
+for KEY in $(get_keys); do
+    USER_ID="$(user_id $KEY)"
+
+    if [ ! -z "$USER_ID" ]; then
+        USER_PATH="$SNAP_COMMON/sync/$USER_ID"
+        mkdir -p "$USER_PATH"
+
+        echo "Full import of $USER_PATH for user $USER_ID"
+        upload "$KEY" --recursive "$USER_PATH"
+    fi
+done

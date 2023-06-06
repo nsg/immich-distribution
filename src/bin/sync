@@ -1,4 +1,108 @@
 #!/bin/bash
 
-. $SNAP/bin/load-env
-python3 $SNAP/bin/sync.py
+if [ -z $SNAP ]; then
+    . src/bin/load-env
+else
+    . $SNAP/bin/load-env
+fi
+
+export PGDATA="$SNAP_COMMON/pgsql/data"
+
+query_db() {
+    if [ -z $SNAP ]; then
+        cat - | sudo immich-distribution.psql -d immich $@
+    else
+        cat - | $SNAP/bin/psql -d immich $@
+    fi
+}
+
+last_removed_file_by_user_from_immich_db() {
+    echo "
+        SELECT assets_filesync_lookup.asset_path, assets_delete_audits.asset_id
+        FROM assets_delete_audits
+        INNER JOIN assets_filesync_lookup
+        ON assets_delete_audits.checksum = assets_filesync_lookup.checksum
+        WHERE assets_filesync_lookup.user_id = '$1'
+        AND assets_delete_audits.file_removed = 'false'
+        ORDER BY changed_on desc
+        LIMIT 1
+    " | query_db -At
+}
+
+mark_file_as_removed_in_immich_db() {
+    local asset="$1"
+
+    echo "
+        UPDATE assets_delete_audits
+        SET file_removed = 'true'
+        WHERE asset_id = '$asset'
+    " | query_db
+}
+
+save_hash_to_db() {
+    local user="$1"
+    local path="$2"
+    local hash="$(echo $3 | tr -cd '[:digit:]a-f')"
+
+    echo "
+        INSERT INTO
+        assets_filesync_lookup(user_id, asset_path, checksum)
+        VALUES('$user','$path',E'\\\\x$hash')
+        ON CONFLICT (user_id, asset_path) DO
+            UPDATE SET checksum = E'\\\\x$hash'
+            WHERE assets_filesync_lookup.asset_path = '$path'
+            AND assets_filesync_lookup.user_id = '$user';
+    " | query_db
+}
+
+get_asset_by_path_from_db() {
+    local user="$1"
+    local path="$2"
+
+    echo "
+        SELECT assets.id FROM assets
+        INNER JOIN assets_filesync_lookup
+        ON assets.checksum = assets_filesync_lookup.checksum
+        WHERE assets_filesync_lookup.asset_path = '$path'
+        AND assets_filesync_lookup.user_id = '$user'
+    " | query_db -At
+}
+
+extract_user_id_from_path() {
+    echo "$1" | sed 's,.*/sync/,,' | sed 's,/.*,,'
+}
+
+extract_relative_path() {
+    echo "$1" | sed 's,.*/sync/[^/]*/,,'
+}
+
+upload() {
+    local key="$1"
+    shift
+    $SNAP/bin/immich-cli upload --key "$key" --yes "$@"
+}
+
+get_keys() {
+    snapctl get sync
+}
+
+sync_enabled() {
+    snapctl get sync-enabled | grep -q "true"
+}
+
+block_sync_enabled() {
+    while ! sync_enabled; do
+        sleep 3600
+    done
+
+    echo "Starting service..."
+}
+
+ignore_path() {
+    local name="$(basename "$1")"
+
+    [[ "${name:0:1}" == "." ]] && return 0
+    [ -d "$1" ] && return 0
+
+    return 1
+}

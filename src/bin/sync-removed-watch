@@ -1,0 +1,53 @@
+#!/bin/bash
+
+if [ -z $SNAP ]; then
+    . src/bin/sync
+else
+    . $SNAP/bin/sync
+fi
+
+block_sync_enabled
+block_immich_server_ready
+
+
+watch_removed() {
+    cat - | while read -r removed_path; do
+        if ! ignore_path "$removed_path"; then
+            user_id="$(extract_user_id_from_path "$removed_path")"
+            path="$(extract_relative_path "$removed_path")"
+            asset_id="$(get_asset_by_path_from_db "$user_id" "$path")"
+
+            if [ -z "$asset_id" ]; then
+                echo "ERROR: Asset not found in database (user $user_id, path $path)"
+                continue
+            fi
+
+            if ! immich_api "$KEY" "/asset/assetById/$asset_id" | jq -e .id > /dev/null; then
+                echo "Asset $asset_id not found in Immich (user $user_id, path $path)"
+                continue
+            fi
+
+            status="$(immich_delete_asset "$KEY" "$asset_id" | jq -r .[].status)"
+            if [ "x$status" == "xSUCCESS" ]; then
+                echo "Asset $asset_id removed from Immich (user $user_id, path $path)"
+            else
+                echo "ERROR: Asset $asset_id not removed from Immich (user $user_id, path $path)"
+            fi
+        fi
+    done
+}
+
+for KEY in $(get_keys); do
+    USER_ID="$(user_id $KEY)"
+
+    if [ ! -z "$USER_ID" ]; then
+        USER_PATH="$SNAP_COMMON/sync/$USER_ID"
+        mkdir -p "$USER_PATH"
+
+        {
+            echo "Watch for removed events in $USER_PATH"
+            fswatch --recursive --event Removed "$USER_PATH" | watch_removed
+        } &
+    fi
+done
+wait
