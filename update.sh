@@ -36,6 +36,7 @@ else
 fi
 
 CHECK_FILES="
+    server/libs/infra/src/migrations
     server/Dockerfile
     server/start-server.sh
     server/start-microservices.sh
