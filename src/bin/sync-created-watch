@@ -12,6 +12,18 @@ block_immich_server_ready
 watch_created() {
     cat - | while read -r changed_path; do
         if ! ignore_path "$changed_path"; then
+
+            init_file_size="$(stat --printf="%s" "$changed_path")"
+            while true; do
+                sleep 1
+                current_file_size="$(stat --printf="%s" "$changed_path")"
+                if [ "$init_file_size" -eq "$current_file_size" ]; then
+                    break
+                else
+                    init_file_size="$current_file_size"
+                fi
+            done
+
             file_hash="$(sha1sum "$changed_path")"
             file_hash="${file_hash% *}"
             user_id="$(extract_user_id_from_path "$changed_path")"
