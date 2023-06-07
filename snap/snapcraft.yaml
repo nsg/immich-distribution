@@ -189,6 +189,25 @@ parts:
         | tar xJf - -C "$SNAPCRAFT_PART_INSTALL" --no-same-owner --strip-components=1
       fi
 
+  python:
+    source: https://www.python.org/ftp/python/3.10.11/Python-3.10.11.tgz
+    plugin: make
+    override-build: |
+      ./configure --enable-optimizations --with-ensurepip=install
+      snapcraftctl build
+    build-packages:
+      - libssl-dev
+      - zlib1g-dev
+      - libbz2-dev
+      - libreadline-dev
+      - libsqlite3-dev
+      - xz-utils
+      - libffi-dev
+    stage-packages:
+      - libtcl8.6
+      - libtk8.6
+      - libxft2
+
   ffmpeg:
     plugin: nil
     stage-packages:
@@ -250,22 +269,21 @@ parts:
       - patches
 
   machine-learning:
-    plugin: python
+    plugin: nil
     source: https://github.com/immich-app/immich.git
     source-tag: v1.60.0
     source-subdir: machine-learning
-    build-environment:
-      - SNAPCRAFT_PYTHON_VENV_INTERP_PATH: /root/parts/machine-learning/install/bin/python3
     override-build: |
-      snapcraftctl build
-      pip install torch --index-url https://download.pytorch.org/whl/cpu
-      pip install transformers tqdm numpy scikit-learn scipy nltk sentencepiece fastapi Pillow uvicorn[standard]
-      pip install --no-deps sentence-transformers
-      pip install insightface onnxruntime
+      ../../python/install/usr/local/bin/python3 ../../python/install/usr/local/bin/pip3 install --target $SNAPCRAFT_PART_INSTALL/opt/piptarget torch --index-url https://download.pytorch.org/whl/cpu
+      ../../python/install/usr/local/bin/python3 ../../python/install/usr/local/bin/pip3 install --target $SNAPCRAFT_PART_INSTALL/opt/piptarget transformers tqdm numpy scikit-learn scipy nltk sentencepiece fastapi Pillow uvicorn[standard]
+      ../../python/install/usr/local/bin/python3 ../../python/install/usr/local/bin/pip3 install --target $SNAPCRAFT_PART_INSTALL/opt/piptarget --no-deps sentence-transformers
+      ../../python/install/usr/local/bin/python3 ../../python/install/usr/local/bin/pip3 install --target $SNAPCRAFT_PART_INSTALL/opt/piptarget insightface onnxruntime
       mkdir -p $SNAPCRAFT_PART_INSTALL/usr/src/ml
       cp -r machine-learning/src $SNAPCRAFT_PART_INSTALL/usr/src/ml
     stage-packages:
       - libgomp1
+    after:
+      - python
 
   cli:
     plugin: npm
