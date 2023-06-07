@@ -22,7 +22,7 @@ watch_removed() {
                 continue
             fi
 
-            if ! immich_api "$KEY" "/asset/assetById/$asset_id" | jq -e .id > /dev/null; then
+            if ! immich_api "$KEY" "asset/assetById/$asset_id" | jq -e .id > /dev/null; then
                 echo "Asset $asset_id not found in Immich (user $user_id, path $path)"
                 continue
             fi
