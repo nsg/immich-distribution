@@ -26,6 +26,21 @@ for KEY in $(get_keys); do
             USER_PATH="$SNAP_COMMON/sync/$USER_ID"
             mkdir -p "$USER_PATH"
 
+            {
+                echo "Initial import of $USER_PATH ..."
+                find "$USER_PATH" -type f | while read -r file_path; do
+                    if ! ignore_path "$file_path"; then
+                        file_hash="$(sha1sum "$file_path")"
+                        file_hash="${file_hash%% *}"
+                        user_id="$(extract_user_id_from_path "$file_path")"
+                        path="$(extract_relative_path "$file_path")"
+
+                        echo "Import: $path (user: $user_id, hash: $file_hash)"
+                        save_hash_to_db "$user_id" "$path" "$file_hash"
+                    fi
+                done
+            }
+
             echo "Watching Immich database for deleted images ..."
             while sleep 10; do
                 record="$(last_removed_file_by_user_from_immich_db "$USER_ID")"
