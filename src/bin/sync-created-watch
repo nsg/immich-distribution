@@ -25,7 +25,7 @@ watch_created() {
             done
 
             file_hash="$(sha1sum "$changed_path")"
-            file_hash="${file_hash% *}"
+            file_hash="${file_hash%% *}"
             user_id="$(extract_user_id_from_path "$changed_path")"
             path="$(extract_relative_path "$changed_path")"
 
