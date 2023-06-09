@@ -22,6 +22,7 @@ last_removed_file_by_user_from_immich_db() {
         FROM assets_delete_audits
         INNER JOIN assets_filesync_lookup
         ON assets_delete_audits.checksum = assets_filesync_lookup.checksum
+        AND assets_delete_audits.user_id = assets_filesync_lookup.user_id
         WHERE assets_filesync_lookup.user_id = '$1'
         AND assets_delete_audits.file_removed = 'false'
         ORDER BY changed_on desc
