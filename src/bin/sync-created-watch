@@ -29,8 +29,13 @@ watch_created() {
             user_id="$(extract_user_id_from_path "$changed_path")"
             path="$(extract_relative_path "$changed_path")"
 
-            save_hash_to_db "$user_id" "$path" "$file_hash"
-            upload "$KEY" "$changed_path"
+            payload=$(jq --null-input \
+                --arg path "$path" \
+                --arg file_hash "$file_hash" \
+                '{"path": $path, "file_hash": $file_hash}'
+            )
+
+            add_work_queue "add-file" "$user_id" "$payload"
         fi
     done
 }

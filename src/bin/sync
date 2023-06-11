@@ -40,6 +40,38 @@ mark_file_as_removed_in_immich_db() {
     " | query_db
 }
 
+add_work_queue() {
+    local identifier="$1"
+    local user_id="$2"
+    local payload="$3"
+
+    echo "
+        INSERT INTO sync_work_queue(identifier, user_id, payload, changed_on)
+        VALUES('$identifier', '$user_id', '$payload', NOW())
+    " | query_db
+}
+
+last_item_from_work_queue() {
+    echo "
+        SELECT id, identifier, payload
+        FROM sync_work_queue
+        WHERE completed = 'false'
+        AND user_id = '$1'
+        ORDER BY changed_on desc
+        LIMIT 1
+    " | query_db -At
+}
+
+mark_work_queue_item_as_done() {
+    local id="$1"
+
+    echo "
+        UPDATE sync_work_queue
+        SET completed = 'true'
+        WHERE id = '$id'
+    " | query_db
+}
+
 save_hash_to_db() {
     local user="$1"
     local path="$2"

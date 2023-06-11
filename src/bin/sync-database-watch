@@ -41,8 +41,11 @@ for KEY in $(get_keys); do
                 done
             }
 
-            echo "Watching Immich database for deleted images ..."
+            echo "Watching Immich database for changes ..."
             while sleep 10; do
+
+                # Look in the database for deleted assets, remove the file from the
+                # filesystem and mark the asset as removed in the database
                 record="$(last_removed_file_by_user_from_immich_db "$USER_ID")"
 
                 if [ -z "$record" ]; then
@@ -61,6 +64,29 @@ for KEY in $(get_keys); do
                     echo "File $USER_PATH/$file_path already deleted. Set asset $asset_id as removed in database."
                     mark_file_as_removed_in_immich_db "$asset_id"
                 fi
+
+                # Look in the database for new tasks in the work queue
+                record="$(last_item_from_work_queue "$USER_ID")"
+
+                if [ -z "$record" ]; then
+                    continue
+                fi
+
+                work_queue_id="$(echo "$record" | cut -d '|' -f 1)"
+                work_queue_identifier="$(echo "$record" | cut -d '|' -f 2)"
+                work_queue_payload="$(echo "$record" | cut -d '|' -f 3)"
+
+                if [ "$work_queue_identifier" == "add-file" ]; then
+                    # Process newly added files to the sync folder
+
+                    file_path="$(echo "$work_queue_payload" | jq -r '.path')"
+                    file_hash="$(echo "$work_queue_payload" | jq -r '.file_hash')"
+
+                    save_hash_to_db "$USER_ID" "$file_path" "$file_hash"
+                    upload "$KEY" "$file_path"
+                    mark_work_queue_item_as_done "$work_queue_id"
+                fi
+
             done
         fi
     } &
