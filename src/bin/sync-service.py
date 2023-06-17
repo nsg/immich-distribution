@@ -17,6 +17,7 @@ def log(msg: str):
 class ImmichDatabase:
     def __init__(self, host: str, database: str, user: str, password: str, port: int):
         self.conn = psycopg2.connect(host=host, database=database, user=user, password=password, port=port)
+        self.conn.set_client_encoding('UTF8')
 
     def last_removed_asset(self, user_id: str) -> list[psycopg2.extras.RealDictRow]:
         with self.conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
