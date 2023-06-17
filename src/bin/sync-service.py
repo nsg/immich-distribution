@@ -15,10 +15,10 @@ def log(msg: str):
     print(msg, flush=True)
 
 class ImmichDatabase:
-    def __init__(self, host, database, user, password, port):
+    def __init__(self, host: str, database: str, user: str, password: str, port: int):
         self.conn = psycopg2.connect(host=host, database=database, user=user, password=password, port=port)
 
-    def last_removed_asset(self, user_id):
+    def last_removed_asset(self, user_id: str) -> list[psycopg2.extras.RealDictRow]:
         with self.conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
             cur.execute("""
                 SELECT
@@ -36,7 +36,7 @@ class ImmichDatabase:
 
             return cur.fetchall()
 
-    def set_asset_removed(self, asset_id):
+    def set_asset_removed(self, asset_id: str) -> None:
         with self.conn.cursor() as cur:
             cur.execute("""
                 UPDATE assets_delete_audits
@@ -45,7 +45,7 @@ class ImmichDatabase:
             """, (asset_id,))
             self.conn.commit()
 
-    def save_hash(self, user_id, asset_path, checksum):
+    def save_hash(self, user_id: str, asset_path: str, checksum: bytes) -> None:
         with self.conn.cursor() as cur:
             cur.execute("""
                 INSERT INTO
@@ -60,7 +60,7 @@ class ImmichDatabase:
              checksum, asset_path, user_id))
             self.conn.commit()
 
-    def get_asset_id_by_path(self, user_id, asset_path):
+    def get_asset_id_by_path(self, user_id: str, asset_path: str) -> psycopg2.extras.RealDictRow | None:
         with self.conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
             cur.execute("""
                 SELECT assets.id
@@ -77,7 +77,7 @@ class ImmichDatabase:
         self.conn.close()
 
 class ImmichAPI:
-    def __init__(self, host, api_key):
+    def __init__(self, host: str, api_key: str):
         self.host = host
         self.headers = {
             "Accept": "application/json",
@@ -85,16 +85,16 @@ class ImmichAPI:
             "x-api-key": api_key
         }
 
-    def get_user_id(self):
+    def get_user_id(self) -> str:
         r = requests.get(f"{self.host}/user/me", headers=self.headers)
         return r.json()["id"]
     
-    def delete_asset(self, asset_id):
+    def delete_asset(self, asset_id: str) -> dict:
         data = { "ids": [ asset_id ] }
         r = requests.delete(f"{self.host}/asset", headers=self.headers, json=data)
         return r.json()
 
-def hash_file(path):
+def hash_file(path: str) -> bytes:
     file_hash = hashlib.sha1()
     with open(path, "rb") as f:
         fb = f.read(2048)
@@ -103,14 +103,16 @@ def hash_file(path):
             fb = f.read(2048)
     return file_hash.digest()
 
-def ignored_paths(path):
+def ignored_paths(path: str) -> bool:
     if os.path.basename(path).startswith("."):
         return True
 
     if os.path.isdir(path):
         return True
+    
+    return False
 
-def hash_all_files(db, user_id, path):
+def hash_all_files(db: ImmichDatabase, user_id: str, path: str) -> None:
     for root, _, files in os.walk(path):
         for file in files:
             file_path = os.path.join(root, file)
@@ -118,7 +120,7 @@ def hash_all_files(db, user_id, path):
             db.save_hash(user_id, relative_path, hash_file(file_path))
             log(f"Hash for {file_path} stored in database")
 
-def import_asset(db, api, key, base_path, asset_path):
+def import_asset(db: ImmichDatabase, api: ImmichAPI, key: str, base_path: str, asset_path: str) -> None:
     snap_path = os.getenv("SNAP")
     relative_path = os.path.relpath(asset_path, base_path)
     import_command = [
@@ -145,7 +147,7 @@ def import_asset(db, api, key, base_path, asset_path):
         db.save_hash(user_id, relative_path, checksum)
         log(f"{relative_path} hash {checksum.hex()} user {user_id})")
 
-def delete_asset(db, api, asset_path, base_path):
+def delete_asset(db: ImmichDatabase, api: ImmichAPI, asset_path: str, base_path: str) -> None:
     relative_path = os.path.relpath(asset_path, base_path)
     user_id = api.get_user_id()
     asset = db.get_asset_id_by_path(user_id, relative_path)
@@ -155,7 +157,7 @@ def delete_asset(db, api, asset_path, base_path):
     else:
         print(f"ERROR: Asset {relative_path} not found in database")
 
-def file_watcher(event, db, api, api_key, user_path):
+def file_watcher(event: threading.Event, db: ImmichDatabase, api: ImmichAPI, api_key: str, user_path: str) -> None:
     log("File watcher thread running...")
     for changes in watch(user_path, recursive=True, stop_event=event):
         for c_type, c_path in changes:
@@ -173,7 +175,7 @@ def file_watcher(event, db, api, api_key, user_path):
                 log(f"{c_path} deleted, mark asset as removed")
                 delete_asset(db, api, c_path, user_path)
 
-def database_watcher(event, db, api, user_path):
+def database_watcher(event: threading.Event, db: ImmichDatabase, api: ImmichAPI, user_path: str) -> None:
     log("Database watcher thread running...")
     user_id = api.get_user_id()
     while not event.is_set():
@@ -192,16 +194,16 @@ def database_watcher(event, db, api, user_path):
 
 def main():
     db = ImmichDatabase(
-        host=os.getenv("DB_HOSTNAME"),
-        database=os.getenv("DB_DATABASE_NAME"),
-        user=os.getenv("DB_USERNAME"),
-        password=os.getenv("DB_PASSWORD"),
+        host=os.environ["DB_HOSTNAME"],
+        database=os.environ["DB_DATABASE_NAME"],
+        user=os.environ["DB_USERNAME"],
+        password=os.environ["DB_PASSWORD"],
         port=5432
     )
 
-    api_key = os.getenv("IMMICH_API_KEY")
-    immich = ImmichAPI(os.getenv("IMMICH_SERVER_URL"), api_key)
-    snap_common = os.getenv("SNAP_COMMON")
+    api_key = os.environ["IMMICH_API_KEY"]
+    immich = ImmichAPI(os.environ["IMMICH_SERVER_URL"], api_key)
+    snap_common = os.environ["SNAP_COMMON"]
     user_id = immich.get_user_id()
     user_path = f"{snap_common}/sync/{user_id}"
 
