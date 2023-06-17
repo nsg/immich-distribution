@@ -230,5 +230,14 @@ def main():
 
     signal.signal(signal.SIGTERM, lambda signum, frame: stop_event.set())
 
+    while True:
+        print("Running thread watch")
+
+        if not watch_thread.is_alive():
+            print("Critical: Thread watch is not alive")
+        if not database_thread.is_alive():
+            print("Critical: Thread database is not alive")
+        time.sleep(10)
+
 if __name__ == '__main__':
     main()
