@@ -2,12 +2,6 @@
 
 . $SNAP/bin/load-env
 
-upload() {
-    local key="$1"
-    shift
-    $SNAP/bin/immich-cli upload --key "$key" --yes "$@"
-}
-
 if ! sync_enabled; then
     echo "Folder sync disabled"
     exit 0
@@ -25,6 +19,6 @@ for KEY in $(snapctl get sync); do
         mkdir -p "$USER_PATH"
 
         echo "Full import of $USER_PATH for user $USER_ID"
-        upload "$KEY" --recursive "$USER_PATH"
+        $SNAP/bin/immich-cli upload --recursive --key "$KEY" --yes "$USER_PATH"
     fi
 done
