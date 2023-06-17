@@ -10,6 +10,8 @@ snapctl() {
 
 export LD_LIBRARY_PATH="$SNAP/usr/local/pgsql/lib:$SNAP/usr/lib/x86_64-linux-gnu/pulseaudio:$SNAP/usr/lib/x86_64-linux-gnu/libfswatch:$LD_LIBRARY_PATH"
 
+export PGDATA="$SNAP_COMMON/pgsql/data"
+
 export LC_ALL="C"
 export LC_CTYPE="C"
 
@@ -61,31 +63,12 @@ immich_server_ready() {
     curl -s "$IMMICH_SERVER_URL/server-info/ping" -o /dev/null
 }
 
-block_immich_server_ready() {
-    while ! immich_server_ready; do
-        sleep 2
-    done
-}
-
 immich_api() {
     curl -s "$IMMICH_SERVER_URL/$2" -H 'Accept: application/json' -H "x-api-key: $1"
 }
 
-immich_api_delete() {
-    curl -s "$IMMICH_SERVER_URL/$2" -X DELETE -H "Accept: application/json" \
-        -H "Content-Type: application/json" -H "x-api-key: $1" \
-        -d "$3"
-}
-
 user_id() {
     immich_api "$1" user/me | jq -r .id
-}
-
-immich_delete_asset() {
-    local key="$1"
-    local asset_id="$2"
-
-    immich_api_delete "$key" "asset" '{"ids": ["'$asset_id'"]}'
 }
 
 root_check() {
@@ -103,4 +86,16 @@ banner() {
 
 lego_staging_string() {
     [ x$ACME_STAGING == xtrue ] && echo "--server=https://acme-staging-v02.api.letsencrypt.org/directory"
+}
+
+sync_enabled() {
+    snapctl get sync-enabled | grep -q "true"
+}
+
+query_db() {
+    if [ -z $SNAP ]; then
+        cat - | sudo immich-distribution.psql -d immich $@
+    else
+        cat - | $SNAP/bin/psql -d immich $@
+    fi
 }

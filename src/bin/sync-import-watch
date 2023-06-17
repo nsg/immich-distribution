@@ -1,24 +1,23 @@
 #!/bin/bash
 
-if [ -z $SNAP ]; then
-    . src/bin/sync
-else
-    . $SNAP/bin/sync
-fi
+. $SNAP/bin/load-env
 
-if [ -z $SNAP ]; then
-    echo "Abort: Only run this inside the snap"
-    exit 0
-fi
+upload() {
+    local key="$1"
+    shift
+    $SNAP/bin/immich-cli upload --key "$key" --yes "$@"
+}
 
 if ! sync_enabled; then
     echo "Folder sync disabled"
     exit 0
 fi
 
-block_immich_server_ready
+while ! immich_server_ready; do
+    sleep 2
+done
 
-for KEY in $(get_keys); do
+for KEY in $(snapctl get sync); do
     USER_ID="$(user_id $KEY)"
 
     if [ ! -z "$USER_ID" ]; then

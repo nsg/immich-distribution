@@ -17,16 +17,6 @@ CREATE TABLE IF NOT EXISTS assets_filesync_lookup (
     UNIQUE(user_id, asset_path)
 );
 
--- A queue used by the sync feature to import assets from the file system
-CREATE TABLE IF NOT EXISTS sync_work_queue (
-    id INT GENERATED ALWAYS AS IDENTITY,
-    user_id VARCHAR(256) NULL,
-    identifier VARCHAR(256) NULL,
-    payload TEXT NOT NULL,
-    completed BOOLEAN DEFAULT FALSE,
-    changed_on TIMESTAMP(6) NOT NULL
-);
-
 -- Function that logs the deletion of assets
 CREATE OR REPLACE FUNCTION log_assets_delete_audits()
     RETURNS TRIGGER
@@ -45,3 +35,7 @@ CREATE OR REPLACE TRIGGER trigger_assets_delete_audits
 BEFORE DELETE ON assets
 FOR EACH ROW
 EXECUTE PROCEDURE log_assets_delete_audits();
+
+-- Clean up deprecated work queue table
+-- Remove this later when all installations have updated
+DROP table IF EXISTS sync_work_queue;
