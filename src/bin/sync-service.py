@@ -119,7 +119,7 @@ def hash_all_files(db: ImmichDatabase, user_id: str, path: str) -> None:
             file_path = os.path.join(root, file)
             relative_path = os.path.relpath(file_path, path)
             db.save_hash(user_id, relative_path, hash_file(file_path))
-            log(f"Hash for {file_path} stored in database")
+            log(f"Hash {file_path} and store in database")
 
 def import_asset(db: ImmichDatabase, api: ImmichAPI, key: str, base_path: str, asset_path: str) -> None:
     snap_path = os.getenv("SNAP")
@@ -146,17 +146,17 @@ def import_asset(db: ImmichDatabase, api: ImmichAPI, key: str, base_path: str, a
         checksum = hash_file(asset_path)
         user_id = api.get_user_id()
         db.save_hash(user_id, relative_path, checksum)
-        log(f"{relative_path} hash {checksum.hex()} user {user_id})")
+        log(f"Hash {relative_path} and store in database for user {user_id})")
 
 def delete_asset(db: ImmichDatabase, api: ImmichAPI, asset_path: str, base_path: str) -> None:
     relative_path = os.path.relpath(asset_path, base_path)
     user_id = api.get_user_id()
     asset = db.get_asset_id_by_path(user_id, relative_path)
     if asset:
-        print(f"Asset {asset['id']} removed from database")
+        log(f"Asset {asset['id']} removed from database")
         api.delete_asset(asset["id"])
     else:
-        print(f"ERROR: Asset {relative_path} not found in database")
+        log(f"Asset {relative_path} not found in database")
 
 def file_watcher(event: threading.Event, db: ImmichDatabase, api: ImmichAPI, api_key: str, user_path: str) -> None:
     log("File watcher thread running...")
@@ -231,12 +231,10 @@ def main():
     signal.signal(signal.SIGTERM, lambda signum, frame: stop_event.set())
 
     while True:
-        print("Running thread watch")
-
         if not watch_thread.is_alive():
-            print("Critical: Thread watch is not alive")
+            log("Critical: Thread watch is not alive")
         if not database_thread.is_alive():
-            print("Critical: Thread database is not alive")
+            log("Critical: Thread database is not alive")
         time.sleep(10)
 
 if __name__ == '__main__':
