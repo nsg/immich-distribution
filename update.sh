@@ -36,11 +36,10 @@ else
 fi
 
 CHECK_FILES="
-    server/libs/infra/src/migrations
+    server/src/infra/migrations
     server/Dockerfile
     server/start-server.sh
     server/start-microservices.sh
-    server/README.md
     web/README.md
     web/entrypoint.sh
     web/Dockerfile
