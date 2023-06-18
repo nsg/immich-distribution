@@ -1,24 +1,17 @@
 #!/bin/bash
 
-if [ -z $SNAP ]; then
-    . src/bin/sync
-else
-    . $SNAP/bin/sync
-fi
-
-if [ -z $SNAP ]; then
-    echo "Abort: Only run this inside the snap"
-    exit 0
-fi
+. $SNAP/bin/load-env
 
 if ! sync_enabled; then
     echo "Folder sync disabled"
     exit 0
 fi
 
-block_immich_server_ready
+while ! immich_server_ready; do
+    sleep 2
+done
 
-for KEY in $(get_keys); do
+for KEY in $(snapctl get sync); do
     USER_ID="$(user_id $KEY)"
 
     if [ ! -z "$USER_ID" ]; then
@@ -26,6 +19,6 @@ for KEY in $(get_keys); do
         mkdir -p "$USER_PATH"
 
         echo "Full import of $USER_PATH for user $USER_ID"
-        upload "$KEY" --recursive "$USER_PATH"
+        $SNAP/bin/immich-cli upload --recursive --key "$KEY" --yes "$USER_PATH"
     fi
 done

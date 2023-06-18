@@ -132,26 +132,8 @@ apps:
     plugs:
       - network
 
-  sync-removed-fs:
-    command: bin/sync-removed-watch
-    daemon: simple
-    restart-delay: 10s
-    after:
-      - immich-server
-    plugs:
-      - network
-
-  sync-created-fs:
-    command: bin/sync-created-watch
-    daemon: simple
-    restart-delay: 10s
-    after:
-      - immich-server
-    plugs:
-      - network
-
-  sync-database-watch:
-    command: bin/sync-database-watch
+  sync-service:
+    command: bin/sync-service.sh
     daemon: simple
     restart-delay: 10s
     after:
@@ -372,6 +354,13 @@ parts:
       - curl
       - jq
       - xz-utils
+
+  sync:
+    plugin: nil
+    override-build:
+      ../../python/install/usr/local/bin/python3 ../../python/install/usr/local/bin/pip3 install watchfiles requests psycopg2-binary --target $SNAPCRAFT_PART_INSTALL/opt/pipsyncenv
+    after:
+      - python
 
   patches:
     source: patches

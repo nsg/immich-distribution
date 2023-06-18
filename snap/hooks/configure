@@ -19,7 +19,4 @@ fi
 snapctl restart immich-distribution.postgres
 snapctl restart immich-distribution.typesense
 snapctl restart immich-distribution.haproxy
-
-snapctl restart immich-distribution.sync-removed-fs
-snapctl restart immich-distribution.sync-created-fs
-snapctl restart immich-distribution.sync-database-watch
+snapctl restart immich-distribution.sync-service
