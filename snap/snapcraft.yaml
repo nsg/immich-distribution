@@ -185,6 +185,9 @@ parts:
       - libsqlite3-dev
       - xz-utils
       - libffi-dev
+      - libncurses5-dev
+      - libgdbm-dev
+      - libnss3-dev
     stage-packages:
       - libtcl8.6
       - libtk8.6
@@ -260,28 +263,10 @@ parts:
       - patches
 
   machine-learning:
-    plugin: nil
-    source: https://github.com/immich-app/immich.git
-    source-tag: v1.61.0
-    source-subdir: machine-learning
-    override-build: |
-      # Install Poetry and setup a virtualenv
-      ../../python/install/usr/local/bin/python3 -m venv /opt/mlenv
-      ../../python/install/usr/local/bin/python3 ../../python/install/usr/local/bin/pip3 install poetry
-      export PATH="${PWD}/../../python/install/usr/local/bin/:${PATH}"
-      export VIRTUAL_ENV="/opt/mlenv"
-
-      # Configure Poetry and install dependencies
-      cd machine-learning
-      poetry config installer.max-workers 10
-      poetry config virtualenvs.create false
-      poetry install --sync --no-interaction --no-ansi --no-root --only main
-
-      # Install the application and the virtualenv
-      mkdir -p $SNAPCRAFT_PART_INSTALL/usr/src/ml
-      mkdir -p $SNAPCRAFT_PART_INSTALL/opt
-      cp -r app $SNAPCRAFT_PART_INSTALL/usr/src/ml
-      cp -r /opt/mlenv $SNAPCRAFT_PART_INSTALL/opt/mlenv
+    plugin: make
+    source: parts/machine-learning
+    build-packages:
+      - git
     stage-packages:
       - libgomp1
     after:
