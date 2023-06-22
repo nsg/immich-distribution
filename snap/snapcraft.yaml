@@ -172,7 +172,7 @@ parts:
       fi
 
   python:
-    source: https://www.python.org/ftp/python/3.10.11/Python-3.10.11.tgz
+    source: https://www.python.org/ftp/python/3.11.4/Python-3.11.4.tgz
     plugin: make
     override-build: |
       ./configure --enable-optimizations --with-ensurepip=install
@@ -185,6 +185,9 @@ parts:
       - libsqlite3-dev
       - xz-utils
       - libffi-dev
+      - libncurses5-dev
+      - libgdbm-dev
+      - libnss3-dev
     stage-packages:
       - libtcl8.6
       - libtk8.6
@@ -198,6 +201,9 @@ parts:
       - freeglut3
       - libpulse0
       - libslang2
+    stage:
+      - -usr/lib/x86_64-linux-gnu/libX11.so.6.3.0
+      - -usr/share/doc
     prime:
       - -usr/share/doc
       - -usr/share/man
@@ -207,7 +213,7 @@ parts:
     plugin: npm
     npm-node-version: "18.16.0"
     source: https://github.com/immich-app/immich.git
-    source-tag: v1.60.0
+    source-tag: v1.61.0
     source-subdir: server
     override-build: |
       snapcraftctl set-version "$(git describe --tags)-dist1"
@@ -219,7 +225,11 @@ parts:
       cp -r node_modules $SNAPCRAFT_PART_INSTALL/usr/src/app
       cp -r dist $SNAPCRAFT_PART_INSTALL/usr/src/app
       cp -r bin $SNAPCRAFT_PART_INSTALL/usr/src/app
+      cp package.json $SNAPCRAFT_PART_INSTALL/usr/src/app
       cp start-server.sh start-microservices.sh $SNAPCRAFT_PART_INSTALL/usr/src/app
+    build-packages:
+      - libraw-dev
+      - libvips-dev
     stage-packages:
       - libc-ares2
       - libicu66
@@ -227,6 +237,8 @@ parts:
       - libnode64
       - libuv1
       - libvips
+      - imagemagick
+      - libraw19
     after:
       - node
 
@@ -234,7 +246,7 @@ parts:
     plugin: npm
     npm-node-version: "18.16.0"
     source: https://github.com/immich-app/immich.git
-    source-tag: v1.60.0
+    source-tag: v1.61.0
     source-subdir: web
     override-build: |
       patch -p0 -i $SNAPCRAFT_PART_SRC/../../patches/src/001-version-announcement-box.patch -d $SNAPCRAFT_PART_BUILD
@@ -251,17 +263,10 @@ parts:
       - patches
 
   machine-learning:
-    plugin: nil
-    source: https://github.com/immich-app/immich.git
-    source-tag: v1.60.0
-    source-subdir: machine-learning
-    override-build: |
-      ../../python/install/usr/local/bin/python3 ../../python/install/usr/local/bin/pip3 install --target $SNAPCRAFT_PART_INSTALL/opt/piptarget torch --index-url https://download.pytorch.org/whl/cpu
-      ../../python/install/usr/local/bin/python3 ../../python/install/usr/local/bin/pip3 install --target $SNAPCRAFT_PART_INSTALL/opt/piptarget transformers tqdm numpy scikit-learn scipy nltk sentencepiece fastapi Pillow uvicorn[standard]
-      ../../python/install/usr/local/bin/python3 ../../python/install/usr/local/bin/pip3 install --target $SNAPCRAFT_PART_INSTALL/opt/piptarget --no-deps sentence-transformers
-      ../../python/install/usr/local/bin/python3 ../../python/install/usr/local/bin/pip3 install --target $SNAPCRAFT_PART_INSTALL/opt/piptarget insightface onnxruntime
-      mkdir -p $SNAPCRAFT_PART_INSTALL/usr/src/ml
-      cp -r machine-learning/src $SNAPCRAFT_PART_INSTALL/usr/src/ml
+    plugin: make
+    source: parts/machine-learning
+    build-packages:
+      - git
     stage-packages:
       - libgomp1
     after:

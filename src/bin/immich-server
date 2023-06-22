@@ -11,10 +11,4 @@ fi
 banner
 
 cd $SNAP/usr/src/app
-node dist/apps/immich/apps/immich/src/main
-
-  #     #DB_PORT: 5432
-  #     # REDIS_PORT=6379
-  #     # REDIS_DBINDEX=0
-  #     # REDIS_PASSWORD=
-  #     # REDIS_SOCKET=
+node dist/main immich

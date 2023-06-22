@@ -4,10 +4,8 @@
 
 export PYTHONDONTWRITEBYTECODE=1
 export PYTHONUNBUFFERED=1
-export PYTHONPATH="$SNAP/opt/piptarget"
+export PYTHONPATH="$SNAP/opt/venv/ml/lib/python3.11/site-packages/"
 export MACHINE_LEARNING_CACHE_FOLDER="$SNAP_COMMON/cache"
 
-banner
-
 cd $SNAP/usr/src/ml
-$SNAP/usr/local/bin/python3 $SNAP/usr/src/ml/src/main.py | grep -v "GET /ping"
+$SNAP/usr/local/bin/python3 $SNAP/usr/src/ml/app/main.py | grep -v "GET /ping"
