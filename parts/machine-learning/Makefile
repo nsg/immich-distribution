@@ -1,8 +1,8 @@
-all: build install
-
+.PHONY: build
 build:
 	./build.sh v1.62.1
 
+.PHONY: install
 install:
 	mkdir -p ${SNAPCRAFT_PART_INSTALL}/usr/src/ml
 	mkdir -p ${SNAPCRAFT_PART_INSTALL}/opt/venv
