@@ -1,3 +1,4 @@
+all: build install
 
 build:
 	./build.sh v1.62.1

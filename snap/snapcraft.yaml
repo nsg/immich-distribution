@@ -263,6 +263,8 @@ parts:
   machine-learning:
     plugin: make
     source: parts/machine-learning
+    override-build: |
+      make
     build-packages:
       - git
     stage-packages:
