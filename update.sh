@@ -74,3 +74,9 @@ if ! grep -q $NEW_RELEASE_TAG snap/snapcraft.yaml; then
     echo "The string $NEW_RELEASE_TAG was NOT found in snapcraft.yaml"
     echo
 fi
+
+if ! grep -q $NEW_RELEASE_TAG parts/machine-learning/Makefile; then
+    echo
+    echo "The string $NEW_RELEASE_TAG was NOT found in parts/machine-learning/Makefile"
+    echo
+fi

@@ -1,6 +1,6 @@
 
 build:
-	./build.sh v1.61.0
+	./build.sh v1.62.1
 
 install:
 	mkdir -p ${SNAPCRAFT_PART_INSTALL}/usr/src/ml
