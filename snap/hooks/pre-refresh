@@ -1,0 +1,30 @@
+#!/bin/bash
+
+# Add this file to ignore the checks in this hook
+[ -e "$SNAP_COMMON/no-pre-refresh-hook" ] && exit 0
+
+. $SNAP/bin/load-env
+
+message() {
+    echo "There are duplicate assets originalPath in the database."
+    echo "You need to manually fix this, the update is blocked until this is fixed."
+    echo "For more information see: https://github.com/immich-app/immich/issues/2931#issuecomment-1605396092"
+    echo "Run 'sudo immich-distribution.psql -d immich' to query the database."
+    echo "The affected assets are:"
+
+    echo '
+    SELECT "originalPath", count(id)
+    FROM assets
+    GROUP BY "originalPath"
+    HAVING count(id) > 1;
+    ' | query_db
+}
+
+echo '
+SELECT "originalPath", count(id)
+FROM assets
+GROUP BY "originalPath"
+HAVING count(id) > 1;
+' | query_db -At | grep -q '/' && message && exit 1
+
+exit 0
