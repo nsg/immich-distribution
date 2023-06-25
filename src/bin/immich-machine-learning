@@ -4,7 +4,7 @@
 
 export PYTHONDONTWRITEBYTECODE=1
 export PYTHONUNBUFFERED=1
-export PYTHONPATH="$SNAP/opt/venv/ml/lib/python3.11/site-packages/"
+export PYTHONPATH="$SNAP/opt/python-libs/ml/site-packages/"
 export MACHINE_LEARNING_CACHE_FOLDER="$SNAP_COMMON/cache"
 
 cd $SNAP/usr/src/ml
