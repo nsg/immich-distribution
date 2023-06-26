@@ -274,7 +274,7 @@ parts:
     plugin: npm
     npm-node-version: "18.16.0"
     source: https://github.com/immich-app/CLI.git
-    source-tag: v0.37.0
+    source-tag: v0.39.0
     override-build: |
       npm install
       npm run build
