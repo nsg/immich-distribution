@@ -1,8 +1,8 @@
-+++
-title = "Security"
-weight = 2
-+++
-
+---
+tags:
+  - security
+  - configuration
+---
 # Security
 
 This page collect security considerations related to Immich Distribution.

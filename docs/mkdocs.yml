@@ -1,0 +1,40 @@
+site_name: Immich Distribution
+repo_url: https://github.com/nsg/immich-distribution
+edit_uri: edit/master/docs/docs/
+theme:
+  name: material
+  palette:
+    primary: deep purple
+  logo: assets/immich-dist.png
+  icon:
+    repo: fontawesome/brands/github
+    edit: material/source-repository
+  features:
+    - navigation.tabs
+    - navigation.expand
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.action.edit
+    - content.code.copy
+    - content.code.annotate
+plugins:
+  - social
+  - tags
+  - search
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/nsg/immich-distribution
+      name: Project page at GitHub
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - tables

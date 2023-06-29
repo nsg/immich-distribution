@@ -3,4 +3,6 @@
 __pycache__
 *.bkp
 *.dtmp
-/docs/site/public/
+/docs/.cache
+/docs/.venv
+/docs/site

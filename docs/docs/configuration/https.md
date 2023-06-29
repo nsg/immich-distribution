@@ -1,8 +1,3 @@
-+++
-title = "Configure HTTPS"
-weight = 1
-+++
-
 # Configure HTTPS
 
 This page will show you how to enable the built in HTTPS certificate managent in Immich Distribution. If you already have infrastructure for TLS certificates feel free to ignore this sections and point your load balancer to port 80.
@@ -19,7 +14,7 @@ Your Immich installation need to be accessable on port 80 over the internet. If 
 
 Use snapd:s configuration options to set `acme-domain` and `acme-email` to appropriate values. The domain name should be the one pointing to your Immich installation, and please use a real email address, it's used for your Let's Encrypt account. Let's Encrypt uses it to send important information about your certificate.
 
-```sh
+```sh 
 sudo snap set immich-distribution acme-domain="my.domain.name"
 sudo snap set immich-distribution acme-email="immich@example.com"
 ```

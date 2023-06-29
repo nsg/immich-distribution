@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "documentation"
+version = "0.1.0"
+description = ""
+authors = ["Stefan Berggren <nsg@nsg.cc>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+mkdocs-material = "^9.1.17"
+pillow = "^9.5.0"
+cairosvg = "^2.7.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

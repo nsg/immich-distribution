@@ -1,7 +1,12 @@
-+++
-title = "Install Immich Distribution"
-weight = 1
-+++
+# Installation
+
+``` bash title="Install Immich Distribution"
+sudo snap install immich-distribution
+```
+
+The package can be installed from the snap store like any other snap package. The package is over 500MB in size so it can take a little while to install. See the [installation section](/installation/install.md) for more information.
+
+<iframe src="https://snapcraft.io/immich-distribution/embedded?channels=true" frameborder="0" width="100%" height="350px" style="border: 1px solid #CCC; border-radius: 2px;"></iframe>
 
 ## Prerequisites
 
@@ -53,3 +58,6 @@ If you installed immich-distribution to a server with the IP 192.168.1.10 open a
 The page will update and reload automatically when all services are ready. This is a new install so Immich will offer you to register an admin account. The official [Post Install Steps](https://immich.app/docs/install/post-install) will guide you to get going.
 
 If this installation is exposed to the public internet I stronly suggest that you set up https, for information how to do that see [Enable HTTPS](@/configuration/https.md)
+
+
+
