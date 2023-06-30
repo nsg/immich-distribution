@@ -4,7 +4,7 @@ This page will show you how to enable the built in HTTPS certificate managent in
 
 ## Prerequisites
 
-HTTPS requires a domain name (like immich.example.com), it will not work with IP-numbers (like 192.168.1.10). Immich Distribution has built in support to issue free certificates from a service called [Let's Encrypt](https://letsencrypt.org/).
+HTTPS requires a domain name (like `immich.example.com`), it will not work with IP-numbers (like 192.168.1.10). Immich Distribution has built in support to issue free certificates from a service called [Let's Encrypt](https://letsencrypt.org/).
 
 Either use a domain name you already own, buy one or use a free provider. Point the DNS name to your Immich server and make sure that you can access it via http://my.domain.name (note **http**).
 
@@ -27,7 +27,7 @@ The following command will register an Let's Encrypt account, and issue the cert
 sudo immich-distribution.lets-encrypt
 ```
 
-Try to access the site via http**s**://my.domain.name, if it loads you are all done! The certificate should be renewed automatically when needed.
+Try to access the site via http{==s==}://my.domain.name, if it loads you are all done! The certificate should be renewed automatically when needed.
 
 ## Troubleshoot
 
@@ -40,5 +40,5 @@ Try to access the site via http**s**://my.domain.name, if it loads you are all d
 ## Disable HTTPS
 
 ```sh
-sudo snap set immich-distribution http-enabled="false"
+sudo snap set immich-distribution https-enabled="false"
 ```

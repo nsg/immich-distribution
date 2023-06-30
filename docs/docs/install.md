@@ -4,9 +4,19 @@
 sudo snap install immich-distribution
 ```
 
-The package can be installed from the snap store like any other snap package. The package is over 500MB in size so it can take a little while to install. See the [installation section](/installation/install.md) for more information.
+The package can be installed from the snap store like any other snap package. The package is **huge** (over 700MB) so it can take some time to download. For more information see the [Snap Store](https://snapcraft.io/immich-distribution).
 
-<iframe src="https://snapcraft.io/immich-distribution/embedded?channels=true" frameborder="0" width="100%" height="350px" style="border: 1px solid #CCC; border-radius: 2px;"></iframe>
+<iframe src="https://snapcraft.io/immich-distribution/embedded?channels=true" frameborder="0" width="100%" height="390px" style="border: 1px solid #CCC; border-radius: 2px;"></iframe>
+
+??? Warning "Important information if you like to use candidate, beta or edge"
+
+    The `edge` channel is not intended for end users, it contains experimental untested builds directly from the repository. The `beta` channel contains software that "works on my machine" and is published for general testing, expect things to break. I personally use `candidate` as a staging ground to try out a release for a few days before I push it to stable.
+
+    Updates from "candidate to candidate", "stable to stable" or "stable to candidate" should always work. Otherwise I consider it a bug. The snap may contain migration logic that makes hard to downgrade, **never** downgrade a revision.
+
+    ![](/assets/channel-flow.png)
+
+    Feel free to use the `candidate` channel if you can't wait, but overall for a trouble free experience, stay at the default `stable` channel. Sounds complicated? Use the default `stable` channel.
 
 ## Prerequisites
 
@@ -14,50 +24,43 @@ The package can be installed from the snap store like any other snap package. Th
 
 A computer running Linux with [support for snapd](https://snapcraft.io/docs/installing-snapd). Most commonly used Linux distributions are supported. If you do not have any strong preferences I recommends Ubuntu, or something Ubuntu based.
 
+??? Info "Windows and WSL2"
+
+    The snap *almost* works under Windows Subsystem for Linux. This is **not** a tested deployment but feel free to try it out if you are a Windows user. I did a quick test
+    and noticed only a minor problem with the machine learning service.
+
 ### Hardware
 
-A computer with a relatively modern Intel or AMD based CPU, for example the AVX instructionset is needed. You need **at minimum** 4GB available RAM, six or eight is preferred. You probably also need a lot of free disk space, pictures are stored at `/var/snap`.
+A computer with a relatively modern Intel or AMD based CPU, for example the AVX instructionset is needed. You need **at minimum** 4GB available RAM, 6 or 8 is preferred. You probably also need a lot of free disk space, pictures are stored at `/var/snap`.
 
-#### What about ARM?
+??? Note "What about ARM?"
 
-There is nothing technically blocking me from adapting this package for more architectures like ARM. At the moment I do not have any ARM based systems running to test and develop ARM support, so I have focused my resources on what I use personally.
+    There is nothing technically blocking me from adapting this package for more architectures like ARM. At the moment I do not have any ARM based systems running to test and develop ARM support, so I have focused my resources on what I use personally.
 
-### Type of server
+### Used ports
 
-Any type of server/computer will work. A home server, or an always on computer will work just fine. If you need to access it from the outside world, a port forward (port 80, and 443 if you like to use https) from your router to Immich would probably work. An alternative is to use a VPN (like [WireGuard](https://www.wireguard.com/) or [Tailscale](https://tailscale.com/)) to access the server from the outside. 
+Immich Distribution requires ports `80`, `443`, `3000-3003`, `5432`, `6379`, `8108` to be unused, only port 80 (and possible 443) needs to be available over the network. Immich will fail to start if they are used by another application.
 
-A [VPS](https://en.wikipedia.org/wiki/Virtual_private_server) or server running in a datacenter will of course work. All you need to do is to install the package and you are ready to go!
+??? Info "Used ports with service names"
 
-### Available ports
+    | Port | Interface | Comment |
+    | ---- | --------- | ------- |
+    | `80`   | all | HAProxy - Reverse proxy |
+    | `443`  | all | HAProxy (only if HTTPS is enabled) |
+    | `3000-3003` | all | Immich Services |
+    | `5432` | lo | Postgres - Relation database |
+    | `6379` | lo | Redis - In-memory KV database |
+    | `8108` | lo | Typesense - Search database |
 
-The following ports will be used by Immich Distribution and they need to be unused.
+## Connecting to the server
 
-| Port | Interface | Comment |
-| ---- | --------- | ------- |
-| 80   | all | HAProxy |
-| 443  | all | HAProxy (only if HTTPS is enabled) |
-| 3000-3003 | all | Immich |
-| 5432 | lo | Postgres |
-| 6379 | lo | Redis |
-| 8108 | lo | Typesense |
+![](/assets/immich-loading.png){ align=right .img-scale }
 
-## Install
+If you installed immich-distribution to a server with the IP `192.168.1.10` open a browser and navigate to `http://192.168.1.10`. The stack can take up to a minute to fully start, especially the machine learning components are slow to start.
 
-Installing Immich Distribution is easy, just execute the following command on a server. The package is over 500MB so it can take some time to install, but with a decent internet connection it should be quite fast.
+See the official [Post Install Steps](https://immich.app/docs/install/post-install) will guide you to setup your account, and configure your mobile application.
 
-```sh
-sudo snap install immich-distribution
-```
-
-### Connecting to the server
-
-If you installed immich-distribution to a server with the IP 192.168.1.10 open a browser and navigate to http://192.168.1.10. The stack can take up to a minute to fully start, especially the machine learning components are slow to start. You should be greeted with a screen like this indicating that Immich is still loading.
-
-![](/img/immich-loading.png)
-
-The page will update and reload automatically when all services are ready. This is a new install so Immich will offer you to register an admin account. The official [Post Install Steps](https://immich.app/docs/install/post-install) will guide you to get going.
-
-If this installation is exposed to the public internet I stronly suggest that you set up https, for information how to do that see [Enable HTTPS](@/configuration/https.md)
+If this installation is exposed to the public internet I stronly suggest that you set up [https](/configuration/https) and read the [security](/configuration/security) section.
 
 
 

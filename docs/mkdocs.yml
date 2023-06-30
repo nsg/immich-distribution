@@ -4,8 +4,8 @@ edit_uri: edit/master/docs/docs/
 theme:
   name: material
   palette:
-    primary: deep purple
-  logo: assets/immich-dist.png
+    primary: custom
+  logo: assets/immich-dist-greyscale.png
   icon:
     repo: fontawesome/brands/github
     edit: material/source-repository
@@ -38,3 +38,12 @@ markdown_extensions:
   - pymdownx.inlinehilite
   - pymdownx.snippets
   - tables
+  - attr_list
+  - md_in_html
+  - footnotes
+  - pymdownx.critic
+  - pymdownx.caret
+  - pymdownx.mark
+  - pymdownx.tilde
+extra_css:
+  - css/extra.css
