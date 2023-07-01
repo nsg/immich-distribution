@@ -21,6 +21,10 @@ beta2store:
 shell:
 	multipass shell snapcraft-immich-distribution
 
+.PHONY: docs
+docs:
+	cd docs && poetry run mkdocs serve
+
 clean:
 	rm -rf SNAP_COMMON tests/latest_logs/ *.snap
 	snapcraft clean
