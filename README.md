@@ -3,7 +3,7 @@
 > First an important mention, this is **NOT** an official package of [Immich](https://immich.app/). If you like to have Immich installed directly from the Immich project use the official [Docker images](https://immich.app/docs/install/docker-compose). Do not report bugs to upstream _unless_ you are sure that the same bug is present in the upstream images. Feel free to ask **me** if you are unsure.
 
 <p align="center">
-  <img src="docs/site/static/img/immich-dist-snap-gh.png">
+  <img src="docs/docs/assets/immich-dist-snap-gh.png">
 </p>
 
 ## About
