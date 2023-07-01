@@ -28,6 +28,4 @@ I deployed the [Docker based images](https://immich.app/docs/install/docker-comp
 
 ## Contribute
 
-I like to keep upstream Immich a thriving project, so if you have the possibility please consider to [support the project](https://immich.app/docs/overview/support-the-project). If you like to support *this* project. Use the software, report issues, write suggestions, contribute with bugfixes and help me to test new releases. A simple :star:
-
-see the projects [GitHub repository](https://github.com/nsg/immich-distribution) for more information how to contribute. It can be a
+I like to keep upstream Immich a thriving project, so if you have the possibility please consider to [support the project](https://immich.app/docs/overview/support-the-project). If you like to support *this* project. Use the software, report issues, write suggestions, contribute with bugfixes and help me to test new releases. A simple :star: or :thumbsup: at the right place will also keep me motivated. See the projects [GitHub repository](https://github.com/nsg/immich-distribution) for more information.
