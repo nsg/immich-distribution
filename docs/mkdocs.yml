@@ -19,7 +19,6 @@ theme:
     - content.code.copy
     - content.code.annotate
 plugins:
-  - social
   - tags
   - search
 extra:
