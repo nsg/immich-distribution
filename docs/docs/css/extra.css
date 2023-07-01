@@ -1,0 +1,13 @@
+:root {
+    --md-primary-fg-color:        #d40000;
+    --md-primary-fg-color--light: #f3b8b8;
+    --md-primary-fg-color--dark:  #740209;
+}
+
+.md-tabs {
+    font-weight: bold;
+}
+
+.img-scale {
+    width: clamp(5rem, 25vw, 12rem);
+}

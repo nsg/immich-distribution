@@ -2,3 +2,7 @@
 /src/etc/5xx.html
 __pycache__
 *.bkp
+*.dtmp
+/docs/.cache
+/docs/.venv
+/docs/site
