@@ -62,5 +62,38 @@ See the official [Post Install Steps](https://immich.app/docs/install/post-insta
 
 If this installation is exposed to the public internet I stronly suggest that you set up [https](/configuration/https) and read the [security](/configuration/security) section.
 
+## Updates
 
+Updates are by **default** automatic, this is a core concept of the package format. I write the software with that in mind so I will never push a breaking change. You should never have a broken system as a result of an automatic update.
 
+??? Note "Disable or control automatic updates"
+
+    The advantages with automatic updates usually outweights the disadvantages for ordinary users, that's why automatic updates are on by default. If you have other needs this behavior can be changed with the following commands.
+
+    **Please note** that if you do not update regularly (that's about once a week, at minimum) I can't guarantee that updates are completely trouble free. They should be, but I test only updates done sequentially from version to version.
+    
+    ```bash title="Prevent updates over the weekend"
+    snap refresh --hold=72h immich-distribution # (1)
+    ```
+
+    1. Change this to a value to your likeing. See the [documentation](https://snapcraft.io/docs/keeping-snaps-up-to-date) for more information.
+
+    ```bash title="Never update automatically"
+    snap refresh --hold=forever immich-distribution
+    ```
+
+    Another alternative is to pick a time when updates are applied, like in the middle in the night. For more information about that, and much more see [snapd:s documentation](https://snapcraft.io/docs/keeping-snaps-up-to-date).
+
+**Do not expect me to release updates the same day** as an upstream Immich release. I hope to do so in a **reasonable time**. When Immich releases an update I will build and push an update to the candidate channel when I beleave I got it right (my server uses this channel) and try it out myself for a few days. I will relese the build to the stable channel after a few days, if everyting works.
+
+??? Note "When is the next update released?"
+
+    Updates can be quick and easy, or a lot of work depending on the changes upstream. I will open a tracking issue tagged with [new-version](https://github.com/nsg/immich-distribution/issues?q=is%3Aissue+is%3Aopen+label%3Anew-version) when I detect an update, feel free to ask questions there. If you have experience with building snap packages, see [upgrade](/build/upgrade) how to contribute to the project.
+
+    To speed up the transition time from "beta -> candidate -> stable", help me test the build and inform me about detected problems, try to troubleshoot them, and of course, also report success!
+
+    Finally, just a thumbs up or any message will keep me motivated to carry on!
+
+## Configuration
+
+By default you should have a working installation of Immich, but you may like to configure it a bit. See the [configuration](/configuration/) pages for that.
