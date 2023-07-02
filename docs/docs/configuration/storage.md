@@ -32,17 +32,6 @@ I have provided a sample disk usage with 56k pictures and 800 videos. If you lik
 
 Let's assume that you like to move `$C/upload/library` to another drive, our large drive is located at `/data` and that we have a folder inside it at `/data/library` that should contain our library data. This is done with a bind mount, in this example I use systemd mounts.
 
-!!! Warning
-    Note that (`\x2d`) can cause problems, you need to double escapt it as `\\x2d` alternatively surround it with a single quote (`'`). One of the following will work:
-
-    ```
-    $EDITOR {=='==}/etc/systemd/system/var-snap-immich\x2ddistribution-common-upload-library.mount{=='==}
-    ```
-
-    ```
-    $EDITOR /etc/systemd/system/var-snap-immich{==\==}\x2ddistribution-common-upload-library.mount
-    ```
-
 Create the following mount-file. Note that the filename is based on `Where`, if you change this patch, this file need to be renamed as well.
 
 ```toml title="/etc/systemd/system/var-snap-immich\x2ddistribution-common-upload-library.mount" 
@@ -59,6 +48,17 @@ TimeoutSec=5
 [Install]
 WantedBy=multi-user.target
 ```
+
+!!! Warning
+    Note that (`\x2d`) can cause problems, you need to double escapt it as `\\x2d` alternatively surround it with a single quote (`'`). One of the following will work:
+
+    ```
+    $EDITOR {=='==}/etc/systemd/system/var-snap-immich\x2ddistribution-common-upload-library.mount{=='==}
+    ```
+
+    ```
+    $EDITOR /etc/systemd/system/var-snap-immich{==\==}\x2ddistribution-common-upload-library.mount
+    ```
 
 ??? Info "Figure out a correct filename"
     There is a built in command called `systemd-escape` that you can use to generate a correctly escaped string.
@@ -85,7 +85,7 @@ sudo mv /var/snap/immich-distribution/common/upload/library/* /data/library
 sudo systemctl enable --now var-snap-immich\\x2ddistribution-common-upload-library.mount
 ```
 
-Both locations should not contain the same files
+Both locations should now contain the same files
 
 ```bash
 $ ls /var/snap/immich-distribution/common/upload/library
@@ -104,7 +104,7 @@ sudo snap start immich-distribution
 ## Relocate the entire upload folder with a bind mount
 
 !!! Warning
-    This section assumes that you have read and understood the above section about library.
+    This section assumes that you have read and understood the above section.
 
 Stop Immich, move data to it's new location. Use this unitfile, note that the filename has changed, and `What` and `Where`. Enable and start it, and finally Immich.
 
