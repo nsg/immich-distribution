@@ -116,6 +116,9 @@ def ignored_paths(path: str) -> bool:
 def hash_all_files(db: ImmichDatabase, user_id: str, path: str) -> None:
     for root, _, files in os.walk(path):
         for file in files:
+            if ignored_paths(file):
+                continue
+
             file_path = os.path.join(root, file)
             relative_path = os.path.relpath(file_path, path)
             db.save_hash(user_id, relative_path, hash_file(file_path))
