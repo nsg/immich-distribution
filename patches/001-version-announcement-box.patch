@@ -1,44 +1,37 @@
---- web/src/lib/components/shared-components/version-announcement-box.svelte	2023-03-23 08:42:30.335516653 +0100
-+++ web/src/lib/components/shared-components/version-announcement-box-snap.svelte	2023-03-23 10:19:12.774002763 +0100
-@@ -47,24 +47,25 @@
- 			<p class="text-2xl mb-4">🎉 NEW VERSION AVAILABLE 🎉</p>
+--- web/src/lib/components/shared-components/version-announcement-box.svelte	2023-07-08 20:28:47.259649393 +0200
++++ web/src/lib/components/shared-components/version-announcement-box-snap.svelte	2023-07-08 18:59:20.364160636 +0200
+@@ -48,20 +48,28 @@
+       <p class="text-2xl mb-4">🎉 NEW VERSION AVAILABLE 🎉</p>
  
- 			<div>
--				Hi friend, there is a new release of
--				<span class="font-immich-title text-immich-primary dark:text-immich-dark-primary font-bold"
--					>IMMICH</span
--				>, please take your time to visit the
--				<span class="underline font-medium"
--					><a
--						href="https://github.com/immich-app/immich/releases/latest"
--						target="_blank"
--						rel="noopener noreferrer">release notes</a
--					></span
--				>
--				and ensure your <code>docker-compose</code>, and <code>.env</code> setup is up-to-date to prevent
--				any misconfigurations, especially if you use WatchTower or any mechanism that handles updating
--				your application automatically.
-+				You are running an community build of
-+				<span class="font-immich-title text-immich-primary dark:text-immich-dark-primary font-bold">IMMICH</span>,
-+				packaged in a
-+				<span class="underline font-medium">
-+					<a href="https://snapcraft.io/immich-distribution" target="_blank" rel="noopener noreferrer">snap package</a>.
-+				</span>
-+				The snap package should update automatically in a few days, you can inspect the progress at
-+				<span class="underline font-medium">
-+					<a href="https://github.com/nsg/immich-distribution/labels/new-version" target="_blank" rel="noopener noreferrer">the issue tracker</a>.
-+				</span>
-+				If this breaks compability with the mobile client please provide this information, otherwise relax and give us time.
-+				
-+				Look at the
-+				<span class="underline font-medium">
-+					<a href="https://github.com/immich-app/immich/releases/latest" target="_blank" rel="noopener noreferrer">release notes</a>
-+				</span>
-+				for news and information of what the new release contains.
- 			</div>
+       <div>
+-        Hi friend, there is a new release of
++        You are running an community build of
+         <span class="font-immich-title text-immich-primary dark:text-immich-dark-primary font-bold">IMMICH</span>,
+-        please take your time to visit the
++        packaged in a
++        <span class="underline font-medium"
++          ><a href="https://snapcraft.io/immich-distribution" target="_blank" rel="noopener noreferrer"
++            >snap package</a
++          >.</span
++        >
++        The snap package should update automatically in a few days, you can inspect the progress at
++        <span class="underline font-medium"
++          ><a href="https://github.com/nsg/immich-distribution/labels/new-version" target="_blank" rel="noopener noreferrer"
++            >the issue tracker</a
++          >.</span>
++        If this breaks compability with the mobile client please provide this information, otherwise relax and give us time. Look at the
+         <span class="underline font-medium"
+           ><a href="https://github.com/immich-app/immich/releases/latest" target="_blank" rel="noopener noreferrer"
+             >release notes</a
+           ></span
+         >
+-        and ensure your <code>docker-compose</code>, and <code>.env</code> setup is up-to-date to prevent any misconfigurations,
+-        especially if you use WatchTower or any mechanism that handles updating your application automatically.
++        for news and information of what the new release contains.
+       </div>
  
--			<div class="font-medium mt-4">Your friend, Alex</div>
+-      <div class="font-medium mt-4">Your friend, Alex</div>
 -
- 			<div class="font-sm mt-8">
- 				<code>Server Version: {serverVersionName}</code>
- 				<br />
+       <div class="font-sm mt-8">
+         <code>Server Version: {serverVersionName}</code>
+         <br />
