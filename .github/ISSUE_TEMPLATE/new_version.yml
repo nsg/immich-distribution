@@ -24,6 +24,7 @@ body:
         - [ ] Read Immich Discord to get a feeling if there is any critical bugs (and maybe wait for a dot release).
         - [ ] Check for new releases of the [Immich CLI](https://github.com/immich-app/CLI/releases).
         - [ ] Build and test it locally.
+        - [ ] Write a news post in docs/docs/news/index.md
         - [ ] Push it to a branch in a PR, let CI run it's tests.
         - [ ] Merge the PR.
         - [ ] Wait for snapcraft build service to do it's thing and release a build to edge channel.
