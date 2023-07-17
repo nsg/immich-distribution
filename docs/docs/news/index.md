@@ -2,6 +2,16 @@
 
 This page list latest news and announcements related to Immich Distribution.
 
+## Release v1.67
+
+[Issue #51](https://github.com/nsg/immich-distribution/issues/51) - (Released to beta 2023-07-17)
+
+This was a simple release, I have bumped the version to the latest Immich relese.
+
+### Changes
+
+* Immich v1.67.2
+
 ## Release v1.66
 
 [Issue #48](https://github.com/nsg/immich-distribution/issues/48) - (Released to beta 2023-07-09)
