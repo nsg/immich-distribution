@@ -6,3 +6,4 @@ download-patch:
 
 make-patch:
 	diff -u src/version-announcement-box.svelte src/version-announcement-box-snap.svelte > 001-version-announcement-box.patch || :
+	sed -i "s/src\/version-announcement-box/web\/src\/lib\/components\/shared-components\/version-announcement-box/g" 001-version-announcement-box.patch
