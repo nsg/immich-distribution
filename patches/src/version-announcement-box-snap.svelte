@@ -43,26 +43,26 @@
 {#if showModal}
   <FullScreenModal on:clickOutside={() => (showModal = false)}>
     <div
-      class="border bg-immich-bg dark:bg-immich-dark-gray dark:border-immich-dark-gray shadow-sm max-w-lg rounded-3xl py-10 px-8 dark:text-immich-dark-fg"
+      class="max-w-lg rounded-3xl border bg-immich-bg px-8 py-10 shadow-sm dark:border-immich-dark-gray dark:bg-immich-dark-gray dark:text-immich-dark-fg"
     >
-      <p class="text-2xl mb-4">🎉 NEW VERSION AVAILABLE 🎉</p>
+      <p class="mb-4 text-2xl">🎉 NEW VERSION AVAILABLE 🎉</p>
 
       <div>
         You are running an community build of
-        <span class="font-immich-title text-immich-primary dark:text-immich-dark-primary font-bold">IMMICH</span>,
+        <span class="font-immich-title font-bold text-immich-primary dark:text-immich-dark-primary">IMMICH</span>,
         packaged in a
-        <span class="underline font-medium"
+        <span class="font-medium underline"
           ><a href="https://snapcraft.io/immich-distribution" target="_blank" rel="noopener noreferrer"
             >snap package</a
           >.</span
         >
         The snap package should update automatically in a few days, you can inspect the progress at
-        <span class="underline font-medium"
+        <span class="font-medium underline"
           ><a href="https://github.com/nsg/immich-distribution/labels/new-version" target="_blank" rel="noopener noreferrer"
             >the issue tracker</a
           >.</span>
         If this breaks compability with the mobile client please provide this information, otherwise relax and give us time. Look at the
-        <span class="underline font-medium"
+        <span class="font-medium underline"
           ><a href="https://github.com/immich-app/immich/releases/latest" target="_blank" rel="noopener noreferrer"
             >release notes</a
           ></span
@@ -76,7 +76,7 @@
         <code>Latest Version: {githubVersion}</code>
       </div>
 
-      <div class="text-right mt-8">
+      <div class="mt-8 text-right">
         <Button fullwidth on:click={onAcknowledge}>Acknowledge</Button>
       </div>
     </div>

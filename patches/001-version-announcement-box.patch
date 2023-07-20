@@ -1,26 +1,26 @@
---- web/src/lib/components/shared-components/version-announcement-box.svelte	2023-07-08 20:28:47.259649393 +0200
-+++ web/src/lib/components/shared-components/version-announcement-box-snap.svelte	2023-07-08 18:59:20.364160636 +0200
+--- web/src/lib/components/shared-components/version-announcement-box.svelte	2023-07-20 20:45:53.673236581 +0200
++++ web/src/lib/components/shared-components/version-announcement-box-snap.svelte	2023-07-20 21:19:55.952997300 +0200
 @@ -48,20 +48,28 @@
-       <p class="text-2xl mb-4">🎉 NEW VERSION AVAILABLE 🎉</p>
+       <p class="mb-4 text-2xl">🎉 NEW VERSION AVAILABLE 🎉</p>
  
        <div>
 -        Hi friend, there is a new release of
 +        You are running an community build of
-         <span class="font-immich-title text-immich-primary dark:text-immich-dark-primary font-bold">IMMICH</span>,
+         <span class="font-immich-title font-bold text-immich-primary dark:text-immich-dark-primary">IMMICH</span>,
 -        please take your time to visit the
 +        packaged in a
-+        <span class="underline font-medium"
++        <span class="font-medium underline"
 +          ><a href="https://snapcraft.io/immich-distribution" target="_blank" rel="noopener noreferrer"
 +            >snap package</a
 +          >.</span
 +        >
 +        The snap package should update automatically in a few days, you can inspect the progress at
-+        <span class="underline font-medium"
++        <span class="font-medium underline"
 +          ><a href="https://github.com/nsg/immich-distribution/labels/new-version" target="_blank" rel="noopener noreferrer"
 +            >the issue tracker</a
 +          >.</span>
 +        If this breaks compability with the mobile client please provide this information, otherwise relax and give us time. Look at the
-         <span class="underline font-medium"
+         <span class="font-medium underline"
            ><a href="https://github.com/immich-app/immich/releases/latest" target="_blank" rel="noopener noreferrer"
              >release notes</a
            ></span
@@ -30,7 +30,7 @@
 +        for news and information of what the new release contains.
        </div>
  
--      <div class="font-medium mt-4">Your friend, Alex</div>
+-      <div class="mt-4 font-medium">Your friend, Alex</div>
 -
        <div class="font-sm mt-8">
          <code>Server Version: {serverVersionName}</code>
