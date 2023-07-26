@@ -25,6 +25,9 @@ shell:
 docs:
 	cd docs && poetry run mkdocs serve
 
+version-update:
+	./version-update.sh
+
 clean:
 	rm -rf SNAP_COMMON tests/latest_logs/ *.snap
 	snapcraft clean

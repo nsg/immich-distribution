@@ -1,6 +1,23 @@
 site_name: Immich Distribution
 repo_url: https://github.com/nsg/immich-distribution
 edit_uri: edit/master/docs/docs/
+nav:
+  - About: index.md
+  - News: news/index.md
+  - Installation: install.md
+  - Configuration:
+    - Introduction: configuration/index.md
+    - configuration/cli.md
+    - configuration/security.md
+    - HTTPS: configuration/https.md
+    - configuration/storage.md
+    - configuration/backup-restore.md
+    - configuration/postgres.md
+    - configuration/haproxy.md
+  - Contribute:
+    - Upgrade: build/upgrade.md
+    - Patches: build/patches.md
+
 theme:
   name: material
   palette:

@@ -10,9 +10,9 @@ This page describe the upgrade process as a **developer** that I follow when I r
 
 Open a [New version issue](https://github.com/nsg/immich-distribution/issues/new/choose). Change `X.Y` to the relevant Immich version. Ignore patch releases (`1.23` instead of `1.23.4`). That will make it simpler if upstream releases a patch release. Immich do **not** follow strict [semantic versioning](https://semver.org/) but overall the patch releases are usually fixes and **minor** features that do not usually affect Immich Distribution.
 
-## Bump the Immich version
+## Bump Immich version
 
-Update `snap/snapcraft.yaml` and `parts/machine-learning/Makefile` with the new release version, note that this number occurs at several places in the files. The update script below will also validate that is is correctly done.
+Run `make version-update`, this should update  `snap/snapcraft.yaml`, `parts/machine-learning/Makefile` and `patches/Makefile` with the new release version. The update script below will also validate that is is correctly done.
 
 ```yaml hl_lines="5"
   server:
@@ -21,11 +21,6 @@ Update `snap/snapcraft.yaml` and `parts/machine-learning/Makefile` with the new 
     source: https://github.com/immich-app/immich.git
     source-tag: v1.64.0
     source-subdir: server
-```
-
-```make hl_lines="2"
-build:
-	./build.sh v1.64.0
 ```
 
 ## Immich CLI
