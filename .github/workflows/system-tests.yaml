@@ -44,8 +44,6 @@ jobs:
       #   run: |
       #     sudo snap install --edge immich-distribution
 
-      - name: Copy test assets to selenium container
-        run: sudo cp -v ${{ github.workspace }}/tests/assets/* /var/snap/immich-distribution/current/
 
       - name: Install requirements
         run: pip install -r tests/requirements.txt
