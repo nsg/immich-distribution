@@ -108,7 +108,7 @@ class TestImmichWeb(BaseCase):
         )
 
         if not os.path.exists(snap_readable_path):
-            os.mkdir(snap_readable_path)
+            os.makedirs(snap_readable_path)
 
         for upload in os.listdir("assets"):
             shutil.copy(f"assets/{upload}", snap_readable_path)
