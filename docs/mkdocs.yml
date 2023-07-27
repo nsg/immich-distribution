@@ -14,6 +14,7 @@ nav:
     - configuration/backup-restore.md
     - configuration/postgres.md
     - configuration/haproxy.md
+    - configuration/sync.md
   - Contribute:
     - Upgrade: build/upgrade.md
     - Patches: build/patches.md
