@@ -1,9 +1,9 @@
 
 test: .env/bin/seleniumbase wait
-	.env/bin/pytest tests_selenium.py --server=127.0.0.1 --port=4444 --headed
+	.env/bin/pytest tests_selenium.py --server=127.0.0.1 --port=4444 --headed --html=report.html
 
 ci: wait
-	pytest tests_selenium.py --server=127.0.0.1 --port=4444
+	pytest tests_selenium.py --server=127.0.0.1 --port=4444 --html=report.html
 
 wait:
 	while ! ./test_haproxy.sh ; do sleep 1; done

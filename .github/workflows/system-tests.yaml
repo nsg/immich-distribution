@@ -50,3 +50,11 @@ jobs:
 
       - name: Run Selenium Tests
         run: make ci -C tests
+
+      - name: Upload test report
+        uses: actions/upload-artifact@v3
+        with:
+          name: selenium-test-report
+          path: |
+            tests/report.html
+            tests/assets/style.css

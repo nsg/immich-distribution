@@ -8,3 +8,5 @@ __pycache__
 /docs/site
 /tests/secret.txt
 /tests/latest_logs
+/tests/report.html
+/tests/assets/style.css
