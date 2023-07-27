@@ -17,6 +17,7 @@ nav:
   - Contribute:
     - Upgrade: build/upgrade.md
     - Patches: build/patches.md
+    - Tests: build/tests.md
 
 theme:
   name: material

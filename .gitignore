@@ -6,3 +6,5 @@ __pycache__
 /docs/.cache
 /docs/.venv
 /docs/site
+/tests/secret.txt
+/tests/latest_logs
