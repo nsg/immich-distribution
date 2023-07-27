@@ -38,17 +38,38 @@ Any file synchronization software of your choice, for full functionality if need
 
 You need to make sure that Immich Distribution Sync has permissions to read **and** remove files added by the sync solution.
 
-## Immich Distribution Sync
+## Configure
 
-### Configure
+The sync functionality can be enabled with the following command.
 
-### Schematics
+```bash
+snap set immich-distribution sync-enabled=true # (1)
+```
 
-This is a more detailed schema of _my_ setup, feel free to configure and use whatever software that you like.
+1. or `false` to disable the service
+
+The sync service uses an API Key so you need to generate one in Immich Web. API Keys can be generated under your users account settings. Configure your API Key like this:
+
+```bash
+snap set immich-distribution sync="lECqjpwl4KdlfI7z8jOJoWXjbtaxGp5HLzJ9zU8Wnc"
+```
+
+!!! Note "Multiple users"
+    To configure multiple sync services for several users, specify both keys separarated by a space.
+
+Inspect the sync service logs with:
+
+```bash
+journalctl -eu snap.immich-distribution.sync-*
+```
+
+## My Setup
+
+This is a more detailed schema of _my_ setup, feel free to configure and use whatever software that you like. I have configured [Syncthing](https://syncthing.net) to synchronize my phones camera roll/folder with `/var/snap/immich-distribution/common/sync/b85e...6a4b/phone`.
 
 ``` mermaid
 graph TB
-P("📱 Phone")
+P("📱 Phone (Camera)")
 IS("🌹 Immich Server")
 IW("🌹 Immich Web")
 SY("/var/snap/.../sync/UUID/phone")
@@ -65,5 +86,6 @@ SYNC -- "⛔ Deleted picture" ---> SY
 SYNC -- "🌄 New picture" ---> CLI --> IS
 SYNC -- "⛔ Deleted picture" ---> API --> IS
 IS -- "⛔ Deleted picture" ---> SYNC
-IS ---> IW
+IS -- "🌄 New picture" ---> IW
+IW -- "⛔ Deleted picture" ---> IS
 ```
