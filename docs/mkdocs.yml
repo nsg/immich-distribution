@@ -24,6 +24,7 @@ theme:
   palette:
     primary: custom
   logo: assets/immich-dist-greyscale.png
+  favicon: assets/immich-dist-greyscale.png
   icon:
     repo: fontawesome/brands/github
     edit: material/source-repository
@@ -31,6 +32,7 @@ theme:
     - navigation.tabs
     - navigation.expand
     - navigation.top
+    - navigation.indexes
     - search.suggest
     - search.highlight
     - content.action.edit
@@ -65,5 +67,10 @@ markdown_extensions:
   - pymdownx.emoji:
       emoji_index: !!python/name:materialx.emoji.twemoji
       emoji_generator: !!python/name:materialx.emoji.to_svg
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
 extra_css:
   - css/extra.css
