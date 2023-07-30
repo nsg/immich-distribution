@@ -1,0 +1,31 @@
+name: Automatically bump version
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: "bump"
+  cancel-in-progress: true
+
+jobs:
+  bump-version:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Bump version
+        run: |
+          git config --global user.name "Github Action Automation"
+          git config --global user.email "nsg@users.noreply.github.com"
+
+          touch test-file
+          git add test-file
+          git commit -m "TEST"
+          git push -u origin test-bump-version
+
+      # - name: Create pull request
+      #   run: >
+      #     gh pr create -B master -H test123 --title 'TEST: V1.71' --body 'Created by Github action'
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
