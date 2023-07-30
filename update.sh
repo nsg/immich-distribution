@@ -14,7 +14,12 @@ if [ -d "$TMPDIR" ]; then
 fi
 
 vdiff() {
-    git diff --color=always -w $OLD_RELEASE_TAG $NEW_RELEASE_TAG -- $1
+    if [ -z $GITHUB_ACTIONS ]; then
+        COLOR=always
+    else
+        COLOR=never
+    fi
+    git diff --color=$COLOR -w $OLD_RELEASE_TAG $NEW_RELEASE_TAG -- $1
 }
 
 git clone $REPO_PATH $TMPDIR
