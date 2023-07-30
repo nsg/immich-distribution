@@ -33,9 +33,25 @@ jobs:
           NEW_VERSION=$(cat VERSION)
           BRANCH_NAME="bump-$NEW_VERSION"
           REMOTE_URL=$(git remote get-url origin)
+          NEW_VERSION_MAJOR_MINOR=$(echo $NEW_VERSION | cut -d. -f1-2)
+
+          if ! [[ "$NEW_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Version $NEW_VERSION is not a valid version number."
+            exit 0
+          fi
 
           if git ls-remote --exit-code "$REMOTE_URL" "refs/heads/$BRANCH_NAME" >/dev/null 2>&1; then
             echo "Branch $BRANCH_NAME already exists."
+            exit 0
+          fi
+
+          if gh issue list \
+            --label new-version \
+            --state open \
+            --title "Immich $NEW_VERSION_MAJOR_MINOR released" \
+            --limit 1 > /dev/null 2>&1; then
+
+            echo "Issue for $NEW_VERSION_MAJOR_MINOR already exists."
             exit 0
           fi
 
@@ -57,7 +73,13 @@ jobs:
           * Possible write a news entry (and push it to this PR)
           * Wait for the CI to finish
           * Merge the PR
-          " > /tmp/BODY.md
+          " > /tmp/PR-BODY.md
+
+          echo "
+          Tracking issue for Immich $NEW_VERSION.
+
+
+          " > ISSUE-BODY.md
 
           if [ "$OLD_VERSION" != "$NEW_VERSION" ]; then
             git checkout -b $BRANCH_NAME
@@ -65,9 +87,13 @@ jobs:
             git commit -m "Bump version to $NEW_VERSION"
             git push -u origin $BRANCH_NAME
 
+            # gh issue create \
+            #   --title "Immich $NEW_VERSION released" \
+            #   --body-file /tmp/ISSUE-BODY.md \
+
             gh pr create \
               --base master \
               --assignee=nsg \
               --title "Bump $NEW_VERSION" \
-              --body-file /tmp/BODY.md
+              --body-file /tmp/PR-BODY.md
           fi
