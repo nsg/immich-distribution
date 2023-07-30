@@ -1,0 +1,31 @@
+name: Automatically bump version
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 0,6,12,18 * * *"
+  pull_request:
+
+concurrency:
+  group: "bump"
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+jobs:
+  bump-version:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Bump version
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git config --global user.name "Github Action Automation"
+          git config --global user.email "nsg@users.noreply.github.com"
+          ./auto-bump.sh
