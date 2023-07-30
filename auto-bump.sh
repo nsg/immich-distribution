@@ -17,7 +17,7 @@ get_issue_number() {
         --search "Immich $1 released" \
         --json number \
         --limit 1 \
-        --jq ".[].number"
+        --jq ".[].number" 2>/dev/null
 }
 
 get_pr_number() {
@@ -26,7 +26,7 @@ get_pr_number() {
         --search "Bump $1" \
         --json number \
         --limit 1 \
-        --jq ".[].number"
+        --jq ".[].number" 2>/dev/null
 }
 
 has_any_pr_bump_open() {
@@ -79,8 +79,11 @@ Expect it to be released in the next few days to the beta channel, and to stable
 It may be faster if there are no issues with the release.
 " > /tmp/ISSUE-BODY.md
 
-if get_issue_number "${NEW_VERSION_MAJOR_MINOR}" | grep -qE '.'; then
-    echo "Issue for $NEW_VERSION_MAJOR_MINOR already exists."
+ISSUE_NUMBER="$(get_issue_number "${NEW_VERSION_MAJOR_MINOR}")"
+if [ -z $ISSUE_NUMBER ]; then
+    echo "Issue for $NEW_VERSION_MAJOR_MINOR already exists, issue $ISSUE_NUMBER."
+    gh issue view $ISSUE_NUMBER --json body --jq ".body" > /tmp/ISSUE-BODY.md
+    cat /tmp/ISSUE-BODY.md
 else
     gh issue create \
         --title "Immich $NEW_VERSION_MAJOR_MINOR released" \
