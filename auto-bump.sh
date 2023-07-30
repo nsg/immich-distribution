@@ -122,7 +122,6 @@ $(new_cli_version)
 
 ## Upstream release notes
 * https://github.com/immich-app/immich/releases/tag/$NEW_VERSION
-* https://github.com/immich-app/immich/releases
 
 ## Monitored upstream files
 $(./update.sh $OLD_VERSION $NEW_VERSION)
