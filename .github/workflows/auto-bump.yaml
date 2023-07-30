@@ -52,6 +52,8 @@ jobs:
             --search "Immich ${NEW_VERSION_MAJOR_MINOR:1} released" \
             --limit 1
 
+          gh issue list --label new-version --state open --search "Immich 1.71 released" --json title,number
+
           #   echo "Issue for $NEW_VERSION_MAJOR_MINOR already exists."
           #   exit 0
           # fi
