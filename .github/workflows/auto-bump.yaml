@@ -12,6 +12,7 @@ concurrency:
 
 permissions:
   contents: write
+  pull-requests: write
 
 jobs:
   bump-version:
@@ -43,8 +44,12 @@ jobs:
             git push -u origin $BRANCH_NAME
           fi
 
-      # - name: Create pull request
-      #   run: >
-      #     gh pr create -B master -H test123 --title 'TEST: V1.71' --body 'Created by Github action'
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Create pull request
+        run: >
+          gh pr create
+          --base master
+          --assignee=@nsg
+          --title "Bump $NEW_VERSION"
+          --body 'Created by Github action'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
