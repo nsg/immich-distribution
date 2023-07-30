@@ -8,6 +8,9 @@ concurrency:
   group: "bump"
   cancel-in-progress: true
 
+permissions:
+  contents: write
+
 jobs:
   bump-version:
     runs-on: ubuntu-latest
