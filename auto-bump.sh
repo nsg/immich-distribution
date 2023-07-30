@@ -105,7 +105,9 @@ fi
 git checkout -b $BRANCH_NAME
 git add .
 git commit -m "Bump version to $NEW_VERSION"
-git push -u origin $BRANCH_NAME
+
+# Push to GitHub via SSH to trigger the GitHub Action Events
+git push -u origin $BRANCH_NAME --repo=git@github.com:nsg/immich-distribution.git
 
 echo "
 This PR bumps the version from **$OLD_VERSION** to **$NEW_VERSION**.

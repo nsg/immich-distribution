@@ -21,6 +21,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      # A GitHub Action can't trigger another GitHub Actions Events
+      # using the GH_TOKEN. So we need to use a SSH key to trigger
+      # the push event in system-tests.yaml for our pull request.
       - name: Add SSH key to SSH Agent
         env:
             SSH_AUTH_SOCK: /tmp/ssh_agent.sock
