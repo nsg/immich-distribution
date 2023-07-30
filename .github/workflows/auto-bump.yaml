@@ -29,7 +29,7 @@ jobs:
           git config --global user.email "nsg@users.noreply.github.com"
 
           OLD_VERSION=$(cat VERSION)
-          make version-update
+          make version-update > /tmp/version-update 2>&1
           NEW_VERSION=$(cat VERSION)
           BRANCH_NAME="bump-$NEW_VERSION"
           REMOTE_URL=$(git remote get-url origin)
@@ -38,6 +38,20 @@ jobs:
             echo "Branch $BRANCH_NAME already exists."
             exit 0
           fi
+
+          echo "
+          This PR bumps the version from $OLD_VERSION to $NEW_VERSION. This PR was automatically created by a Github Action.
+          Please review the changes and merge this PR if everything looks good.
+
+          ## Version update output
+          $(cat /tmp/version-update)
+
+          ## Upstream release notes
+          https://github.com/immich-app/immich/releases/tag/$NEW_VERSION
+          
+          ## `./update.sh $OLD_VERSION $NEW_VERSION`
+          $(./update.sh $OLD_VERSION $NEW_VERSION)
+          " > /tmp/BODY.md
 
           if [ "$OLD_VERSION" != "$NEW_VERSION" ]; then
             git checkout -b $BRANCH_NAME
@@ -49,5 +63,5 @@ jobs:
               --base master \
               --assignee=nsg \
               --title "Bump $NEW_VERSION" \
-              --body 'Created by Github action'
+              --body-file /tmp/BODY.md
           fi
