@@ -129,5 +129,5 @@ $(./update.sh $OLD_VERSION $NEW_VERSION)
 * Wait for the CI to finish
 * Merge the PR
 
-ref #$(get_issue_number "${NEW_VERSION_MAJOR_MINOR:1}")
+ref #$(get_issue_number "${NEW_VERSION_MAJOR_MINOR}")
 " | create_pr
