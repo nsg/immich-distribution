@@ -23,12 +23,22 @@ jobs:
           git config --global user.name "Github Action Automation"
           git config --global user.email "nsg@users.noreply.github.com"
 
-          touch test-file
+          OLD_VERSION=$(cat VERSION)
+          make version-update
+          NEW_VERSION=$(cat VERSION)
+          BRANCH_NAME="bump-$NEW_VERSION"
 
-          git checkout -b test-bump-version
-          git add test-file
-          git commit -m "TEST"
-          git push -u origin test-bump-version
+          if git rev-parse --quiet --verify "$BRANCH_NAME" >/dev/null 2>&1; then
+            echo "Branch $BRANCH_NAME already exists."
+            exit 0
+          fi
+
+          if [ "$OLD_VERSION" != "$NEW_VERSION" ]; then
+            git checkout -b $BRANCH_NAME
+            git add .
+            git commit -m "Bump version to $NEW_VERSION"
+            git push -u origin $BRANCH_NAME
+          fi
 
       # - name: Create pull request
       #   run: >
