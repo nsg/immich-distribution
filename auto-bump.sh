@@ -86,7 +86,7 @@ if [ ! -z $ISSUE_NUMBER ]; then
     if grep -qE "https.*releases\/tag\/$NEW_VERSION" /tmp/ISSUE-BODY.md; then
         echo "Release link for $NEW_VERSION already exists."
     else
-        sed -i "/https.*releases\/tag\/v.*/a https://github.com/immich-app/immich/releases/tag/$NEW_VERSION" /tmp/ISSUE-BODY.md
+        sed -i "/https.*releases\/tag\/v.*/a * https://github.com/immich-app/immich/releases/tag/$NEW_VERSION" /tmp/ISSUE-BODY.md
         gh issue edit $ISSUE_NUMBER --body-file /tmp/ISSUE-BODY.md
     fi
 else
