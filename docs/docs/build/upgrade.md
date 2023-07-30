@@ -6,22 +6,20 @@ This page describe the upgrade process as a **developer** that I follow when I r
 
     This page **do not** describe the update process done as a user. That's automatic! :partying_face: For update and user focused instructions see the [install page](/install/#updates).
 
-## Open a tracking issue
+## Tracking issue
 
-Open a [New version issue](https://github.com/nsg/immich-distribution/issues/new/choose). Change `X.Y` to the relevant Immich version. Ignore patch releases (`1.23` instead of `1.23.4`). That will make it simpler if upstream releases a patch release. Immich do **not** follow strict [semantic versioning](https://semver.org/) but overall the patch releases are usually fixes and **minor** features that do not usually affect Immich Distribution.
+A GitHub Action monitors Immich releases and should automatically create a new version issue for major and minor releases (`1.23` instead of `1.23.4`). This issue tracks all pull requests related to this release. This is also a place where developers and users can communicate.
+
+Immich do **not** follow strict [semantic versioning](https://semver.org/) but overall the patch releases are usually fixes and **minor** features that do not usually affect Immich Distribution.
 
 ## Bump Immich version
 
-Run `make version-update`, this should update  `snap/snapcraft.yaml`, `parts/machine-learning/Makefile` and `patches/Makefile` with the new release version. The update script below will also validate that is is correctly done.
+A GitHub Action will automatically run `make version-update` in a branch, this should update  `snap/snapcraft.yaml`, `parts/machine-learning/Makefile` and `patches/Makefile` with the new release version.
 
-```yaml hl_lines="5"
-  server:
-    plugin: npm
-    npm-node-version: "18.16.0"
-    source: https://github.com/immich-app/immich.git
-    source-tag: v1.64.0
-    source-subdir: server
-```
+A pull request will be opened containing various information. A human needs to verify the state and if it looks good merge the PR.
+
+!!! Note "Multiple versions"
+    If there is multiple versions (like 1.23 and 1.24) open at the same time, a PR will only be created for the first version. The PR for 1.24 should be created when 1.23 is merged. This is done to reduce the need for rebases and the chance of a merge conflict.
 
 ## Immich CLI
 
@@ -59,11 +57,14 @@ This script will diff files that I like to keep track on, for example:
 * nginx config - I use HAProxy so I track changes to nginx to see if I need to apply them
 * migrations - I track database changes to see if anything relevant has changed related to [database changes](https://github.com/nsg/immich-distribution/blob/master/src/etc/modify-db.sql) that the sync feature has done.
 
+!!! Info "Automatically run i pull request"
+    This script is executed as part of the automatic pull request, so most likely there is no need for you to manually execute this.
+
 ## Test it locally
 
 !!! Note "This requires snapcraft"
 
-    This requires that you have snapcraft installed and configured. I use multipass to build the package, but LXD should work just fine.
+    This requires that you have snapcraft installed and configured. I use multipass to build the package, but LXD should work just fine. This is not essential, if the tests pass in GitHub Actions for a simple version bump I consider that fine. For everyting else, please test it locally.
 
 Now test it locally, I usually just run `make` that will build and install the snap. I try to trigger a few jobs from Immich Administration pages to make sure that the microservices and machine learning components work. I usually also upload a picture and/or a video to make sure that works. More advanced tests are done in CI and on a deployment that I run that follows the beta channel.
 
@@ -75,11 +76,9 @@ journalctl -fu snap.immich-distribution.*
 
 Note that the package need to be installed for the `*` to expand properly.
 
-## Make a Pull Request
+## Merge the Pull Request
 
-I make a branch with a descriptive name and opens a pull request. This will trigger a CI run that builds the package and run a few simple tests agains the environment. If CI is happy, I will merge it to the `master` branch.
-
-When that's done, the build service provided be Canonical will build the real snap that will end up in the store. It will be automatically signed and published to the edge channel.
+When the PR is merged, the build service provided be Canonical will build the real snap that will end up in the store. It will be automatically signed and published to the edge channel.
 
 ## Release to beta
 
