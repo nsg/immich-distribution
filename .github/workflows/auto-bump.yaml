@@ -45,15 +45,15 @@ jobs:
             exit 0
           fi
 
-          if gh issue list \
+          gh issue list \
             --label new-version \
             --state open \
             --title "Immich ${NEW_VERSION_MAJOR_MINOR:1} released" \
-            --limit 1 > /dev/null 2>&1; then
+            --limit 1
 
-            echo "Issue for $NEW_VERSION_MAJOR_MINOR already exists."
-            exit 0
-          fi
+          #   echo "Issue for $NEW_VERSION_MAJOR_MINOR already exists."
+          #   exit 0
+          # fi
 
           echo "
           This PR bumps the version from **$OLD_VERSION** to **$NEW_VERSION**.
