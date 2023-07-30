@@ -27,6 +27,7 @@ jobs:
           make version-update
           NEW_VERSION=$(cat VERSION)
           BRANCH_NAME="bump-$NEW_VERSION"
+          REMOTE_URL=$(git remote get-url origin)
 
           if git ls-remote --exit-code "$REMOTE_URL" "refs/heads/$BRANCH_NAME" >/dev/null 2>&1; then
             echo "Branch $BRANCH_NAME already exists."
