@@ -22,6 +22,8 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Bump version
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           git config --global user.name "Github Action Automation"
           git config --global user.email "nsg@users.noreply.github.com"
