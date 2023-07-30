@@ -48,7 +48,7 @@ jobs:
           if gh issue list \
             --label new-version \
             --state open \
-            --title "Immich $NEW_VERSION_MAJOR_MINOR released" \
+            --title "Immich ${NEW_VERSION_MAJOR_MINOR:1} released" \
             --limit 1 > /dev/null 2>&1; then
 
             echo "Issue for $NEW_VERSION_MAJOR_MINOR already exists."
