@@ -47,7 +47,7 @@ jobs:
 
             gh pr create \
               --base master \
-              --assignee=@nsg \
+              --assignee=nsg \
               --title "Bump $NEW_VERSION" \
               --body 'Created by Github action'
           fi
