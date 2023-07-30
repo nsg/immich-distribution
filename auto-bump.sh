@@ -80,7 +80,7 @@ It may be faster if there are no issues with the release.
 " > /tmp/ISSUE-BODY.md
 
 ISSUE_NUMBER="$(get_issue_number "${NEW_VERSION_MAJOR_MINOR}")"
-if [ -z $ISSUE_NUMBER ]; then
+if [ ! -z $ISSUE_NUMBER ]; then
     echo "Issue for $NEW_VERSION_MAJOR_MINOR already exists, issue $ISSUE_NUMBER."
     gh issue view $ISSUE_NUMBER --json body --jq ".body" > /tmp/ISSUE-BODY.md
     cat /tmp/ISSUE-BODY.md
