@@ -20,6 +20,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+        with:
+          ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: Bump version
         env:
