@@ -45,6 +45,7 @@ jobs:
             exit 0
           fi
 
+          echo "Search for issue: Immich ${NEW_VERSION_MAJOR_MINOR:1} released"
           gh issue list \
             --label new-version \
             --state open \
