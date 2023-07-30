@@ -48,7 +48,7 @@ jobs:
           gh issue list \
             --label new-version \
             --state open \
-            --title "Immich ${NEW_VERSION_MAJOR_MINOR:1} released" \
+            --search "Immich ${NEW_VERSION_MAJOR_MINOR:1} released" \
             --limit 1
 
           #   echo "Issue for $NEW_VERSION_MAJOR_MINOR already exists."
