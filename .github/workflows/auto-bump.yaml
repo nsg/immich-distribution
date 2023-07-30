@@ -20,24 +20,12 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-
-      # A GitHub Action can't trigger another GitHub Actions Events
-      # using the GH_TOKEN. So we need to use a SSH key to trigger
-      # the push event in system-tests.yaml for our pull request.
-      - name: Add SSH key to SSH Agent
-        env:
-            SSH_AUTH_SOCK: /tmp/ssh_agent.sock
-        run: |
-            mkdir -p /home/runner/.ssh
-            echo "${{ secrets.SSH_PRIVATE_KEY }}" > /home/runner/.ssh/github_actions
-            chmod 600 /home/runner/.ssh/github_actions
-            ssh-agent -a $SSH_AUTH_SOCK > /dev/null	
-            ssh-add /home/runner/.ssh/github_actions
+        with:
+          ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: Bump version
         env:
           GH_TOKEN: ${{ github.token }}
-          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
         run: |
           git config --global user.name "Github Action Automation"
           git config --global user.email "nsg@users.noreply.github.com"

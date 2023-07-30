@@ -134,3 +134,4 @@ $(./update.sh $OLD_VERSION $NEW_VERSION)
 
 ref #$(get_issue_number "${NEW_VERSION_MAJOR_MINOR}")
 " | create_pr
+
