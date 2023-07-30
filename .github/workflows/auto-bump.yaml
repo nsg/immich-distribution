@@ -49,8 +49,14 @@ jobs:
           ## Upstream release notes
           https://github.com/immich-app/immich/releases/tag/$NEW_VERSION
           
-          ## Monitored files
+          ## Monitored upstream files
           $(./update.sh $OLD_VERSION $NEW_VERSION)
+
+          ## Checklist
+          * Review the changes above
+          * Possible write a news entry (and push it to this PR)
+          * Wait for the CI to finish
+          * Merge the PR
           " > /tmp/BODY.md
 
           if [ "$OLD_VERSION" != "$NEW_VERSION" ]; then
