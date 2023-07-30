@@ -46,14 +46,16 @@ jobs:
             exit 0
           fi
 
-          echo "Search for issue: Immich ${NEW_VERSION_MAJOR_MINOR:1} released"
-          gh issue list \
+          if gh issue list \
             --label new-version \
             --state open \
             --search "Immich ${NEW_VERSION_MAJOR_MINOR:1} released" \
-            --limit 1
+            --json number \
+            --jq ". | length" | grep -qE '^1$'; then
 
-          gh issue list --label new-version --state open --search "Immich 1.71 released" --json title,number
+            echo "Issue for $NEW_VERSION_MAJOR_MINOR already exists."
+            echo "I will not create a new tracking issue for this version."
+          fi
 
           #   echo "Issue for $NEW_VERSION_MAJOR_MINOR already exists."
           #   exit 0
