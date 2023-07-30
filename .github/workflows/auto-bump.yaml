@@ -42,14 +42,10 @@ jobs:
             git add .
             git commit -m "Bump version to $NEW_VERSION"
             git push -u origin $BRANCH_NAME
-          fi
 
-      - name: Create pull request
-        run: >
-          gh pr create
-          --base master
-          --assignee=@nsg
-          --title "Bump $NEW_VERSION"
-          --body 'Created by Github action'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            gh pr create \
+              --base master \
+              --assignee=@nsg \
+              --title "Bump $NEW_VERSION" \
+              --body 'Created by Github action'
+          fi
