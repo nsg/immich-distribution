@@ -83,8 +83,8 @@ ISSUE_NUMBER="$(get_issue_number "${NEW_VERSION_MAJOR_MINOR}")"
 if [ ! -z $ISSUE_NUMBER ]; then
     echo "Issue for $NEW_VERSION_MAJOR_MINOR already exists, issue $ISSUE_NUMBER."
     gh issue view $ISSUE_NUMBER --json body --jq ".body" > /tmp/ISSUE-BODY.md
-    sed "/https.*releases\/tag\/v.*/a https://github.com/immich-app/immich/releases/tag/$NEW_VERSION" /tmp/ISSUE-BODY.md
-    cat /tmp/ISSUE-BODY.md
+    sed -i "/https.*releases\/tag\/v.*/a https://github.com/immich-app/immich/releases/tag/$NEW_VERSION" /tmp/ISSUE-BODY.md
+    gh issue edit $ISSUE_NUMBER --body-file /tmp/ISSUE-BODY.md
 else
     gh issue create \
         --title "Immich $NEW_VERSION_MAJOR_MINOR released" \
