@@ -35,7 +35,7 @@ jobs:
           REMOTE_URL=$(git remote get-url origin)
           NEW_VERSION_MAJOR_MINOR=$(echo $NEW_VERSION | cut -d. -f1-2)
 
-          if ! [[ "$NEW_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+          if ! [[ "$NEW_VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
             echo "Version $NEW_VERSION is not a valid version number."
             exit 0
           fi
