@@ -103,12 +103,10 @@ if git ls-remote --exit-code "$REMOTE_URL" "refs/heads/$BRANCH_NAME" >/dev/null 
     exit 0
 fi
 
+# Create our branch and push it to GitHub, I have intentionally not added the
+# commit to the branch at this stage. They will be added after the PR is created.
 git checkout -b $BRANCH_NAME
-git add .
-git commit -m "Bump version to $NEW_VERSION"
-
-# Push to GitHub via SSH to trigger the GitHub Action Events
-git push -u origin $BRANCH_NAME --repo=git@github.com:nsg/immich-distribution.git
+git push -u origin $BRANCH_NAME
 
 echo "
 This PR bumps the version from **$OLD_VERSION** to **$NEW_VERSION**.
@@ -134,3 +132,9 @@ $(./update.sh $OLD_VERSION $NEW_VERSION)
 
 ref #$(get_issue_number "${NEW_VERSION_MAJOR_MINOR}")
 " | create_pr
+
+git add .
+git commit -m "Bump version to $NEW_VERSION"
+
+# Push to GitHub via SSH to trigger the GitHub Action Events
+git push -u origin $BRANCH_NAME --repo=ssh://git@github.com:nsg/immich-distribution.git
