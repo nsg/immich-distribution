@@ -6,7 +6,7 @@ set -eo pipefail
 OLD_VERSION=$(cat VERSION)
 make version-update > /tmp/version-update 2>&1
 NEW_VERSION=$(cat VERSION)
-BRANCH_NAME="bump-$NEW_VERSION"
+BRANCH_NAME="bump/$NEW_VERSION"
 REMOTE_URL=$(git remote get-url origin)
 NEW_VERSION_MAJOR_MINOR=$(echo $NEW_VERSION | cut -d. -f1-2)
 

@@ -2,7 +2,9 @@ name: System Testing
 
 on:
   push:
-    branches: [ "master" ]
+    branches:
+      - "master"
+      - 'bump/**'
     paths-ignore:
       - 'docs/**'
       - '*.md'
