@@ -103,9 +103,10 @@ if git ls-remote --exit-code "$REMOTE_URL" "refs/heads/$BRANCH_NAME" >/dev/null 
     exit 0
 fi
 
-# Create our branch and push it to GitHub, I have intentionally not added the
+# Create our branch and push it to GitHub, I have intentionally not added most of the
 # commit to the branch at this stage. They will be added after the PR is created.
 git checkout -b $BRANCH_NAME
+git add VERSION
 git push -u origin $BRANCH_NAME
 
 echo "
