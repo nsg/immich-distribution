@@ -28,7 +28,7 @@ jobs:
           NEW_VERSION=$(cat VERSION)
           BRANCH_NAME="bump-$NEW_VERSION"
 
-          if git rev-parse --quiet --verify "$BRANCH_NAME" >/dev/null 2>&1; then
+          if git ls-remote --exit-code "$REMOTE_URL" "refs/heads/$BRANCH_NAME" >/dev/null 2>&1; then
             echo "Branch $BRANCH_NAME already exists."
             exit 0
           fi
