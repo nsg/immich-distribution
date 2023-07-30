@@ -19,7 +19,9 @@ vdiff() {
     else
         COLOR=never
     fi
+    echo '```diff'
     git diff --color=$COLOR -w $OLD_RELEASE_TAG $NEW_RELEASE_TAG -- $1
+    echo '```'
 }
 
 git clone $REPO_PATH $TMPDIR
