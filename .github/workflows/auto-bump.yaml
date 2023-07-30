@@ -21,6 +21,8 @@ jobs:
           git config --global user.email "nsg@users.noreply.github.com"
 
           touch test-file
+
+          git checkout -b test-bump-version
           git add test-file
           git commit -m "TEST"
           git push -u origin test-bump-version
