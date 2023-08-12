@@ -222,6 +222,8 @@ parts:
     override-build: |
       ./configure --with-modules
       snapcraftctl build
+    build-packages:
+      - libltdl-dev
     after:
       - cgif
 
