@@ -60,3 +60,4 @@ jobs:
           path: |
             tests/report.html
             tests/assets/style.css
+            tests/latest_logs
