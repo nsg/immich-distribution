@@ -1,14 +1,14 @@
 name: System Testing
 
 on:
-  push:
-    branches:
-      - "master"
-      - 'bump/**'
-    paths-ignore:
-      - 'docs/**'
-      - '*.md'
-      - 'LICENSE'
+  # push:
+  #   branches:
+  #     - "master"
+  #     - 'bump/**'
+  #   paths-ignore:
+  #     - 'docs/**'
+  #     - '*.md'
+  #     - 'LICENSE'
 
   pull_request:
     branches: [ "master" ]
