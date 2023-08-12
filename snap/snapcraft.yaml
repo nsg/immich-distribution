@@ -192,24 +192,71 @@ parts:
       - libxft2
 
   ffmpeg:
-    # This is based on server/bin/install-ffmpeg.sh, but bullseye instead of bookworm because it closer matches core20
-    # Update the environment variables below to match upstream. Note that sha256sum need to match the bullseye build
-    # from https://github.com/jellyfin/jellyfin-ffmpeg/releases/
-    plugin: nil
-    build-environment:
-      - FFMPEG_VERSION: "6.0-4"
-      - FFMPEG_SHA256: "3153726ebb680e0af80a2d36469ac619f6b0604ef3ac9ee3448a9e8e6a0a9ca0"
-      - TARGETARCH: "amd64"
-      - DEBIAN_VERSION: "bullseye"
-    override-pull: |
-      wget https://github.com/jellyfin/jellyfin-ffmpeg/releases/download/v${FFMPEG_VERSION}/jellyfin-ffmpeg6_${FFMPEG_VERSION}-${DEBIAN_VERSION}_${TARGETARCH}.deb
-      echo "${FFMPEG_SHA256}  jellyfin-ffmpeg6_${FFMPEG_VERSION}-${DEBIAN_VERSION}_${TARGETARCH}.deb" | sha256sum -c -
+    # Note that I use the bullseye version, instead of bookworm because it closer matches core20
+    # Note that the checksum from build-lock.json will not match (fetch it from GitHub)
+    plugin: dump
+    source: https://github.com/jellyfin/jellyfin-ffmpeg/releases/download/v6.0-4/jellyfin-ffmpeg6_6.0-4-bullseye_amd64.deb
+    source-checksum: "sha256/3153726ebb680e0af80a2d36469ac619f6b0604ef3ac9ee3448a9e8e6a0a9ca0"
+
+  libraw:
+    plugin: autotools
+    source: https://github.com/libraw/libraw/archive/0.21.1.tar.gz
+    source-checksum: "sha256/b63d7ffa43463f74afcc02f9083048c231349b41cc9255dec0840cf8a67b52e0"
     override-build: |
-      dpkg -x $SNAPCRAFT_PART_SRC/jellyfin-ffmpeg6_${FFMPEG_VERSION}-${DEBIAN_VERSION}_${TARGETARCH}.deb $SNAPCRAFT_PART_INSTALL
+      autoreconf --install
+      snapcraftctl build
     build-packages:
-      - wget
-    prime:
-      - -usr/share/doc
+      - zlib1g-dev
+      - libjpeg8-dev
+
+  cgif:
+    plugin: meson
+    meson-version: "1.2.1"
+    source: https://github.com/dloebl/cgif.git
+    source-tag: "V0.3.2"
+
+  imagemagick:
+    plugin: make
+    source: https://github.com/ImageMagick/ImageMagick/archive/7.1.1-13.tar.gz
+    source-checksum: "sha256/8e3ce1aaad19da9f2ca444072bcc631d193a219e3ee11c13ad6d3c895044142c"
+    override-build: |
+      ./configure --with-modules
+      snapcraftctl build
+    after:
+      - cgif
+
+  libvips:
+    plugin: meson
+    meson-version: "1.2.1"
+    source: https://github.com/libvips/libvips/releases/download/v8.14.2/vips-8.14.2.tar.xz
+    source-checksum: "sha256/27dad021f0835a5ab14e541d02abd41e4c3bd012d2196438df5a9e754984f7ce"
+    build-packages:
+      # From https://github.com/libvips/libvips/wiki/Build-for-Ubuntu
+      - libfftw3-dev
+      - libopenexr-dev
+      - libgsf-1-dev
+      - libglib2.0-dev
+      - liborc-dev
+      - libopenslide-dev
+      - libmatio-dev
+      - libwebp-dev
+      - libjpeg-turbo8-dev
+      - libexpat1-dev
+      - libexif-dev
+      - libtiff5-dev
+      - libcfitsio-dev
+      - libpoppler-glib-dev
+      - librsvg2-dev
+      - libpango1.0-dev
+      - libopenjp2-7-dev
+      - libimagequant-dev
+      # From errors complaining about missing packages during build
+      - libgirepository1.0-dev
+      # Packages enabling more features in libvips
+      - libheif-dev
+      - libtiff-dev
+    after:
+      - cgif
 
   # "npm run build" builds: server, microservices, cli
   server:
@@ -230,20 +277,16 @@ parts:
       cp -r bin $SNAPCRAFT_PART_INSTALL/usr/src/app
       cp package.json $SNAPCRAFT_PART_INSTALL/usr/src/app
       cp start-server.sh start-microservices.sh $SNAPCRAFT_PART_INSTALL/usr/src/app
-    build-packages:
-      - libraw-dev
-      - libvips-dev
     stage-packages:
       - libc-ares2
       - libicu66
       - libnghttp2-14
       - libnode64
       - libuv1
-      - libvips
-      - imagemagick
-      - libraw19
     after:
       - node
+      - libvips
+      - imagemagick
 
   web:
     plugin: npm
