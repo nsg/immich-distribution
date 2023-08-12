@@ -1,14 +1,14 @@
 name: System Testing
 
 on:
-  push:
-    branches:
-      - "master"
-      - 'bump/**'
-    paths-ignore:
-      - 'docs/**'
-      - '*.md'
-      - 'LICENSE'
+  # push:
+  #   branches:
+  #     - "master"
+  #     - 'bump/**'
+  #   paths-ignore:
+  #     - 'docs/**'
+  #     - '*.md'
+  #     - 'LICENSE'
 
   pull_request:
     branches: [ "master" ]
@@ -55,8 +55,10 @@ jobs:
 
       - name: Upload test report
         uses: actions/upload-artifact@v3
+        if: always()
         with:
           name: selenium-test-report
           path: |
             tests/report.html
             tests/assets/style.css
+            tests/latest_logs
