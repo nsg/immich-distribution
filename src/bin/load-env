@@ -8,7 +8,6 @@ snapctl() {
     fi
 }
 
-export PATH="$PATH:/usr/lib/jellyfin-ffmpeg"
 export LD_LIBRARY_PATH="$SNAP/usr/local/pgsql/lib:$SNAP/usr/lib/x86_64-linux-gnu/pulseaudio:$SNAP/usr/lib/x86_64-linux-gnu/libfswatch:$SNAP/usr/local/lib/x86_64-linux-gnu/:$LD_LIBRARY_PATH"
 
 export PGDATA="$SNAP_COMMON/pgsql/data"

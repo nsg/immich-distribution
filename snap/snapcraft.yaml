@@ -192,22 +192,16 @@ parts:
       - libxft2
 
   ffmpeg:
-    # Note that I use the bullseye version, instead of bookworm because it closer matches core20
-    # Note that the checksum from build-lock.json will not match (fetch it from GitHub)
     plugin: dump
-    source: https://github.com/jellyfin/jellyfin-ffmpeg/releases/download/v6.0-4/jellyfin-ffmpeg6_6.0-4-bullseye_amd64.deb
-    source-checksum: "sha256/3153726ebb680e0af80a2d36469ac619f6b0604ef3ac9ee3448a9e8e6a0a9ca0"
-    stage-packages:
-      - libfontconfig1
-      - libfreetype6
-      - libfribidi0
-      - libpng16-16
-      - libwebp6
-      - libwebpmux3
-      - libxau6
-      - libxcb-shm0
-      - libxcb1
-      - libxdmcp6
+    # These builds are linked from the official ffmpeg site, so I assume they are safe.
+    # It's a little annoying that there is not a stable URL, this link will be updated in the future and
+    # the checksum will change... when that happens select the same release from "old-releases".
+    source: https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz
+    source-checksum: md5/bef7015ca2fd7f19057cad0262d970d2
+    override-build: |
+      mkdir -p $SNAPCRAFT_PART_INSTALL/bin
+      cp $SNAPCRAFT_PART_SRC/ffmpeg $SNAPCRAFT_PART_INSTALL/bin
+      cp $SNAPCRAFT_PART_SRC/ffprobe $SNAPCRAFT_PART_INSTALL/bin
 
   libraw:
     plugin: autotools
