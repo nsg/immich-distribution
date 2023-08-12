@@ -197,6 +197,17 @@ parts:
     plugin: dump
     source: https://github.com/jellyfin/jellyfin-ffmpeg/releases/download/v6.0-4/jellyfin-ffmpeg6_6.0-4-bullseye_amd64.deb
     source-checksum: "sha256/3153726ebb680e0af80a2d36469ac619f6b0604ef3ac9ee3448a9e8e6a0a9ca0"
+    stage-packages:
+      - libfontconfig1
+      - libfreetype6
+      - libfribidi0
+      - libpng16-16
+      - libwebp6
+      - libwebpmux3
+      - libxau6
+      - libxcb-shm0
+      - libxcb1
+      - libxdmcp6
 
   libraw:
     plugin: autotools
@@ -208,6 +219,10 @@ parts:
     build-packages:
       - zlib1g-dev
       - libjpeg8-dev
+    stage-packages:
+      - libgomp1
+      - libjpeg-turbo8
+      - liblcms2-2
 
   cgif:
     plugin: meson
@@ -226,6 +241,49 @@ parts:
       - libltdl-dev
     after:
       - cgif
+    stage-packages:
+      - libcairo2
+      - libdatrie1
+      - libde265-0
+      - libdjvulibre21
+      - libfontconfig1
+      - libfreetype6
+      - libfribidi0
+      - libgomp1
+      - libgraphite2-3
+      - libharfbuzz0b
+      - libheif1
+      - libicu66
+      - libilmbase24
+      - libjbig0
+      - libjpeg-turbo8
+      - liblcms2-2
+      - liblqr-1-0
+      - libltdl7
+      - libnuma1
+      - libopenexr24
+      - libopenjp2-7
+      - libpango-1.0-0
+      - libpangocairo-1.0-0
+      - libpangoft2-1.0-0
+      - libpixman-1-0
+      - libpng16-16
+      - libthai0
+      - libtiff5
+      - libwebp6
+      - libwebpdemux2
+      - libwebpmux3
+      - libwmf0.2-7
+      - libx11-6
+      - libx265-179
+      - libxau6
+      - libxcb-render0
+      - libxcb-shm0
+      - libxcb1
+      - libxdmcp6
+      - libxext6
+      - libxml2
+      - libxrender1
 
   libvips:
     plugin: meson
@@ -257,6 +315,84 @@ parts:
       # Packages enabling more features in libvips
       - libheif-dev
       - libtiff-dev
+    stage-packages:
+      - libaec0
+      - libasn1-8-heimdal
+      - libbrotli1
+      - libcairo-gobject2
+      - libcairo2
+      - libcfitsio8
+      - libcurl3-gnutls
+      - libdatrie1
+      - libde265-0
+      - libexif12
+      - libfftw3-double3
+      - libfontconfig1
+      - libfreetype6
+      - libfribidi0
+      - libgdk-pixbuf2.0-0
+      - libgif7
+      - libgomp1
+      - libgraphite2-3
+      - libgsf-1-114
+      - libgssapi3-heimdal
+      - libharfbuzz0b
+      - libhcrypto4-heimdal
+      - libhdf5-103
+      - libheif1
+      - libheimbase1-heimdal
+      - libheimntlm0-heimdal
+      - libhx509-5-heimdal
+      - libicu66
+      - libilmbase24
+      - libimagequant0
+      - libjbig0
+      - libjpeg-turbo8
+      - libkrb5-26-heimdal
+      - liblcms2-2
+      - libldap-2.4-2
+      - liblqr-1-0
+      - libltdl7
+      - libmagickcore-6.q16-6
+      - libmatio9
+      - libnghttp2-14
+      - libnspr4
+      - libnss3
+      - libnuma1
+      - libopenexr24
+      - libopenjp2-7
+      - libopenslide0
+      - liborc-0.4-0
+      - libpango-1.0-0
+      - libpangocairo-1.0-0
+      - libpangoft2-1.0-0
+      - libpixman-1-0
+      - libpng16-16
+      - libpoppler-glib8
+      - libpoppler97
+      - libpsl5
+      - libroken18-heimdal
+      - librsvg2-2
+      - librtmp1
+      - libsasl2-2
+      - libssh-4
+      - libsz2
+      - libthai0
+      - libtiff5
+      - libwebp6
+      - libwebpdemux2
+      - libwebpmux3
+      - libwind0-heimdal
+      - libx11-6
+      - libx265-179
+      - libxau6
+      - libxcb-render0
+      - libxcb-shm0
+      - libxcb1
+      - libxdmcp6
+      - libxext6
+      - libxml2
+      - libxrender1
     after:
       - cgif
 
@@ -285,6 +421,52 @@ parts:
       - libnghttp2-14
       - libnode64
       - libuv1
+      - libaec0
+      - libcairo-gobject2
+      - libcairo2
+      - libcfitsio8
+      - libcurl3-gnutls
+      - libdatrie1
+      - libexif12
+      - libfftw3-double3
+      - libfribidi0
+      - libgdk-pixbuf2.0-0
+      - libgif7
+      - libgraphite2-3
+      - libgsf-1-114
+      - libharfbuzz0b
+      - libhdf5-103
+      - libilmbase24
+      - libimagequant0
+      - libjbig0
+      - libjpeg-turbo8
+      - liblcms2-2
+      - liblqr-1-0
+      - libltdl7
+      - libmagickcore-6.q16-6
+      - libmatio9
+      - libnspr4
+      - libnss3
+      - libopenexr24
+      - libopenjp2-7
+      - libopenslide0
+      - liborc-0.4-0
+      - libpango-1.0-0
+      - libpangocairo-1.0-0
+      - libpangoft2-1.0-0
+      - libpixman-1-0
+      - libpoppler-glib8
+      - libpoppler97
+      - librsvg2-2
+      - libsz2
+      - libthai0
+      - libtiff5
+      - libwebp6
+      - libwebpdemux2
+      - libwebpmux3
+      - libxcb-render0
+      - libxcb-shm0
+      - libxml2
     after:
       - node
       - libvips
