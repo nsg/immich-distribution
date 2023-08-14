@@ -17,6 +17,9 @@ def get_ip_address():
 def is_dirty_state():
     return os.getenv("DIRTY_STATE")
 
+def get_secret():
+    with open("secret.txt", "r") as f:
+        return f.read()
 
 def css_selector_path(element):
     """ Returns a CSS selector that will uniquely select the given element. """
@@ -61,6 +64,9 @@ class TestImmichWeb(BaseCase):
         self.wait_for_element("p:contains('Photos')")
 
     def test_001_register_and_login(self):
+        """
+        Register a new user and login, make sure we end up on the photos page.
+        """
         if not is_dirty_state():
             self.immich(login=False)
             self.register()
@@ -68,6 +74,9 @@ class TestImmichWeb(BaseCase):
             self.assert_title("Photos - Immich")
 
     def test_002_no_errors(self):
+        """
+        Make sure there are no JS or 404 errors on the page before and after login.
+        """
         self.immich(login=False)
         self.assert_no_js_errors()
         self.assert_no_404_errors()
@@ -76,11 +85,18 @@ class TestImmichWeb(BaseCase):
         self.assert_no_404_errors()
 
     def test_003_empty_timeline(self):
+        """
+        Make sure the timeline is empty and we get a message to upload photos.
+        """
         if not is_dirty_state():
             self.immich()
             self.assert_element("p:contains('CLICK TO UPLOAD YOUR FIRST PHOTO')")
 
     def test_004_generate_api_keys(self):
+        """
+        Generate API keys and save them to a file called secret.txt.
+        The API keys will be used by other tests to query the API and upload assets.
+        """
         self.immich(login=True)
         self.immich(login=False, path="user-settings")
         self.wait_for_element("h2")
@@ -95,12 +111,17 @@ class TestImmichWeb(BaseCase):
             f.write(secret)
 
     def test_10_verify_cli(self):
+        """
+        Verify that the CLI is installed and can be executed.
+        """
         p = subprocess.run(["immich-distribution.cli", "-h"])
         self.assertEqual(p.returncode, 0)
 
     def test_005_upload_assets_with_cli(self):
-        with open("secret.txt", "r") as f:
-            secret = f.read()
+        """
+        Use the CLI to upload assets from the assets/ directory.
+        """
+        secret = get_secret()
         
         snap_readable_path = os.path.join(
             os.environ["HOME"],
@@ -135,9 +156,7 @@ class TestImmichWeb(BaseCase):
           * FFmpeg transcoding works
         """
 
-        with open("secret.txt", "r") as f:
-            secret = f.read()
-
+        secret = get_secret()
         headers = { "X-API-KEY": secret }
 
         r = requests.get(f"http://{get_ip_address()}/api/asset", headers=headers)
