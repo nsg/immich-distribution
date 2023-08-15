@@ -21,6 +21,22 @@ def get_secret():
     with open("secret.txt", "r") as f:
         return f.read()
 
+def get_headers():
+    return { "X-API-KEY": get_secret() }
+
+def get_assets(filter=[]):
+    r = requests.get(f"http://{get_ip_address()}/api/asset", headers=get_headers())
+    
+    if len(filter) == 0:
+        return r.json()
+    
+    resp = {}
+    for asset in r.json():
+        if asset['originalFileName'] in filter:
+            resp[asset['originalFileName']] = asset
+    
+    return resp
+
 def css_selector_path(element):
     """ Returns a CSS selector that will uniquely select the given element. """
     path = []
@@ -147,58 +163,56 @@ class TestImmichWeb(BaseCase):
         # Give the system time to process the new assets
         self.sleep(60)
 
-    def test_100_verify_uploaded_assets(self):
+    def test_100_verify_uploaded_assets_number_of_files(self):
         """
-        Query the API to get a list of assets, this mainly tests that:
-          * The assets are there (upload works)
-          * The exif extraction works
-          * The live photo detection works
-          * FFmpeg transcoding works
+        Use the API to verify that the assets were uploaded correctly.
         """
-
-        secret = get_secret()
-        headers = { "X-API-KEY": secret }
-
-        r = requests.get(f"http://{get_ip_address()}/api/asset", headers=headers)
-        assets = r.json()
+        assets = get_assets()
         self.assertEqual(len(assets), 11)
 
-        for asset in assets:
-            match asset['originalFileName']:
-                case "ship":
-                    self.assertEqual(asset['type'], "VIDEO")
-                    self.assertEqual(asset['exifInfo']['country'], "Sweden")
-                case "ship-vp9":
-                    self.assertEqual(asset['type'], "VIDEO")
+    def test_100_verify_exif_location_extraction(self):
+        """
+        Extract the location from the EXIF data and verify that it is parses
+        correctly as a named location.
+        """
 
-                    r = requests.get(f"http://{get_ip_address()}/api/asset/file/{asset['id']}?isThumb=false&isWeb=true", headers=headers)
-                    self.assertEqual(r.status_code, 200)
-                    self.assertEqual(r.headers['content-type'], "video/mp4")
-                case "ohm":
-                    self.assertEqual(asset['type'], "IMAGE")
-                    self.assertEqual(asset['exifInfo']['exifImageWidth'], 640)
-                case "grass.MP":
-                    self.assertEqual(asset['type'], "IMAGE")
-                    self.assertEqual(asset['exifInfo']['model'], "Pixel 4")
-                    self.assertEqual(asset['exifInfo']['dateTimeOriginal'], "2023-07-08T12:13:53.000Z")
-                    self.assertEqual(asset['exifInfo']['city'], "Mora")
-                    self.assertNotEqual(asset['livePhotoVideoId'], None)
-                case "plane":
-                    pass
-                case "field":
-                    pass
-                case "memory":
-                    pass
-                case "ai-people1":
-                    pass
-                case "ai-people2":
-                    pass
-                case "ai-people3":
-                    pass
-                case "ai-apple":
-                    pass
-                case _:
-                    raise Exception(asset)
+        assets = get_assets(["ship", "grass.MP"])
+        ship = assets['ship']
+        grass = assets['grass.MP']
+
+        self.assertEqual(ship['type'], "VIDEO")
+        self.assertEqual(ship['exifInfo']['country'], "Sweden")
+        self.assertEqual(grass['exifInfo']['city'], "Mora")
+
+    def test_100_verify_video_transcode(self):
+        """
+        Verify that the video was transcoded from VP9 to MP4
+        """
+
+        assets = get_assets(["ship-vp9"])
+        ship = assets['ship-vp9']
+        self.assertEqual(ship['type'], "VIDEO")
+        r = requests.get(f"http://{get_ip_address()}/api/asset/file/{ship['id']}?isThumb=false&isWeb=true", headers=get_headers())
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.headers['content-type'], "video/mp4")
+
+    def test_100_verify_image_exitdata(self):
+        """
+        Extract the EXIF data from the images and verify that it is correct.
+        """
+
+        assets = get_assets(["ohm", "grass.MP"])
+        ohm = assets['ohm']
+        grass = assets['grass.MP']
+
+        self.assertEqual(ohm['type'], "IMAGE")
+        self.assertEqual(ohm['exifInfo']['exifImageWidth'], 640)
+
+        self.assertEqual(grass['type'], "IMAGE")
+        self.assertEqual(grass['exifInfo']['model'], "Pixel 4")
+        self.assertEqual(grass['exifInfo']['dateTimeOriginal'], "2023-07-08T12:13:53.000Z")
+        self.assertEqual(grass['exifInfo']['city'], "Mora")
+        self.assertNotEqual(grass['livePhotoVideoId'], None)
 
     def test_100_verify_people_detected(self):
         """
