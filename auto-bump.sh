@@ -46,6 +46,10 @@ new_cli_version() {
     fi
 }
 
+snapstore_version() {
+    snap info immich-distribution | awk "/^ *latest\/$1/{ print \$2 }" | cut -d'-' -f1
+}
+
 #
 # No nothing or fail if these checks conditions are met
 #
@@ -53,11 +57,6 @@ new_cli_version() {
 if ! [[ "$NEW_VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
     echo "Version $NEW_VERSION is not a valid version number."
     exit 1
-fi
-
-if [ "$OLD_VERSION" == "$NEW_VERSION" ]; then
-    echo "No version update detected."
-    exit 0
 fi
 
 #
@@ -77,23 +76,77 @@ Feel free to add any comments or questions related to the release here.
 ## When will this be released?
 Expect it to be released in the next few days to the beta channel, and to stable a few days later.
 It may be faster if there are no issues with the release.
+
+## Channels
+
+| Name | Version | Released | Note |
+| ---- | ------- | -------- | ---- |
+| Edge | <TBD-E> | | Development builds |
+| Beta | <TBD-B> | | Released for testing |
+| Candidate | <TDB-C> | | Release candidate / deployed on a live system |
+| Stable | <TBD-S> | | Released :tada:  |
 " > /tmp/ISSUE-BODY.md
 
 ISSUE_NUMBER="$(get_issue_number "${NEW_VERSION_MAJOR_MINOR}")"
 if [ ! -z $ISSUE_NUMBER ]; then
     echo "Issue for $NEW_VERSION_MAJOR_MINOR already exists, issue $ISSUE_NUMBER."
+
+    # Export the issue body to a file
     gh issue view $ISSUE_NUMBER --json body --jq ".body" > /tmp/ISSUE-BODY.md
+    cp /tmp/ISSUE-BODY.md /tmp/ISSUE-BODY.md.original
+
     if grep -qE "https.*releases\/tag\/$NEW_VERSION" /tmp/ISSUE-BODY.md; then
         echo "Release link for $NEW_VERSION already exists."
     else
         sed -i "/https.*releases\/tag\/v.*/a * https://github.com/immich-app/immich/releases/tag/$NEW_VERSION" /tmp/ISSUE-BODY.md
         gh issue edit $ISSUE_NUMBER --body-file /tmp/ISSUE-BODY.md
     fi
+
+    CURRENT_DATE=$(date +%F)
+    EDGE_VERSION="$(snapstore_version edge)"
+    BETA_VERSION="$(snapstore_version beta)"
+    CANDIDATE_VERSION="$(snapstore_version candidate)"
+    STABLE_VERSION="$(snapstore_version stable)"
+
+    if [[ $EDGE_VERSION == $NEW_VERSION_MAJOR_MINOR* ]] && ! grep -q "| Edge | $EDGE_VERSION" /tmp/ISSUE-BODY.md; then
+        echo "Edge version $EDGE_VERSION is a release under the $NEW_VERSION_MAJOR_MINOR release, update the table."
+        sed -i "s/^| Edge |[^|]*|[^|]*|/| Edge | $EDGE_VERSION | $CURRENT_DATE |/" /tmp/ISSUE-BODY.md
+    fi
+
+    if [[ $BETA_VERSION == $NEW_VERSION_MAJOR_MINOR* ]] && ! grep -q "| Beta | $EDGE_VERSION" /tmp/ISSUE-BODY.md; then
+        echo "Beta version $BETA_VERSION is a release under the $NEW_VERSION_MAJOR_MINOR release, update the table."
+        sed -i "s/^| Beta |[^|]*|[^|]*|/| Beta | $BETA_VERSION | $CURRENT_DATE |/" /tmp/ISSUE-BODY.md
+    fi
+
+    if [[ $CANDIDATE_VERSION == $NEW_VERSION_MAJOR_MINOR* ]] && ! grep -q "| Candidate | $EDGE_VERSION" /tmp/ISSUE-BODY.md; then
+        echo "Candidate version $CANDIDATE_VERSION is a release under the $NEW_VERSION_MAJOR_MINOR release, update the table."
+        sed -i "s/^| Candidate |[^|]*|[^|]*|/| Candidate | $CANDIDATE_VERSION | $CURRENT_DATE |/" /tmp/ISSUE-BODY.md
+    fi
+
+    if [[ $STABLE_VERSION == $NEW_VERSION_MAJOR_MINOR* ]] && ! grep -q "| Stable | $EDGE_VERSION" /tmp/ISSUE-BODY.md; then
+        echo "Stable version $STABLE_VERSION is a release under the $NEW_VERSION_MAJOR_MINOR release, update the table."
+        sed -i "s/^| Stable |[^|]*|[^|]*|/| Stable | $STABLE_VERSION | $CURRENT_DATE |/" /tmp/ISSUE-BODY.md
+    fi
+
+    if ! diff -q /tmp/ISSUE-BODY.md /tmp/ISSUE-BODY.md.original; then
+        echo "Update issue $ISSUE_NUMBER with new release information."
+        gh issue edit $ISSUE_NUMBER --body-file /tmp/ISSUE-BODY.md
+    fi
+
 else
     gh issue create \
         --title "Immich $NEW_VERSION_MAJOR_MINOR released" \
         --label new-version \
         --body-file /tmp/ISSUE-BODY.md
+fi
+
+#
+# Skip PR creation if there is no new version
+#
+
+if [ "$OLD_VERSION" == "$NEW_VERSION" ]; then
+    echo "No version update detected, no pull request will be created."
+    exit 0
 fi
 
 #
