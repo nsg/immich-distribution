@@ -58,6 +58,7 @@ CHECK_FILES="
     machine-learning/Dockerfile
     docker/example.env
     docker/docker-compose.yml
+    docs/docs/install/environment-variables.md
 "
 
 for F in $CHECK_FILES; do

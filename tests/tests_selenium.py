@@ -163,6 +163,36 @@ class TestImmichWeb(BaseCase):
         # Give the system time to process the new assets
         self.sleep(60)
 
+    def test_005_upload_external_assets_with_cli(self):
+        """
+        Use the CLI to upload assets from the external-test-files directory.
+        """
+        secret = get_secret()
+        
+        snap_readable_path = os.path.join(
+            os.environ["HOME"],
+            "snap/immich-distribution/current/tests_external"
+        )
+
+        if not os.path.exists(snap_readable_path):
+            os.makedirs(snap_readable_path)
+
+        for upload in os.listdir("external-test-files"):
+            shutil.copy(f"external-test-files/{upload}", snap_readable_path)
+
+        subprocess.run(
+            [
+                "immich-distribution.cli",
+                "upload",
+                "--key", secret,
+                "--yes",
+                snap_readable_path
+            ]
+        )
+
+        # Give the system time to process the new assets
+        self.sleep(60)
+
     def test_100_verify_uploaded_assets_number_of_files(self):
         """
         Use the API to verify that the assets were uploaded correctly.

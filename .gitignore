@@ -10,3 +10,4 @@ __pycache__
 /tests/latest_logs
 /tests/report.html
 /tests/assets/style.css
+/tests/external-test-files
