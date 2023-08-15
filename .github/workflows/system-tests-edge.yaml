@@ -1,4 +1,4 @@
-name: Build and run System Tests
+name: Run System Tests on Edge Snap
 
 on:
   push:
@@ -31,16 +31,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - uses: snapcore/action-build@v1
 
       - name: Install package
         run: |
-          sudo snap install --dangerous *.snap
-
-      # - name: Install package
-      #   run: |
-      #     sudo snap install --edge immich-distribution
-
+          sudo snap install --edge immich-distribution
 
       - name: Install requirements
         run: pip install -r tests/requirements.txt
