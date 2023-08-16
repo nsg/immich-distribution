@@ -30,6 +30,10 @@ layout:
     symlink: $SNAP_COMMON/reverse-geocoding-dump
   $SNAP/usr/src/app/upload:
     symlink: $SNAP_COMMON/upload
+  /usr/etc/ImageMagick-7:
+    symlink: $SNAP/usr/etc/ImageMagick-7
+  /usr/lib/ImageMagick-7.1.1:
+    symlink: $SNAP/usr/lib/ImageMagick-7.1.1
 
 apps:
   psql:
@@ -203,193 +207,6 @@ parts:
       cp $SNAPCRAFT_PART_SRC/ffmpeg $SNAPCRAFT_PART_INSTALL/bin
       cp $SNAPCRAFT_PART_SRC/ffprobe $SNAPCRAFT_PART_INSTALL/bin
 
-  libraw:
-    plugin: autotools
-    source: https://github.com/libraw/libraw/archive/0.21.1.tar.gz
-    source-checksum: "sha256/b63d7ffa43463f74afcc02f9083048c231349b41cc9255dec0840cf8a67b52e0"
-    override-build: |
-      autoreconf --install
-      snapcraftctl build
-    build-packages:
-      - zlib1g-dev
-      - libjpeg8-dev
-    stage-packages:
-      - libgomp1
-      - libjpeg-turbo8
-      - liblcms2-2
-
-  cgif:
-    plugin: meson
-    meson-version: "1.2.1"
-    source: https://github.com/dloebl/cgif.git
-    source-tag: "V0.3.2"
-
-  imagemagick:
-    plugin: make
-    source: https://github.com/ImageMagick/ImageMagick/archive/7.1.1-13.tar.gz
-    source-checksum: "sha256/8e3ce1aaad19da9f2ca444072bcc631d193a219e3ee11c13ad6d3c895044142c"
-    override-build: |
-      ./configure --with-modules
-      snapcraftctl build
-    build-packages:
-      - libltdl-dev
-    after:
-      - cgif
-    stage-packages:
-      - libcairo2
-      - libdatrie1
-      - libde265-0
-      - libdjvulibre21
-      - libfontconfig1
-      - libfreetype6
-      - libfribidi0
-      - libgomp1
-      - libgraphite2-3
-      - libharfbuzz0b
-      - libheif1
-      - libicu66
-      - libilmbase24
-      - libjbig0
-      - libjpeg-turbo8
-      - liblcms2-2
-      - liblqr-1-0
-      - libltdl7
-      - libnuma1
-      - libopenexr24
-      - libopenjp2-7
-      - libpango-1.0-0
-      - libpangocairo-1.0-0
-      - libpangoft2-1.0-0
-      - libpixman-1-0
-      - libpng16-16
-      - libthai0
-      - libtiff5
-      - libwebp6
-      - libwebpdemux2
-      - libwebpmux3
-      - libwmf0.2-7
-      - libx11-6
-      - libx265-179
-      - libxau6
-      - libxcb-render0
-      - libxcb-shm0
-      - libxcb1
-      - libxdmcp6
-      - libxext6
-      - libxml2
-      - libxrender1
-
-  libvips:
-    plugin: meson
-    meson-version: "1.2.1"
-    source: https://github.com/libvips/libvips/releases/download/v8.14.3/vips-8.14.3.tar.xz
-    source-checksum: "sha256/f884d61a6b54c99cdae855001c8b9523e13b4982be7e76cac03faccb91be105c"
-    build-packages:
-      # From https://github.com/libvips/libvips/wiki/Build-for-Ubuntu
-      - libfftw3-dev
-      - libopenexr-dev
-      - libgsf-1-dev
-      - libglib2.0-dev
-      - liborc-dev
-      - libopenslide-dev
-      - libmatio-dev
-      - libwebp-dev
-      - libjpeg-turbo8-dev
-      - libexpat1-dev
-      - libexif-dev
-      - libtiff5-dev
-      - libcfitsio-dev
-      - libpoppler-glib-dev
-      - librsvg2-dev
-      - libpango1.0-dev
-      - libopenjp2-7-dev
-      - libimagequant-dev
-      # From errors complaining about missing packages during build
-      - libgirepository1.0-dev
-      # Packages enabling more features in libvips
-      - libheif-dev
-      - libtiff-dev
-    stage-packages:
-      - libaec0
-      - libasn1-8-heimdal
-      - libbrotli1
-      - libcairo-gobject2
-      - libcairo2
-      - libcfitsio8
-      - libcurl3-gnutls
-      - libdatrie1
-      - libde265-0
-      - libexif12
-      - libfftw3-double3
-      - libfontconfig1
-      - libfreetype6
-      - libfribidi0
-      - libgdk-pixbuf2.0-0
-      - libgif7
-      - libgomp1
-      - libgraphite2-3
-      - libgsf-1-114
-      - libgssapi3-heimdal
-      - libharfbuzz0b
-      - libhcrypto4-heimdal
-      - libhdf5-103
-      - libheif1
-      - libheimbase1-heimdal
-      - libheimntlm0-heimdal
-      - libhx509-5-heimdal
-      - libicu66
-      - libilmbase24
-      - libimagequant0
-      - libjbig0
-      - libjpeg-turbo8
-      - libkrb5-26-heimdal
-      - liblcms2-2
-      - libldap-2.4-2
-      - liblqr-1-0
-      - libltdl7
-      - libmagickcore-6.q16-6
-      - libmatio9
-      - libnghttp2-14
-      - libnspr4
-      - libnss3
-      - libnuma1
-      - libopenexr24
-      - libopenjp2-7
-      - libopenslide0
-      - liborc-0.4-0
-      - libpango-1.0-0
-      - libpangocairo-1.0-0
-      - libpangoft2-1.0-0
-      - libpixman-1-0
-      - libpng16-16
-      - libpoppler-glib8
-      - libpoppler97
-      - libpsl5
-      - libroken18-heimdal
-      - librsvg2-2
-      - librtmp1
-      - libsasl2-2
-      - libssh-4
-      - libsz2
-      - libthai0
-      - libtiff5
-      - libwebp6
-      - libwebpdemux2
-      - libwebpmux3
-      - libwind0-heimdal
-      - libx11-6
-      - libx265-179
-      - libxau6
-      - libxcb-render0
-      - libxcb-shm0
-      - libxcb1
-      - libxdmcp6
-      - libxext6
-      - libxml2
-      - libxrender1
-    after:
-      - cgif
-
   # "npm run build" builds: server, microservices, cli
   server:
     plugin: npm
@@ -511,37 +328,15 @@ parts:
     after:
       - node
 
-  redis:
-    source: https://github.com/redis/redis.git
-    source-tag: 7.0.9
-    plugin: make
-    build-packages:
-      - pkg-config
-    override-build: |
-      make
-      make PREFIX=$SNAPCRAFT_PART_INSTALL install
-    prime:
-      - bin/redis-server
-
-  postgres:
+  dependencies:
     plugin: nil
     stage-snaps:
+      - immich-distribution-redis/latest/stable
       - immich-distribution-postgres/latest/stable
-
-  typesense:
-    plugin: nil
-    stage-snaps:
       - immich-distribution-typesense/latest/stable
-
-  haproxy:
-    plugin: nil
-    stage-snaps:
       - immich-distribution-haproxy/latest/stable
-
-  lego:
-    plugin: nil
-    stage-snaps:
       - immich-distribution-lego/latest/stable
+      - immich-distribution-libvips/latest/stable
 
   scripts:
     source: src
