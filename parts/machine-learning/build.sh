@@ -1,7 +1,7 @@
 #!/bin/bash
 
 VERSION="$1"
-PYTHON_PART_INSTALL_BIN="${PWD}/../../python/install/usr/local/bin"
+PYTHON_PART_INSTALL_BIN="${PWD}/../../dependencies/install/usr/local/bin"
 
 mkdir -p /opt/venv/
 

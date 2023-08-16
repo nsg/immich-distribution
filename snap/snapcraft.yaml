@@ -321,7 +321,7 @@ parts:
   sync:
     plugin: nil
     override-build:
-      ../../python/install/usr/local/bin/python3 ../../python/install/usr/local/bin/pip3 install watchfiles requests psycopg2-binary --target $SNAPCRAFT_PART_INSTALL/opt/pipsyncenv
+      ../../dependencies/install/usr/local/bin/python3 ../../dependencies/install/usr/local/bin/pip3 install watchfiles requests psycopg2-binary --target $SNAPCRAFT_PART_INSTALL/opt/pipsyncenv
     after:
       - dependencies
 
