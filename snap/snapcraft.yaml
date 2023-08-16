@@ -165,28 +165,6 @@ apps:
       - network-bind
 
 parts:
-  python:
-    source: https://www.python.org/ftp/python/3.11.4/Python-3.11.4.tgz
-    plugin: make
-    override-build: |
-      ./configure --enable-optimizations --with-ensurepip=install
-      snapcraftctl build
-    build-packages:
-      - libssl-dev
-      - zlib1g-dev
-      - libbz2-dev
-      - libreadline-dev
-      - libsqlite3-dev
-      - xz-utils
-      - libffi-dev
-      - libncurses5-dev
-      - libgdbm-dev
-      - libnss3-dev
-    stage-packages:
-      - libtcl8.6
-      - libtk8.6
-      - libxft2
-
   ffmpeg:
     plugin: dump
     # These builds are linked from the official ffmpeg site, so I assume they are safe.
@@ -301,7 +279,7 @@ parts:
     stage-packages:
       - libgomp1
     after:
-      - python
+      - dependencies
 
   cli:
     plugin: npm
@@ -328,6 +306,7 @@ parts:
       - immich-distribution-lego/latest/stable
       - immich-distribution-libvips/latest/stable
       - immich-distribution-node/latest/stable
+      - immich-distribution-python/latest/stable
 
   scripts:
     source: src
@@ -344,7 +323,7 @@ parts:
     override-build:
       ../../python/install/usr/local/bin/python3 ../../python/install/usr/local/bin/pip3 install watchfiles requests psycopg2-binary --target $SNAPCRAFT_PART_INSTALL/opt/pipsyncenv
     after:
-      - python
+      - dependencies
 
   patches:
     source: patches
