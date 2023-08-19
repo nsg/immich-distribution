@@ -196,58 +196,6 @@ parts:
       cp -r bin $SNAPCRAFT_PART_INSTALL/usr/src/app
       cp package.json $SNAPCRAFT_PART_INSTALL/usr/src/app
       cp start-server.sh start-microservices.sh $SNAPCRAFT_PART_INSTALL/usr/src/app
-    stage-packages:
-      - libc-ares2
-      - libicu66
-      - libnghttp2-14
-      - libnode64
-      - libuv1
-      - libaec0
-      - libcairo-gobject2
-      - libcairo2
-      - libcfitsio8
-      - libcurl3-gnutls
-      - libdatrie1
-      - libexif12
-      - libfftw3-double3
-      - libfribidi0
-      - libgdk-pixbuf2.0-0
-      - libgif7
-      - libgraphite2-3
-      - libgsf-1-114
-      - libharfbuzz0b
-      - libhdf5-103
-      - libilmbase24
-      - libimagequant0
-      - libjbig0
-      - libjpeg-turbo8
-      - liblcms2-2
-      - liblqr-1-0
-      - libltdl7
-      - libmagickcore-6.q16-6
-      - libmatio9
-      - libnspr4
-      - libnss3
-      - libopenexr24
-      - libopenjp2-7
-      - libopenslide0
-      - liborc-0.4-0
-      - libpango-1.0-0
-      - libpangocairo-1.0-0
-      - libpangoft2-1.0-0
-      - libpixman-1-0
-      - libpoppler-glib8
-      - libpoppler97
-      - librsvg2-2
-      - libsz2
-      - libthai0
-      - libtiff5
-      - libwebp6
-      - libwebpdemux2
-      - libwebpmux3
-      - libxcb-render0
-      - libxcb-shm0
-      - libxml2
     after:
       - dependencies
 
