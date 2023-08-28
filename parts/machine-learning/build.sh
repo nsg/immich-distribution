@@ -27,4 +27,5 @@ export VIRTUAL_ENV="/opt/venv/ml"
 /opt/venv/poetry/bin/poetry config installer.max-workers 10
 /opt/venv/poetry/bin/poetry config virtualenvs.create false
 /opt/venv/poetry/bin/poetry install --sync --no-interaction --no-ansi --no-root --only main
+/opt/venv/poetry/bin/poetry run pip install --no-deps -r requirements.txt
 unset VIRTUAL_ENV
