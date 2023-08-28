@@ -9,7 +9,7 @@ ci: wait
 	pytest tests_selenium.py --server=127.0.0.1 --port=4444 --html=report.html
 
 wait:
-	while ! ./test_haproxy.sh ; do sleep 1; done
+	./test_haproxy.sh
 
 selenium:
 	podman run \
