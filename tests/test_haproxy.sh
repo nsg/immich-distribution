@@ -22,6 +22,14 @@ systemd_status_success() {
     systemctl show -p ExecMainStatus "$1" | grep -q "ExecMainStatus=0"
 }
 
+log() {
+    echo
+    echo "###"
+    echo "$@"
+    echo "###"
+    echo
+}
+
 N=0
 MAX=60
 while is_backend_down; do
@@ -29,10 +37,14 @@ while is_backend_down; do
 
     if [ "$N" -ge "$MAX" ]; then
         echo "ERROR: Backends are still DOWN after $MAX seconds"
+        log "Failed units"
         for unit in $(systemd_units); do
             echo "Unit: $unit"
             systemd_status_success "$unit" || systemctl status "$unit"
+
         done
+        log "Last 100 lines of log"
+        journalctl -n 100 -eu snap.immich-distribution.*
         exit 1
     fi
 
