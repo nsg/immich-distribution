@@ -42,6 +42,7 @@ jobs:
   create-pr-version-bump:
     name: Create PR Version Bump
     runs-on: ubuntu-latest
+    needs: tracking-issue
 
     steps:
       - uses: actions/checkout@v3
