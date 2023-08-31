@@ -1,6 +1,6 @@
 .PHONY: build
 build:
-	./build.sh v1.75.0
+	./build.sh v1.76.1
 
 .PHONY: install
 install:
