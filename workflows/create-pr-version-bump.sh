@@ -72,6 +72,6 @@ $(./update.sh $OLD_VERSION $NEW_VERSION)
 * Wait for the CI to finish
 * Merge the PR
 
-ref #${TRACKING_ISSUE}")
+ref #${TRACKING_ISSUE}
 " | create_pr
 

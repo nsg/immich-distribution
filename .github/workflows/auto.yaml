@@ -33,7 +33,7 @@ jobs:
         run: |
           ./workflows/tracking-issue.sh
 
-      - name: Update Tracking Issue
+      - name: Update Tracking Issues
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
