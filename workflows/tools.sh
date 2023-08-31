@@ -95,3 +95,7 @@ get_latest_release_for_major_minor() {
 snapstore_version() {
     snap info immich-distribution | awk "/^ *latest\/$1/{ print \$2 }" | cut -d'-' -f1
 }
+
+version_to_int() {
+    echo $1 | awk -F'.' '{ print $1*10000 + $2*100 + $3 }'
+}

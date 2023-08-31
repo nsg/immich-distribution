@@ -43,6 +43,11 @@ if git ls-remote --exit-code "$REMOTE_URL" "refs/heads/$BRANCH_NAME" >/dev/null 
     exit 0
 fi
 
+if [[ $(version_to_int "$NEW_VERSION") -lt $(version_to_int "$OLD_VERSION") ]]; then
+    echo "New version $NEW_VERSION is older then old version $OLD_VERSION, abort execution"
+    exit 0
+fi
+
 git checkout -b $BRANCH_NAME
 
 # Bump version
