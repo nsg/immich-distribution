@@ -9,20 +9,27 @@ set -eo pipefail
 
 REMOTE_URL=$(git remote get-url origin)
 
-# Oldest tracking issue (lowest issue number)
-TRACKING_ISSUE="$(list_tracking_issues | sort -n | head -n 1)"
+#
+# By default, use the oldest open tracking issues latest release as the new version
+# Unless the latest release is already in the VERSION file, then use the next tracking issue
+#
+
+for n in $(list_tracking_issues | sort -n); do
+    TRACKING_ISSUE_TITLE="$(get_issue_title $n)"
+    TRACKING_ISSUE_VERSION_MAJOR_MINOR="$(echo $TRACKING_ISSUE_TITLE | awk '{ print $2 }')"
+    NEW_VERSION=$(get_latest_release_for_major_minor $TRACKING_ISSUE_VERSION_MAJOR_MINOR)
+    if ! grep -q $NEW_VERSION VERSION; then
+        TRACKING_ISSUE=$n
+        break
+    fi
+done
 
 if [ -z "$TRACKING_ISSUE" ]; then
     echo "No tracking issue found."
     exit 0
 fi
 
-TRACKING_ISSUE_TITLE="$(get_issue_title $TRACKING_ISSUE)"
-TRACKING_ISSUE_VERSION_MAJOR_MINOR="$(echo $TRACKING_ISSUE_TITLE | awk '{ print $2 }')"
-
-# Fetch versions (old and new)
 OLD_VERSION=$(cat VERSION)
-NEW_VERSION=$(get_latest_release_for_major_minor $TRACKING_ISSUE_VERSION_MAJOR_MINOR)
 BRANCH_NAME="bump/$NEW_VERSION"
 
 if has_any_pr_bump_open; then

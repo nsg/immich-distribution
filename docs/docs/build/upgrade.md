@@ -18,7 +18,9 @@ A GitHub Action will automatically create an PR with relevant files.
 The pull request will be containing various information. A human needs to verify the state and if it looks good merge the PR.
 
 !!! Note "Multiple versions"
-    If there is different versions like 1.23 or 1.24, it's important to understand the process. Each minor version, denoted as 1.xx, will have its own tracking issue. If there happen to be several tracking issues open at once, only the earliest or oldest one is used for the pull request. It also ensures that there are never two PRs open at the same time. This approach not only minimizes the need for rebasing but also significantly cuts down the risk of merge conflicts.
+    If there are different versions like 1.23 or 1.24, it's important to understand the process. Each minor version, denoted as 1.xx, will have its own tracking issue. If there happen to be several tracking issues open at once, only the earliest or oldest one is used for the pull request. It also ensures that there are never two PRs open at the same time. This approach not only minimizes the need for rebasing but also significantly cuts down the risk of merge conflicts.
+
+    Furthermore, by default, the logic employs the latest release of the oldest open tracking issue as the new version. However, if this latest release is already mentioned in the VERSION file, then the next tracking issue in line is used.
 
 ## Immich CLI
 
