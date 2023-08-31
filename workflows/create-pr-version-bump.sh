@@ -54,9 +54,6 @@ echo "
 This PR bumps the version from **$OLD_VERSION** to **$NEW_VERSION**.
 Please review the changes and merge this PR if everything looks good.
 
-## Version update output
-$(cat /tmp/version-update)
-
 ## New immich-cli version
 $(new_cli_version)
 
