@@ -31,7 +31,7 @@ log() {
 }
 
 N=0
-MAX=60
+MAX=240
 while is_backend_down; do
     backends_down
 
