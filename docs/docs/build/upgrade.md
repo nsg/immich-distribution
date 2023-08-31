@@ -14,12 +14,11 @@ Immich do **not** follow strict [semantic versioning](https://semver.org/) but o
 
 ## Bump Immich version
 
-A GitHub Action will automatically run `make version-update` in a branch, this should update  `snap/snapcraft.yaml`, `parts/machine-learning/Makefile` and `patches/Makefile` with the new release version.
-
-A pull request will be opened containing various information. A human needs to verify the state and if it looks good merge the PR.
+A GitHub Action will automatically create an PR with relevant files.
+The pull request will be containing various information. A human needs to verify the state and if it looks good merge the PR.
 
 !!! Note "Multiple versions"
-    If there is multiple versions (like 1.23 and 1.24) open at the same time, a PR will only be created for the first version. The PR for 1.24 should be created when 1.23 is merged. This is done to reduce the need for rebases and the chance of a merge conflict.
+    If there is different versions like 1.23 or 1.24, it's important to understand the process. Each minor version, denoted as 1.xx, will have its own tracking issue. If there happen to be several tracking issues open at once, only the earliest or oldest one is used for the pull request. It also ensures that there are never two PRs open at the same time. This approach not only minimizes the need for rebasing but also significantly cuts down the risk of merge conflicts.
 
 ## Immich CLI
 
@@ -41,13 +40,7 @@ Because the CLI is included I always check for a [release of the CLI](https://gi
 
 I usually start by reading the [release notes](https://github.com/immich-app/immich/releases) to figure out if I need to do something special. Usually are pure code changes, like changes internally in the server, just fine. Changes to startup scripts, dependencies, paths, environment do possible require changes to this package.
 
-Depending on the release size I have found it useful to look at code changes as well, at least so see what files the release touches. I have written a small tool to track important files called [update.sh](https://github.com/nsg/immich-distribution/blob/master/update.sh), use it like this:
-
-```bash title="Compare released versions"
-./update.sh old-tag new-tag # (1)
-```
-
-1. For example: `./update.sh v1.52.1 v1.53.0`
+Depending on the release size I have found it useful to look at code changes as well, at least so see what files the release touches. I have written a small tool to track important files called [update.sh](https://github.com/nsg/immich-distribution/blob/master/update.sh), the output of it is included in the pull request.
 
 This script will diff files that I like to keep track on, for example:
 
@@ -56,9 +49,6 @@ This script will diff files that I like to keep track on, for example:
 * Env-files and docker-compose-file - Detect relevant changes, like patch or environment changes that are required
 * nginx config - I use HAProxy so I track changes to nginx to see if I need to apply them
 * migrations - I track database changes to see if anything relevant has changed related to [database changes](https://github.com/nsg/immich-distribution/blob/master/src/etc/modify-db.sql) that the sync feature has done.
-
-!!! Info "Automatically run i pull request"
-    This script is executed as part of the automatic pull request, so most likely there is no need for you to manually execute this.
 
 ## Test it locally
 

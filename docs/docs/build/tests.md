@@ -12,7 +12,7 @@ In the `tests/` folder, run `make selenium` to start a selenium container in pod
 
 ```makefile
 wait:
-	while ! ./test_haproxy.sh ; do sleep 1; done
+	./test_haproxy.sh
 ```
 
 The HAProxy tests are configured like this:
