@@ -1,4 +1,4 @@
-name: Automatically bump version
+name: Issue and PR automations
 
 on:
   workflow_dispatch:
@@ -20,7 +20,27 @@ permissions:
   pull-requests: write
 
 jobs:
-  bump-version:
+  tracking-issue:
+    name: Tracking Issue
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Create Tracking Issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          ./workflows/tracking-issue.sh
+
+      - name: Update Tracking Issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          ./workflows/update-tracking-issue.sh
+
+  create-pr-version-bump:
+    name: Create PR Version Bump
     runs-on: ubuntu-latest
 
     steps:
@@ -28,10 +48,10 @@ jobs:
         with:
           ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-      - name: Bump version
+      - name: Create PR Version Bump
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           git config --global user.name "Github Action Automation"
           git config --global user.email "nsg@users.noreply.github.com"
-          ./auto-bump.sh
+          ./workflows/create-pr-version-bump.sh
