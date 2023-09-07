@@ -161,7 +161,7 @@ class TestImmichWeb(BaseCase):
         )
 
         # Give the system time to process the new assets
-        self.sleep(60)
+        self.sleep(240)
 
     def test_100_verify_uploaded_assets_number_of_files(self):
         """
