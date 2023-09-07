@@ -1,0 +1,16 @@
+#!/bin/bash
+
+. $SNAP/bin/load-env
+
+export PYTHONPATH="$SNAP/app/machine-learning/python-packages"
+export LD_PRELOAD="$SNAP/usr/local/lib/libmimalloc.so.2"
+
+echo "Launching machine-learning service using python version: $(python3 --version)"
+echo "PYTHONPATH: $PYTHONPATH"
+
+cd $SNAP/app/machine-learning
+python3 $SNAP/bin/gunicorn app.main:app \
+ 	-k uvicorn.workers.UvicornWorker \
+ 	-w $MACHINE_LEARNING_WORKERS \
+ 	-b $MACHINE_LEARNING_HOST:$MACHINE_LEARNING_PORT \
+ 	--log-config-json log_conf.json

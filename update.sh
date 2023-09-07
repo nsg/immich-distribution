@@ -56,6 +56,7 @@ CHECK_FILES="
     nginx
     machine-learning/README.md
     machine-learning/Dockerfile
+    machine-learning/start.sh
     docker/example.env
     docker/docker-compose.yml
 "
