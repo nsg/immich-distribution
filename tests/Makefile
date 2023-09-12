@@ -1,4 +1,4 @@
-test: .env/bin/seleniumbase prepare-test-file wait
+test: .env/bin/seleniumbase prepare-test-file wait check-selenium
 	.env/bin/pytest tests_selenium.py --server=127.0.0.1 --port=4444 --headed --html=report.html
 
 trace: .env/bin/seleniumbase prepare-test-file wait
@@ -22,6 +22,9 @@ external-test-files:
 
 wait:
 	./test_haproxy.sh
+
+check-selenium:
+	nc -v -w1 127.0.0.1 4444 || (echo "Selenium is not running"; exit 1)
 
 selenium:
 	podman run \
