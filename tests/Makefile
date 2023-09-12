@@ -10,7 +10,10 @@ ci: prepare-test-file wait
 prepare-test-file: external-test-files update-snap-symlinks-for-user
 	mkdir -p ${HOME}/snap/immich-distribution/current/tests
 	mkdir -p ${HOME}/snap/immich-distribution/current/tests_external
-	cp -r assets ${HOME}/snap/immich-distribution/current/tests
+	for asset in assets/*; do \
+		echo $$asset | grep -q py__ \
+			|| cp $$asset ${HOME}/snap/immich-distribution/current/tests/; \
+	done
 	cp -r external-test-files ${HOME}/snap/immich-distribution/current/tests_external
 
 external-test-files: update-snap-symlinks-for-user
