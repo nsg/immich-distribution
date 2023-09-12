@@ -25,6 +25,14 @@ beta2store:
 shell:
 	multipass shell snapcraft-immich-distribution
 
+.PHONY: tests
+tests:
+	make -C tests test
+
+.PHONY: selenium
+selenium:
+	make -C tests/ selenium
+
 .PHONY: docs
 docs:
 	cd docs && poetry run mkdocs serve
