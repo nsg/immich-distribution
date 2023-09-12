@@ -20,7 +20,7 @@ external-test-files: update-snap-symlinks-for-user
 	mkdir -p external-test-files
 
 	cd external-test-files && for file in $(shell cat external-test-files.list); do \
-		wget $$file; \
+		wget -c $$file; \
 	done
 
 update-snap-symlinks-for-user:
