@@ -11,6 +11,10 @@ build:
 install:
 	sudo snap install --dangerous ${SNAP_FILE}
 
+.PHONY: remove
+remove:
+	sudo snap remove --purge immich-distribution
+
 beta: build
 	cat ${SNAP_FILE} | ssh d -- lxc file push - immich-beta/root/${SNAP_FILE}
 	ssh d lxc exec immich-beta -- snap install --dangerous /root/${SNAP_FILE}
