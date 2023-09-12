@@ -7,6 +7,7 @@ export LD_PRELOAD="$SNAP/usr/local/lib/libmimalloc.so.2"
 
 echo "Launching machine-learning service using python version: $(python3 --version)"
 echo "PYTHONPATH: $PYTHONPATH"
+echo "LD_PRELOAD: $LD_PRELOAD"
 
 cd $SNAP/app/machine-learning
 python3 $SNAP/bin/gunicorn app.main:app \
