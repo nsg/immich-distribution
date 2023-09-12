@@ -37,7 +37,6 @@ selenium:
 		-p 4444:4444 \
 		-p 7900:7900 \
 		--shm-size="2g" \
-		-v ${PWD}/assets:/assets \
 		docker.io/selenium/standalone-chrome:latest
 
 .env:
