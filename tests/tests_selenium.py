@@ -5,6 +5,7 @@ import os
 import subprocess
 import shutil
 import requests
+import time
 
 from seleniumbase import BaseCase
 BaseCase.main(__name__, __file__)
@@ -36,6 +37,26 @@ def get_assets(filter=[]):
             resp[asset['originalFileName']] = asset
     
     return resp
+
+def get_all_jobs():
+    r = requests.get(f"http://{get_ip_address()}/api/jobs", headers=get_headers())
+    return r.json()
+
+def trigger_job(job_name):
+    r = requests.put(
+        f"http://{get_ip_address()}/api/jobs/{job_name}",
+        headers=get_headers(),
+        json={"command": "start"}
+    )
+    return r.json()
+
+def wait_for_empty_job_queue():
+    for job_name, job_data in get_all_jobs().items():
+        status = job_data['queueStatus']['isActive']
+        if status == True:
+            print(f"Queue {job_name} is running")
+            time.sleep(1)
+            return wait_for_empty_job_queue()
 
 def css_selector_path(element):
     """ Returns a CSS selector that will uniquely select the given element. """
@@ -141,14 +162,8 @@ class TestImmichWeb(BaseCase):
         
         snap_readable_path = os.path.join(
             os.environ["HOME"],
-            "snap/immich-distribution/current/tests"
+            "snap/immich-distribution/current/"
         )
-
-        if not os.path.exists(snap_readable_path):
-            os.makedirs(snap_readable_path)
-
-        for upload in os.listdir("assets"):
-            shutil.copy(f"assets/{upload}", snap_readable_path)
 
         subprocess.run(
             [
@@ -156,29 +171,9 @@ class TestImmichWeb(BaseCase):
                 "upload",
                 "--key", secret,
                 "--yes",
-                snap_readable_path
+                f"{snap_readable_path}/tests"
             ]
         )
-
-        # Give the system time to process the new assets
-        self.sleep(300)
-
-    def test_005_upload_external_assets_with_cli(self):
-        """
-        Use the CLI to upload assets from the external-test-files directory.
-        """
-        secret = get_secret()
-        
-        snap_readable_path = os.path.join(
-            os.environ["HOME"],
-            "snap/immich-distribution/current/tests_external"
-        )
-
-        if not os.path.exists(snap_readable_path):
-            os.makedirs(snap_readable_path)
-
-        for upload in os.listdir("external-test-files"):
-            shutil.copy(f"external-test-files/{upload}", snap_readable_path)
 
         subprocess.run(
             [
@@ -186,12 +181,18 @@ class TestImmichWeb(BaseCase):
                 "upload",
                 "--key", secret,
                 "--yes",
-                snap_readable_path
+                f"{snap_readable_path}/tests_external"
             ]
         )
 
-        # Give the system time to process the new assets
-        self.sleep(60)
+        # ML models are downloaded in the background when we upload assets
+        # Wait for them to complete, and the queue to be empty before continuing
+        wait_for_empty_job_queue()
+
+        # Re-run the recognition job. I'm not sure if this is an Immich bug or
+        # just a quirk of the test environment. Anyway let's just run it again.
+        trigger_job("recognizeFaces")
+        wait_for_empty_job_queue()
 
     def test_100_verify_uploaded_assets_number_of_files(self):
         """
