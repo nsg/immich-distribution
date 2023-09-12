@@ -11,6 +11,10 @@ build:
 install:
 	sudo snap install --dangerous ${SNAP_FILE}
 
+.PHONY: remove
+remove:
+	sudo snap remove --purge immich-distribution
+
 beta: build
 	cat ${SNAP_FILE} | ssh d -- lxc file push - immich-beta/root/${SNAP_FILE}
 	ssh d lxc exec immich-beta -- snap install --dangerous /root/${SNAP_FILE}
@@ -20,6 +24,14 @@ beta2store:
 
 shell:
 	multipass shell snapcraft-immich-distribution
+
+.PHONY: tests
+tests:
+	make -C tests test
+
+.PHONY: selenium
+selenium:
+	make -C tests/ selenium
 
 .PHONY: docs
 docs:

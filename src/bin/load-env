@@ -8,6 +8,7 @@ snapctl() {
     fi
 }
 
+export PATH="$SNAP/usr/local/bin:$PATH"
 export LD_LIBRARY_PATH="$SNAP/usr/local/pgsql/lib:$SNAP/usr/lib/x86_64-linux-gnu/pulseaudio:$SNAP/usr/lib/x86_64-linux-gnu/libfswatch:$SNAP/usr/local/lib/x86_64-linux-gnu/:$LD_LIBRARY_PATH"
 
 export PGDATA="$SNAP_COMMON/pgsql/data"
@@ -32,6 +33,10 @@ export IMMICH_SERVER_ADDRESS="$IMMICH_SERVER_URL" # CLI
 export IMMICH_MACHINE_LEARNING_URL="http://127.0.0.1:3003"
 export MACHINE_LEARNING_LOG_LEVEL="warning"
 export MACHINE_LEARNING_IP="127.0.0.1"
+export MACHINE_LEARNING_CACHE_FOLDER="$SNAP_COMMON/cache"
+export MACHINE_LEARNING_HOST="0.0.0.0"
+export MACHINE_LEARNING_PORT=3003
+export MACHINE_LEARNING_WORKERS=1
 
 export TYPESENSE_API_KEY="$(snapctl get typesense-key)"
 export TYPESENSE_DATA_DIR="$SNAP_COMMON/typesense"

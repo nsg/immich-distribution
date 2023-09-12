@@ -56,8 +56,10 @@ CHECK_FILES="
     nginx
     machine-learning/README.md
     machine-learning/Dockerfile
+    machine-learning/start.sh
     docker/example.env
     docker/docker-compose.yml
+    docs/docs/install/environment-variables.md
 "
 
 for F in $CHECK_FILES; do

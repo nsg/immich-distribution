@@ -10,3 +10,5 @@ __pycache__
 /tests/latest_logs
 /tests/report.html
 /tests/assets/style.css
+/tests/assets/tests_selenium.py__*
+/tests/external-test-files

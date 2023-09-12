@@ -182,7 +182,7 @@ parts:
     plugin: npm
     npm-node-version: "18.16.0"
     source: https://github.com/immich-app/immich.git
-    source-tag: v1.76.1
+    source-tag: v1.77.0
     source-subdir: server
     override-build: |
       snapcraftctl set-version "$(git describe --tags)-dist1"
@@ -203,7 +203,7 @@ parts:
     plugin: npm
     npm-node-version: "18.16.0"
     source: https://github.com/immich-app/immich.git
-    source-tag: v1.76.1
+    source-tag: v1.77.0
     source-subdir: web
     override-build: |
       patch -p0 -i $SNAPCRAFT_PART_SRC/../../patches/src/001-version-announcement-box.patch -d $SNAPCRAFT_PART_BUILD
@@ -255,6 +255,7 @@ parts:
       - immich-distribution-libvips/latest/stable
       - immich-distribution-node/latest/stable
       - immich-distribution-python/latest/stable
+      - immich-distribution-mimalloc/latest/stable
 
   scripts:
     source: src
