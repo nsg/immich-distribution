@@ -7,18 +7,21 @@ trace: .env/bin/seleniumbase prepare-test-file wait
 ci: prepare-test-file wait
 	pytest tests_selenium.py --server=127.0.0.1 --port=4444 --html=report.html
 
-prepare-test-file: external-test-files
+prepare-test-file: external-test-files update-snap-symlinks-for-user
 	mkdir -p ${HOME}/snap/immich-distribution/current/tests
 	mkdir -p ${HOME}/snap/immich-distribution/current/tests_external
 	cp -r assets ${HOME}/snap/immich-distribution/current/tests
 	cp -r external-test-files ${HOME}/snap/immich-distribution/current/tests_external
 
-external-test-files:
+external-test-files: update-snap-symlinks-for-user
 	mkdir -p external-test-files
 
 	cd external-test-files && for file in $(shell cat external-test-files.list); do \
 		wget $$file; \
 	done
+
+update-snap-symlinks-for-user:
+	immich-distribution.cli -h > /dev/null 2>&1
 
 wait:
 	./test_haproxy.sh
