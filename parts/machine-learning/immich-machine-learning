@@ -14,4 +14,5 @@ python3 $SNAP/bin/gunicorn app.main:app \
  	-k uvicorn.workers.UvicornWorker \
  	-w $MACHINE_LEARNING_WORKERS \
  	-b $MACHINE_LEARNING_HOST:$MACHINE_LEARNING_PORT \
+	-t $MACHINE_LEARNING_WORKER_TIMEOUT \
  	--log-config-json log_conf.json
