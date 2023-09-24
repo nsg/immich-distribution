@@ -176,8 +176,12 @@ def file_watcher(event: threading.Event, db: ImmichDatabase, api: ImmichAPI, api
                 log(f"{c_path} modified, re-import asset to Immich")
                 import_asset(db, api, api_key, user_path, c_path)
             elif c_type == Change.deleted:
-                log(f"{c_path} deleted, mark asset as removed")
-                delete_asset(db, api, c_path, user_path)
+                file_age_days = (time.time() - os.path.getmtime(os.path.relpath(c_path, user_path))) / 86400
+                if file_age_days < 365:
+                    log(f"{c_path} deleted, asset is {file_age_days} days old, delete asset from Immich")
+                    delete_asset(db, api, c_path, user_path)
+                else:
+                    log(f"{c_path} deleted, asset is 365 days or older ({file_age_days} days), do NOT delete from Immich")
 
 def database_watcher(event: threading.Event, db: ImmichDatabase, api: ImmichAPI, user_path: str) -> None:
     log("Database watcher thread running...")
