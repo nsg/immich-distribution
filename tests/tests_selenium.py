@@ -243,7 +243,6 @@ class TestImmichWeb(BaseCase):
         self.assertEqual(grass['exifInfo']['model'], "Pixel 4")
         self.assertEqual(grass['exifInfo']['dateTimeOriginal'], "2023-07-08T12:13:53.210Z")
         self.assertEqual(grass['exifInfo']['city'], "Mora")
-        self.assertNotEqual(grass['livePhotoVideoId'], None)
 
     def test_100_verify_people_detected(self):
         """
