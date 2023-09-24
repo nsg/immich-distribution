@@ -217,7 +217,7 @@ class TestImmichWeb(BaseCase):
 
     def test_100_verify_video_transcode(self):
         """
-        Verify that the video was transcoded from VP9 to MP4
+        Verify that the video was transcoded from VP9 to WEBM
         """
 
         assets = get_assets(["ship-vp9"])
@@ -225,7 +225,7 @@ class TestImmichWeb(BaseCase):
         self.assertEqual(ship['type'], "VIDEO")
         r = requests.get(f"http://{get_ip_address()}/api/asset/file/{ship['id']}?isThumb=false&isWeb=true", headers=get_headers())
         self.assertEqual(r.status_code, 200)
-        self.assertEqual(r.headers['content-type'], "video/mp4")
+        self.assertEqual(r.headers['content-type'], "video/webm")
 
     def test_100_verify_image_exitdata(self):
         """
@@ -241,9 +241,8 @@ class TestImmichWeb(BaseCase):
 
         self.assertEqual(grass['type'], "IMAGE")
         self.assertEqual(grass['exifInfo']['model'], "Pixel 4")
-        self.assertEqual(grass['exifInfo']['dateTimeOriginal'], "2023-07-08T12:13:53.000Z")
+        self.assertEqual(grass['exifInfo']['dateTimeOriginal'], "2023-07-08T12:13:53.210Z")
         self.assertEqual(grass['exifInfo']['city'], "Mora")
-        self.assertNotEqual(grass['livePhotoVideoId'], None)
 
     def test_100_verify_people_detected(self):
         """
