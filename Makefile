@@ -15,12 +15,12 @@ install:
 remove:
 	sudo snap remove --purge immich-distribution
 
-beta: build
-	cat ${SNAP_FILE} | ssh d -- lxc file push - immich-beta/root/${SNAP_FILE}
-	ssh d lxc exec immich-beta -- snap install --dangerous /root/${SNAP_FILE}
+prodsnap: build
+	cat ${SNAP_FILE} | ssh d -- lxc file push - immich-prod/root/${SNAP_FILE}
+	ssh d lxc exec immich-prod -- snap install --dangerous /root/${SNAP_FILE}
 
-beta2store:
-	ssh d lxc exec immich-beta -- snap refresh --beta --amend immich-distribution
+prodstore:
+	ssh d lxc exec immich-prod -- snap refresh --candidate --amend immich-distribution
 
 shell:
 	multipass shell snapcraft-immich-distribution

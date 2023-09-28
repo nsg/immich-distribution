@@ -73,6 +73,18 @@ class ImmichDatabase:
             """, (asset_path, user_id))
             return cur.fetchone()
 
+    def get_asset_modified_by_path(self, user_id: str, asset_path: str) -> psycopg2.extras.RealDictRow | None:
+        with self.conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+            cur.execute("""
+                SELECT assets."fileModifiedAt"
+                FROM assets
+                INNER JOIN assets_filesync_lookup
+                ON assets.checksum = assets_filesync_lookup.checksum
+                WHERE assets_filesync_lookup.asset_path = %s
+                AND assets_filesync_lookup.user_id = %s
+            """, (asset_path, user_id))
+            return cur.fetchone()
+
     def close(self):
         self.conn.commit()
         self.conn.close()
@@ -176,13 +188,19 @@ def file_watcher(event: threading.Event, db: ImmichDatabase, api: ImmichAPI, api
                 log(f"{c_path} modified, re-import asset to Immich")
                 import_asset(db, api, api_key, user_path, c_path)
             elif c_type == Change.deleted:
-                file_age_days = (time.time() - os.path.getmtime(os.path.relpath(c_path, user_path))) / 86400
-                file_age_delete_limit = int(os.environ.get("SYNC_FILE_AGE_DELETE_LIMIT", 365))
-                if file_age_days < file_age_delete_limit:
-                    log(f"{c_path} deleted, asset is {file_age_days} days old (limit {file_age_delete_limit} days), delete asset from Immich")
-                    delete_asset(db, api, c_path, user_path)
+                relative_path = os.path.relpath(c_path, user_path)
+                asset = db.get_asset_modified_by_path(api.get_user_id(), relative_path)
+                if asset:
+                    log(asset['fileModifiedAt'])
                 else:
-                    log(f"{c_path} deleted, asset is {file_age_delete_limit} days or older ({file_age_days} days), do NOT delete from Immich")
+                    log(f"Deleted asset {c_path} not found in Immich database, ignore")
+                #file_age_days = (time.time() - os.path.getmtime(os.path.relpath(c_path, user_path))) / 86400
+                #file_age_delete_limit = int(os.environ.get("SYNC_FILE_AGE_DELETE_LIMIT", 365))
+                #if file_age_days < file_age_delete_limit:
+                #    log(f"{c_path} deleted, asset is {file_age_days} days old (limit {file_age_delete_limit} days), delete asset from Immich")
+                #    delete_asset(db, api, c_path, user_path)
+                #else:
+                #    log(f"{c_path} deleted, asset is {file_age_delete_limit} days or older ({file_age_days} days), do NOT delete from Immich")
 
 def database_watcher(event: threading.Event, db: ImmichDatabase, api: ImmichAPI, user_path: str) -> None:
     log("Database watcher thread running...")
