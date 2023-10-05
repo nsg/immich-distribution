@@ -1,0 +1,48 @@
+name: Build and release snap package to edge channel
+
+on:
+  push:
+    branches:
+      - 'master'
+    paths-ignore:
+      - 'docs/**'
+      - '*.md'
+      - 'LICENSE'
+
+  workflow_dispatch:
+
+jobs:
+  run:
+    name: Build, Test and Release Snap Package
+    runs-on: ubuntu-latest
+
+    services:
+      selenium:
+        image: selenium/standalone-chrome:latest
+        options: --shm-size=2gb
+        ports:
+          - 4444:4444
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Build snap package
+        uses: snapcore/action-build@v1
+
+      - name: TEST | Install package
+        run: sudo snap install --dangerous *.snap
+
+      - name: TEST | Install requirements
+        run: pip install -r tests/requirements.txt
+
+      - name: TEST | Run Selenium Tests
+        run: make ci -C tests
+
+      - name: Upload snap package to edge channel
+        uses: snapcore/action-publish@v1
+        env:
+          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.STORE_LOGIN }}
+        with:
+          snap: "*.snap"
+          channel: edge
