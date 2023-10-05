@@ -24,7 +24,6 @@ export DB_PASSWORD="$(snapctl get database-password)"
 export DB_DATABASE_NAME="immich"
 
 export REDIS_HOSTNAME="127.0.0.1"
-export REVERSE_GEOCODING_PRECISION="3"
 
 export IMMICH_WEB_URL="http://127.0.0.1:3000"
 export IMMICH_SERVER_URL="http://127.0.0.1:3001"
