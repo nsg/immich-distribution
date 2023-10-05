@@ -29,9 +29,10 @@ jobs:
 
       - name: Build snap package
         uses: snapcore/action-build@v1
+        id: build
 
       - name: TEST | Install package
-        run: sudo snap install --dangerous *.snap
+        run: sudo snap install --dangerous ${{ steps.build.outputs.snap }}
 
       - name: TEST | Install requirements
         run: pip install -r tests/requirements.txt
@@ -44,5 +45,5 @@ jobs:
         env:
           SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.STORE_LOGIN }}
         with:
-          snap: "*.snap"
-          channel: edge
+          snap: ${{ steps.build.outputs.snap }}
+          release: edge
