@@ -180,7 +180,7 @@ parts:
   # "npm run build" builds: server, microservices, cli
   server:
     plugin: npm
-    npm-node-version: "18.16.0"
+    npm-node-version: "20.8.0"
     source: https://github.com/immich-app/immich.git
     source-tag: v1.81.1
     source-subdir: server
@@ -201,7 +201,7 @@ parts:
 
   web:
     plugin: npm
-    npm-node-version: "18.16.0"
+    npm-node-version: "20.8.0"
     source: https://github.com/immich-app/immich.git
     source-tag: v1.81.1
     source-subdir: web
@@ -231,7 +231,7 @@ parts:
 
   cli:
     plugin: npm
-    npm-node-version: "18.16.0"
+    npm-node-version: "20.8.0"
     source: https://github.com/immich-app/CLI.git
     source-tag: v0.41.0
     override-build: |
