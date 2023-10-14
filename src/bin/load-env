@@ -56,6 +56,9 @@ else
     export HAPROXY_HTTPS_FRONTEND_DATA="disabled"
 fi
 
+export HAPROXY_HTTP_BIND="$(snapctl get haproxy-http-bind)"
+export HAPROXY_HTTPS_BIND="$(snapctl get haproxy-https-bind)"
+
 drop_privileges() {
     $SNAP/usr/bin/setpriv \
         --clear-groups \

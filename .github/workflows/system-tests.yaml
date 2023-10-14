@@ -19,45 +19,9 @@ on:
   workflow_dispatch:
 
 jobs:
-  prepare:
-    runs-on: ubuntu-latest
-
-    outputs:
-      runjob: ${{ steps.detect.outputs.runjob }}
-
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Detect if this commit already have an active workflow running
-        id: detect
-        env:
-          GH_TOKEN: ${{ github.token }}      
-        run: |
-          sleep $(( RANDOM % 10 ))
-          if gh run list --status in_progress --json headSha --jq ".[].headSha" | grep -q "$GITHUB_SHA"; then
-            echo "This commit already have an active workflow running, canceling this one."
-            echo "runjob=yes" >> $GITHUB_OUTPUT
-          fi
-
   build:
-    name: Build Snap Package
+    name: Build and Test Snap Package
     runs-on: ubuntu-latest
-    needs: [ prepare ]
-    if: ${{ needs.prepare.outputs.runjob == 'yes' }}
-
-    steps:
-      - uses: actions/checkout@v3
-      - uses: snapcore/action-build@v1
-      - uses: actions/cache/save@v3
-        with:
-          path: "*.snap"
-          key: ${{ github.workflow }}-${{ github.sha }}
-
-  test:
-    name: Install and Test Snap Package
-    runs-on: ubuntu-latest
-    needs: [ prepare, build ]
-    if: ${{ needs.prepare.outputs.runjob == 'yes' }}
 
     services:
       selenium:
@@ -67,19 +31,20 @@ jobs:
           - 4444:4444
 
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/cache/restore@v3
-        with:
-          path: "*.snap"
-          key: ${{ github.workflow }}-${{ github.sha }}
-        
-      - name: Install package
-        run: sudo snap install --dangerous *.snap
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-      - name: Install requirements
+      - name: Build snap package
+        uses: snapcore/action-build@v1
+        id: build
+
+      - name: TEST | Install package
+        run: sudo snap install --dangerous ${{ steps.build.outputs.snap }}
+
+      - name: TEST | Install requirements
         run: pip install -r tests/requirements.txt
 
-      - name: Run Selenium Tests
+      - name: TEST | Run Selenium Tests
         run: make ci -C tests
 
       - name: Upload test report
