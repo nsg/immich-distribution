@@ -15,6 +15,14 @@ if [[ $(snapctl get typesense-key) == "" ]]; then
     snapctl set typesense-key="$(random_string)"
 fi
 
+if [[ $(snapctl get haproxy-http-bind) == "" ]]; then
+    snapctl set haproxy-http-bind="*:80"
+fi
+
+if [[ $(snapctl get haproxy-https-bind) == "" ]]; then
+    snapctl set haproxy-https-bind="*:443"
+fi
+
 # Restart services
 snapctl restart immich-distribution.postgres
 snapctl restart immich-distribution.typesense
