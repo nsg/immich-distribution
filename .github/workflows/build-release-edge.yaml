@@ -96,7 +96,7 @@ jobs:
         uses: snapcore/action-build@v1
         id: build
         with:
-          path: .
+          path: snap
 
       - name: TEST | Install package
         run: sudo snap install --dangerous ${{ steps.build.outputs.snap }}
