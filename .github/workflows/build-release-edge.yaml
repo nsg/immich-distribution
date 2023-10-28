@@ -59,8 +59,16 @@ jobs:
           mkdir -p dependencies/workdir
           for artifact in $(cd dependencies/artifacts; ls -1); do
             unsquashfs -d dependencies/workdir/$artifact dependencies/artifacts/$artifact/$artifact/*.snap
+            rm -rf dependencies/workdir/$artifact/meta
           done
 
+      - name: Save workdir
+        uses: actions/upload-artifact@v3
+        with:
+          name: workdir
+          path: |
+            dependencies/workdir
+  
   build:
     name: Build, Test and Release Snap Package
     runs-on: ubuntu-latest

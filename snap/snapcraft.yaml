@@ -245,12 +245,12 @@ parts:
       - dependencies
 
   dependencies:
-    plugin: nil
+    plugin: dump
+    source: dependencies/workdir
     stage-snaps:
       - immich-distribution-redis/latest/stable
       - immich-distribution-postgres/latest/stable
       - immich-distribution-typesense/latest/stable
-      - immich-distribution-haproxy/latest/stable
       - immich-distribution-lego/latest/stable
       - immich-distribution-libvips/latest/stable
       - immich-distribution-node/latest/stable
