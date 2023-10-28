@@ -57,7 +57,7 @@ jobs:
         run: |
           find dependencies/artifacts
           mkdir -p dependencies/workdir
-          for artifact in dependencies/artifacts/*; do
+          for artifact in $(cd dependencies/artifacts; ls -1); do
             unsquashfs -d dependencies/workdir/$artifact dependencies/artifacts/$artifact/*.snap
           done
 
