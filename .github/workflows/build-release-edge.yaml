@@ -32,9 +32,28 @@ jobs:
           name: haproxy-snap-package
           path: ${{ steps.build.outputs.snap }}
 
-  run:
+  prepare-dependencies:
+    name: Prepare dependencies
+    runs-on: ubuntu-latest
+    needs:
+      - haproxy
+
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
+
+      - name: Extract snap package
+        run: |
+          mkdir -p dependencies/workdir
+          for snap in *.snap; do
+            NAME="$($name | awk -F_ '{ print $1 }')"
+            unsquashfs -d dependencies/workdir/$NAME $snap
+          done
+
+  build:
     name: Build, Test and Release Snap Package
     runs-on: ubuntu-latest
+    needs: prepare-dependencies
 
     services:
       selenium:
