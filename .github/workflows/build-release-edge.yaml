@@ -29,7 +29,7 @@ jobs:
       - name: Upload test report
         uses: actions/upload-artifact@v3
         with:
-          name: haproxy-snap-package
+          name: haproxy
           path: ${{ steps.build.outputs.snap }}
 
   prepare-dependencies:
@@ -41,13 +41,14 @@ jobs:
     steps:
       - name: Download artifacts
         uses: actions/download-artifact@v3
+        with:
+          path: dependencies/artifacts
 
       - name: Extract snap package
         run: |
           mkdir -p dependencies/workdir
-          for snap in *.snap; do
-            NAME="$($name | awk -F_ '{ print $1 }')"
-            unsquashfs -d dependencies/workdir/$NAME $snap
+          for artifact in dependencies/artifacts/*; do
+            unsquashfs -d dependencies/workdir/$artifact dependencies/artifacts/$artifact/*.snap
           done
 
   build:
