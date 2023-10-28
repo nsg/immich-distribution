@@ -22,8 +22,15 @@ jobs:
 
       - name: Build snap package
         uses: snapcore/action-build@v1
+        id: build
         with:
           path: dependencies/haproxy
+
+      - name: Upload test report
+        uses: actions/upload-artifact@v3
+        with:
+          name: haproxy-snap-package
+          path: ${{ steps.build.outputs.snap }}
 
   run:
     name: Build, Test and Release Snap Package
