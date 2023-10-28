@@ -12,6 +12,19 @@ on:
   workflow_dispatch:
 
 jobs:
+  haproxy:
+    name: Build HAProxy snap package
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Build snap package
+        uses: snapcore/action-build@v1
+        with:
+          path: dependencies/haproxy
+
   run:
     name: Build, Test and Release Snap Package
     runs-on: ubuntu-latest
