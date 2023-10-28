@@ -48,7 +48,7 @@ jobs:
         run: |
           mkdir -p dependencies/workdir
           for artifact in dependencies/artifacts/*; do
-            unsquashfs -d dependencies/workdir/$artifact dependencies/artifacts/$artifact/*.snap
+            unsquashfs -d dependencies/workdir/$artifact dependencies/artifacts/$artifact/dependencies/$artifact/*.snap
           done
 
   build:
