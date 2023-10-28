@@ -25,7 +25,7 @@ jobs:
         with:
           key: ${{ hashFiles('dependencies/haproxy/snapcraft.yaml') }}
           path: |
-            *.snap
+            dependencies/**/*.snap
 
       - name: Build snap package
         uses: snapcore/action-build@v1
@@ -39,7 +39,7 @@ jobs:
         with:
           name: haproxy
           path: |
-            *.snap
+            dependencies/**/*.snap
 
   prepare-dependencies:
     name: Prepare dependencies
