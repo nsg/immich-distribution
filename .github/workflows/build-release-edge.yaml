@@ -24,11 +24,12 @@ jobs:
         id: cache
         with:
           key: ${{ hashFiles('dependencies/haproxy/snapcraft.yaml') }}
-          path: *.snap
+          path: |
+            *.snap
 
       - name: Build snap package
         uses: snapcore/action-build@v1
-        if: steps.cache-primes.outputs.cache-hit != 'true'
+        if: steps.cache.outputs.cache-hit != 'true'
         id: build
         with:
           path: dependencies/haproxy
@@ -37,7 +38,8 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: haproxy
-          path: *.snap
+          path: |
+            *.snap
 
   prepare-dependencies:
     name: Prepare dependencies
