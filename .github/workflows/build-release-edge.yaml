@@ -13,24 +13,31 @@ on:
 
 jobs:
   haproxy:
-    name: Build HAProxy snap package
+    name: Build HAProxy
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v3
+
+      - uses: actions/cache@v3
+        id: cache
+        with:
+          key: ${{ hashFiles('dependencies/haproxy/snapcraft.yaml') }}
+          path: *.snap
 
       - name: Build snap package
         uses: snapcore/action-build@v1
+        if: steps.cache-primes.outputs.cache-hit != 'true'
         id: build
         with:
           path: dependencies/haproxy
 
-      - name: Upload test report
+      - name: Save snap package as an artifact
         uses: actions/upload-artifact@v3
         with:
           name: haproxy
-          path: ${{ steps.build.outputs.snap }}
+          path: *.snap
 
   prepare-dependencies:
     name: Prepare dependencies
@@ -49,7 +56,7 @@ jobs:
           find dependencies/artifacts
           mkdir -p dependencies/workdir
           for artifact in dependencies/artifacts/*; do
-            unsquashfs -d dependencies/workdir/$artifact dependencies/artifacts/$artifact/dependencies/$artifact/*.snap
+            unsquashfs -d dependencies/workdir/$artifact dependencies/artifacts/$artifact/*.snap
           done
 
   build:
