@@ -70,6 +70,10 @@ jobs:
             rmdir workdir/$artifact
           done
 
+      - name: Compress workdir
+        run: |
+          tar -czf workdir.tar.gz workdir
+
       - name: List workdir
         run: |
           find workdir
@@ -80,7 +84,7 @@ jobs:
           name: workdir
           if-no-files-found: error
           path: |
-            workdir
+            workdir.tar.gz
   
   build:
     name: Build, Test and Release Snap Package
@@ -103,6 +107,10 @@ jobs:
         with:
           name: workdir
           path: workdir
+
+      - name: Extract workdir
+        run: |
+          tar -xzf workdir.tar.gz
 
       - name: Debug
         run: |
