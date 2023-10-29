@@ -64,6 +64,11 @@ jobs:
             rmdir dependencies/workdir/$artifact
           done
 
+      - name: Debug
+        run: |
+          pwd
+          find dependencies
+
       - name: Save workdir
         uses: actions/upload-artifact@v3
         with:
