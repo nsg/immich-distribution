@@ -92,6 +92,11 @@ jobs:
         with:
           name: workdir
 
+      - name: Debug
+        run: |
+          pwd
+          find .
+
       - name: Build snap package
         uses: snapcore/action-build@v1
         id: build
