@@ -60,6 +60,7 @@ jobs:
           for artifact in $(cd dependencies/artifacts; ls -1); do
             unsquashfs -d dependencies/workdir/$artifact dependencies/artifacts/$artifact/$artifact/*.snap
             rm -rf dependencies/workdir/$artifact/meta
+            rm -rf dependencies/workdir/$artifact/snap
             mv dependencies/workdir/$artifact/* dependencies/workdir
             rmdir dependencies/workdir/$artifact
           done
