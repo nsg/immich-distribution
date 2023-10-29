@@ -106,7 +106,6 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: workdir
-          path: workdir
 
       - name: Extract workdir
         run: |
