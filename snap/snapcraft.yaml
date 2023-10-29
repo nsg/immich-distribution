@@ -246,7 +246,7 @@ parts:
 
   dependencies:
     plugin: dump
-    source: dependencies/workdir
+    source: workdir
     stage-snaps:
       - immich-distribution-redis/latest/stable
       - immich-distribution-postgres/latest/stable

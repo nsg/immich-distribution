@@ -57,13 +57,13 @@ jobs:
       - name: Extract snap package
         run: |
           find dependencies/artifacts
-          mkdir -p dependencies/workdir
+          mkdir -p workdir
           for artifact in $(cd dependencies/artifacts; ls -1); do
-            unsquashfs -d dependencies/workdir/$artifact dependencies/artifacts/$artifact/$artifact/*.snap
-            rm -rf dependencies/workdir/$artifact/meta
-            rm -rf dependencies/workdir/$artifact/snap
-            mv dependencies/workdir/$artifact/* dependencies/workdir
-            rmdir dependencies/workdir/$artifact
+            unsquashfs -d workdir/$artifact dependencies/artifacts/$artifact/$artifact/*.snap
+            rm -rf workdir/$artifact/meta
+            rm -rf workdir/$artifact/snap
+            mv workdir/$artifact/* workdir
+            rmdir workdir/$artifact
           done
 
       - name: Debug
@@ -77,7 +77,7 @@ jobs:
           name: workdir
           if-no-files-found: error
           path: |
-            dependencies/workdir
+            workdir
   
   build:
     name: Build, Test and Release Snap Package
