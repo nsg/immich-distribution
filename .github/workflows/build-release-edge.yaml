@@ -54,6 +54,10 @@ jobs:
         with:
           path: dependencies/artifacts
 
+      - name: List snap dependency artifacts
+        run: |
+          find dependencies
+
       - name: Extract snap package
         run: |
           find dependencies/artifacts
@@ -66,10 +70,9 @@ jobs:
             rmdir workdir/$artifact
           done
 
-      - name: Debug
+      - name: List workdir
         run: |
-          pwd
-          find dependencies
+          find workdir
 
       - name: Save workdir
         uses: actions/upload-artifact@v3
