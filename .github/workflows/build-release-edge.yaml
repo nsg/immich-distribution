@@ -38,6 +38,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: haproxy
+          if-no-files-found: error
           path: |
             dependencies/**/*.snap
 
@@ -74,6 +75,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: workdir
+          if-no-files-found: error
           path: |
             dependencies/workdir
   
