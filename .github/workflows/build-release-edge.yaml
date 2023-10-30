@@ -163,7 +163,7 @@ jobs:
             dependencies/**/*.snap
 
   node:
-    name: Build node
+    name: Download node
     runs-on: ubuntu-latest
 
     steps:
@@ -253,7 +253,7 @@ jobs:
             dependencies/**/*.snap
 
   typesense:
-    name: Build typesense
+    name: Download typesense
     runs-on: ubuntu-latest
 
     steps:
