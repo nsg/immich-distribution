@@ -254,7 +254,6 @@ parts:
       - immich-distribution-lego/latest/stable
       - immich-distribution-libvips/latest/stable
       - immich-distribution-node/latest/stable
-      - immich-distribution-python/latest/stable
       - immich-distribution-mimalloc/latest/stable
 
   scripts:

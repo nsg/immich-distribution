@@ -1,0 +1,51 @@
+name: immich-distribution-python
+base: core20
+version: 3.11.4-dist2
+summary: Python packaged for Immich Distribution
+description: |
+  Python packaged for Immich Distribution, this is not intended to be consumed directly.
+architectures:
+  - amd64
+
+grade: stable
+confinement: strict
+
+apps:
+  python3:
+    command: usr/local/bin/python3
+
+parts:
+  python:
+    source: https://www.python.org/ftp/python/3.11.4/Python-3.11.4.tgz
+    plugin: make
+    override-build: |
+      ./configure --enable-optimizations --with-ensurepip=install
+      snapcraftctl build
+    build-packages:
+      - libssl-dev
+      - zlib1g-dev
+      - libbz2-dev
+      - liblzma-dev
+      - libreadline-dev
+      - libsqlite3-dev
+      - xz-utils
+      - libffi-dev
+      - libncurses5-dev
+      - libgdbm-dev
+      - libnss3-dev
+    stage-packages:
+      - libtcl8.6
+      - libtk8.6
+      - libxft2
+      - libgdbm6
+    stage:
+      - -etc/init.d
+      - -etc/X11
+      - -usr/bin
+      - -usr/include
+      - -usr/lib/X11
+      - -usr/share/doc
+      - -usr/share/doc-base
+      - -usr/share/lintian
+      - -usr/share/man
+      - -usr/share/X11
