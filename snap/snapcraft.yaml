@@ -247,6 +247,9 @@ parts:
   dependencies:
     plugin: dump
     source: workdir
+    override-build: |
+      find /root/parts/dependencies/install
+      snapcraftctl build
     stage-snaps:
       - immich-distribution-redis/latest/stable
       - immich-distribution-postgres/latest/stable
