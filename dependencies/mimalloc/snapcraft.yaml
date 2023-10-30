@@ -1,0 +1,17 @@
+name: immich-distribution-mimalloc
+base: core20
+version: 'v2.1.2-dist1'
+summary: mimalloc packaged for Immich Distribution
+description: |
+  mimalloc packaged for Immich Distribution, this is not intended to be consumed directly.
+architectures:
+  - amd64
+
+grade: stable
+confinement: strict
+
+parts:
+  mimalloc:
+    source: https://github.com/microsoft/mimalloc.git
+    source-tag: v2.1.2
+    plugin: cmake

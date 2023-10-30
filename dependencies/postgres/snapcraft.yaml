@@ -1,0 +1,31 @@
+name: immich-distribution-postgres
+base: core20
+version: 15.2-dist1
+summary: Postgres packaged for Immich Distribution
+description: |
+  Postgres packaged for Immich Distribution, this is not intended to be consumed directly.
+architectures:
+  - amd64
+
+grade: stable
+confinement: strict
+
+parts:
+  postgres:
+    source: https://ftp.postgresql.org/pub/source/v15.2/postgresql-15.2.tar.bz2
+    plugin: make
+    build-packages:
+      - libreadline-dev
+      - zlib1g-dev
+      - uuid-dev
+    override-build: |
+      ./configure --enable-thread-safety --with-uuid=e2fs --with-gnu-ld
+      snapcraftctl build
+      cd contrib
+      make
+      make install DESTDIR=$SNAPCRAFT_PART_INSTALL
+    stage:
+      # headers
+      - -usr/local/pgsql/include
+      # examples
+      - -usr/local/share/doc

@@ -1,0 +1,109 @@
+name: immich-distribution-libvips
+base: core20
+version: 8.14.5-dist2
+summary: libvips packaged for Immich Distribution
+description: |
+  libvips packaged for Immich Distribution, this is not intended to be consumed directly.
+architectures:
+  - amd64
+
+grade: stable
+confinement: strict
+
+apps:
+  vips:
+    command: usr/bin/vips
+
+layout:
+  /usr/etc/ImageMagick-7:
+    symlink: $SNAP/usr/etc/ImageMagick-7
+  /usr/lib/ImageMagick-7.1.1:
+    symlink: $SNAP/usr/lib/ImageMagick-7.1.1
+
+parts:
+  libvips:
+    plugin: meson
+    meson-version: "1.2.1"
+    meson-parameters:
+      - --buildtype=release
+      - --prefix=/usr
+      - --libdir=lib
+      - --default-library=static
+    source: https://github.com/libvips/libvips/releases/download/v8.14.5/vips-8.14.5.tar.xz
+    source-checksum: "sha256/90374e9f6fbd5657b5faf306cacda20658d6144d385316b59b865bc1a487b68d"
+    build-packages:
+      - libfftw3-dev
+      - libopenexr-dev
+      - libgsf-1-dev
+      - libglib2.0-dev
+      - liborc-dev
+      - libopenslide-dev
+      - libmatio-dev
+      - libwebp-dev
+      - libjpeg-turbo8-dev
+      - libexpat1-dev
+      - libexif-dev
+      - libtiff5-dev
+      - libcfitsio-dev
+      - libpoppler-glib-dev
+      - librsvg2-dev
+      - libpango1.0-dev
+      - libopenjp2-7-dev
+      - libimagequant-dev
+      - libgirepository1.0-dev
+      - liblqr-1-0-dev
+      - libheif-dev
+      - libtiff-dev
+      - libltdl-dev
+    after:
+      - cgif
+      - dependencies
+    stage-packages:
+      - libaec0
+      - libasn1-8-heimdal
+      - libbrotli1
+      - libcairo-gobject2
+      - libcfitsio8
+      - libcurl3-gnutls
+      - libexif12
+      - libfftw3-double3
+      - libgdk-pixbuf2.0-0
+      - libgsf-1-114
+      - libgssapi3-heimdal
+      - libhcrypto4-heimdal
+      - libhdf5-103
+      - libheimbase1-heimdal
+      - libheimntlm0-heimdal
+      - libhx509-5-heimdal
+      - libimagequant0
+      - libkrb5-26-heimdal
+      - libldap-2.4-2
+      - libmatio9
+      - libnghttp2-14
+      - libnspr4
+      - libnss3
+      - libopenslide0
+      - liborc-0.4-0
+      - libpoppler-glib8
+      - libpoppler97
+      - libpsl5
+      - libroken18-heimdal
+      - librsvg2-2
+      - librtmp1
+      - libsasl2-2
+      - libssh-4
+      - libsz2
+      - libwind0-heimdal
+
+  dependencies:
+    plugin: nil
+    stage-snaps:
+      - immich-distribution-imagemagick/latest/stable
+
+  cgif:
+    plugin: meson
+    meson-version: "1.2.1"
+    source: https://github.com/dloebl/cgif.git
+    source-tag: "V0.3.2"
+    organize:
+      usr/local: usr

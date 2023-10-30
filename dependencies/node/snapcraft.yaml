@@ -1,0 +1,32 @@
+name: immich-distribution-node
+base: core20
+adopt-info: node
+summary: Node packaged for Immich Distribution
+description: |
+  Node packaged for Immich Distribution, this is not intended to be consumed directly.
+architectures:
+  - amd64
+
+grade: stable
+confinement: strict
+
+parts:
+  node:
+    plugin: nil
+    override-build: |
+      export VERSION="$(curl -s https://nodejs.org/dist/index.tab | awk '/^v20.8/{ print $1 }' | sort -V | tail -1)"
+      snapcraftctl set-version "${VERSION}-dist1"
+
+      if [ ! -f "$SNAPCRAFT_PART_INSTALL/bin/node" ]; then
+        curl -s https://nodejs.org/dist/${VERSION}/node-${VERSION}-linux-x64.tar.xz \
+        | tar xJf - -C "$SNAPCRAFT_PART_INSTALL" --no-same-owner --strip-components=1
+      fi
+    build-packages:
+      - curl
+    organize: 
+      bin: usr/bin
+      include: usr/include
+      lib: usr/lib
+      share: usr/share
+    stage:
+      - usr

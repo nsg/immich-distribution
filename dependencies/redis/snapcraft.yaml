@@ -1,0 +1,25 @@
+name: immich-distribution-redis
+base: core20
+adopt-info: redis
+summary: Redis packaged for Immich Distribution
+description: |
+  Redis packaged for Immich Distribution, this is not intended to be consumed directly.
+architectures:
+  - amd64
+
+grade: stable
+confinement: strict
+
+parts:
+  redis:
+    source: https://github.com/redis/redis.git
+    source-tag: 7.0.9
+    plugin: make
+    build-packages:
+      - pkg-config
+    override-build: |
+      snapcraftctl set-version "$(git describe --tags)-dist1"
+      make
+      make PREFIX=$SNAPCRAFT_PART_INSTALL install
+    prime:
+      - bin/redis-server
