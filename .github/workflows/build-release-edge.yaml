@@ -288,6 +288,13 @@ jobs:
     needs:
       - haproxy
       - python
+      - lego
+      - libvips
+      - mimalloc
+      - node
+      - postgres
+      - redis
+      - typesense
 
     steps:
       - name: Download artifacts
