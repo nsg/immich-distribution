@@ -23,7 +23,7 @@ jobs:
       - uses: actions/cache@v3
         id: cache
         with:
-          key: ${{ hashFiles('dependencies/haproxy/snapcraft.yaml') }}
+          key: ${{ hashFiles('dependencies/haproxy/**') }}
           path: |
             dependencies/**/*.snap
 
@@ -53,7 +53,7 @@ jobs:
       - uses: actions/cache@v3
         id: cache
         with:
-          key: ${{ hashFiles('dependencies/python/snapcraft.yaml') }}
+          key: ${{ hashFiles('dependencies/python/**') }}
           path: |
             dependencies/**/*.snap
 
