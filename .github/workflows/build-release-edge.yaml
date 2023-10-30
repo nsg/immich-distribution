@@ -89,17 +89,39 @@ jobs:
         run: |
           find dependencies
 
-      - name: Extract snap package
+      - name: Extract and validate snap packages
         run: |
           find dependencies/artifacts
           mkdir -p workdir
           for artifact in $(cd dependencies/artifacts; ls -1); do
+
             unsquashfs -d workdir/$artifact dependencies/artifacts/$artifact/$artifact/*.snap
+
+            # Clean up snap package
             rm -rf workdir/$artifact/meta
             rm -rf workdir/$artifact/snap
-            mv workdir/$artifact/* workdir
+
+            # Make sure we have a stage directory
+            mkdir -p workdir/stage
+
+            # Check for conflicting files
+            for file in $(cd workdir/$artifact; find . -type f -print); do
+              if [ -f workdir/stage/$file ]; then
+                echo "File $file already exists in stage directory, compare files hashes"
+                if [ "$(sha256sum workdir/$artifact/$file | awk '{print $1}')" != "$(sha256sum workdir/stage/$file | awk '{print $1}')" ]; then
+                  echo "File $file has different content in stage directory, aborting"
+                  exit 1
+                fi
+              fi
+            done
+
+            # Stage files
+            mv workdir/$artifact/* workdir/stage
             rmdir workdir/$artifact
           done
+
+          mv workdir/stage/* workdir
+          rmdir workdir/stage
 
       - name: Compress workdir
         run: |
