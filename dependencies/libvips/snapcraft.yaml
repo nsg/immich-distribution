@@ -57,7 +57,7 @@ parts:
       - libltdl-dev
     after:
       - cgif
-      - dependencies
+      - imagemagick
     stage-packages:
       - libaec0
       - libasn1-8-heimdal
@@ -95,11 +95,6 @@ parts:
       - libsz2
       - libwind0-heimdal
 
-  dependencies:
-    plugin: nil
-    stage-snaps:
-      - immich-distribution-imagemagick/latest/stable
-
   cgif:
     plugin: meson
     meson-version: "1.2.1"
@@ -107,3 +102,116 @@ parts:
     source-tag: "V0.3.2"
     organize:
       usr/local: usr
+
+  imagemagick:
+    plugin: make
+    source: https://github.com/ImageMagick/ImageMagick/archive/7.1.1-17.tar.gz
+    source-checksum: "sha256/8f7840103f710312a50a6dd6a2722f189139c0226607b16af7c33f96bcf3cebd"
+    override-build: |
+      ./configure --with-modules --enable-static=yes --with-x=no --with-raw=yes --prefix=/usr
+      snapcraftctl build
+    build-packages:
+      - libltdl-dev
+      - libbz2-dev
+      - libdjvulibre-dev
+      - libexif-dev
+      - libfftw3-dev
+      - libfontconfig1-dev
+      - libfreetype6-dev
+      - libjpeg-dev
+      - liblcms2-dev
+      - liblqr-1-0-dev
+      - liblzma-dev
+      - libopenexr-dev
+      - libpango1.0-dev
+      - libperl-dev
+      - libpng-dev
+      - librsvg2-bin
+      - librsvg2-dev
+      - libtiff-dev
+      - libwebp-dev
+      - libwmf-dev
+      - libx11-dev
+      - libxext-dev
+      - libxml2-dev
+      - libxt-dev
+      - zlib1g-dev
+      - libheif-dev
+      - libzstd-dev
+      - wget
+    stage-packages:
+      - libcairo2
+      - libdatrie1
+      - libde265-0
+      - libdjvulibre21
+      - libfontconfig1
+      - libfreetype6
+      - libfribidi0
+      - libgomp1
+      - libgraphite2-3
+      - libharfbuzz0b
+      - libheif1
+      - libicu66
+      - libilmbase24
+      - libjbig0
+      - libjpeg-turbo8
+      - liblcms2-2
+      - liblqr-1-0
+      - libltdl7
+      - libnuma1
+      - libopenexr24
+      - libopenjp2-7
+      - libpango-1.0-0
+      - libpangocairo-1.0-0
+      - libpangoft2-1.0-0
+      - libpixman-1-0
+      - libpng16-16
+      - libthai0
+      - libtiff5
+      - libwebp6
+      - libwebpdemux2
+      - libwebpmux3
+      - libwmf0.2-7
+      - libx11-6
+      - libx265-179
+      - libxau6
+      - libxcb-render0
+      - libxcb-shm0
+      - libxcb1
+      - libxdmcp6
+      - libxext6
+      - libxml2
+      - libxrender1
+    stage:
+      - -usr/share/apport
+      - -usr/share/djvu
+      - -usr/share/docs
+      - -usr/share/doc
+      - -usr/share/lintian
+      - -usr/share/man
+      - -usr/share/X11
+    after:
+      - libraw
+
+  libraw:
+    plugin: autotools
+    source: https://github.com/libraw/libraw/archive/0.21.1.tar.gz
+    source-checksum: "sha256/b63d7ffa43463f74afcc02f9083048c231349b41cc9255dec0840cf8a67b52e0"
+    autotools-configure-parameters:
+      - --disable-examples
+      - --prefix=/usr
+      - --enable-jpeg
+      - --enable-zlib
+    override-build: |
+      autoreconf --install
+      snapcraftctl build
+    build-packages:
+      - zlib1g-dev
+      - libjpeg8-dev
+      - pkg-config
+    stage-packages:
+      - libgomp1
+      - libjpeg-turbo8
+      - liblcms2-2
+    stage:
+      - -usr/share
