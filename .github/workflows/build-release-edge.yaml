@@ -18,274 +18,49 @@ jobs:
       dependency: haproxy
 
   python:
-    name: Build Python
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - uses: actions/cache@v3
-        id: cache
-        with:
-          key: ${{ hashFiles('dependencies/python/**') }}
-          path: |
-            dependencies/**/*.snap
-
-      - name: Build snap package
-        uses: snapcore/action-build@v1
-        if: steps.cache.outputs.cache-hit != 'true'
-        id: build
-        with:
-          path: dependencies/python
-
-      - name: Save snap package as an artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: python
-          if-no-files-found: error
-          path: |
-            dependencies/**/*.snap
+    uses: ./.github/workflows/dependency.yaml
+    with:
+      dependency: python
 
   lego:
-    name: Build lego
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - uses: actions/cache@v3
-        id: cache
-        with:
-          key: ${{ hashFiles('dependencies/lego/**') }}
-          path: |
-            dependencies/**/*.snap
-
-      - name: Build snap package
-        uses: snapcore/action-build@v1
-        if: steps.cache.outputs.cache-hit != 'true'
-        id: build
-        with:
-          path: dependencies/lego
-
-      - name: Save snap package as an artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: lego
-          if-no-files-found: error
-          path: |
-            dependencies/**/*.snap
+    uses: ./.github/workflows/dependency.yaml
+    with:
+      dependency: lego
 
   libvips:
-    name: Build libvips
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - uses: actions/cache@v3
-        id: cache
-        with:
-          key: ${{ hashFiles('dependencies/libvips/**') }}
-          path: |
-            dependencies/**/*.snap
-
-      - name: Build snap package
-        uses: snapcore/action-build@v1
-        if: steps.cache.outputs.cache-hit != 'true'
-        id: build
-        with:
-          path: dependencies/libvips
-
-      - name: Save snap package as an artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: libvips
-          if-no-files-found: error
-          path: |
-            dependencies/**/*.snap
+    uses: ./.github/workflows/dependency.yaml
+    with:
+      dependency: libvips
 
   mimalloc:
-    name: Build mimalloc
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - uses: actions/cache@v3
-        id: cache
-        with:
-          key: ${{ hashFiles('dependencies/mimalloc/**') }}
-          path: |
-            dependencies/**/*.snap
-
-      - name: Build snap package
-        uses: snapcore/action-build@v1
-        if: steps.cache.outputs.cache-hit != 'true'
-        id: build
-        with:
-          path: dependencies/mimalloc
-
-      - name: Save snap package as an artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: mimalloc
-          if-no-files-found: error
-          path: |
-            dependencies/**/*.snap
+    uses: ./.github/workflows/dependency.yaml
+    with:
+      dependency: mimalloc
 
   node:
-    name: Download node
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - uses: actions/cache@v3
-        id: cache
-        with:
-          key: ${{ hashFiles('dependencies/node/**') }}
-          path: |
-            dependencies/**/*.snap
-
-      - name: Build snap package
-        uses: snapcore/action-build@v1
-        if: steps.cache.outputs.cache-hit != 'true'
-        id: build
-        with:
-          path: dependencies/node
-
-      - name: Save snap package as an artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: node
-          if-no-files-found: error
-          path: |
-            dependencies/**/*.snap
+    uses: ./.github/workflows/dependency.yaml
+    with:
+      dependency: node
 
   postgres:
-    name: Build postgres
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - uses: actions/cache@v3
-        id: cache
-        with:
-          key: ${{ hashFiles('dependencies/postgres/**') }}
-          path: |
-            dependencies/**/*.snap
-
-      - name: Build snap package
-        uses: snapcore/action-build@v1
-        if: steps.cache.outputs.cache-hit != 'true'
-        id: build
-        with:
-          path: dependencies/postgres
-
-      - name: Save snap package as an artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: postgres
-          if-no-files-found: error
-          path: |
-            dependencies/**/*.snap
+    uses: ./.github/workflows/dependency.yaml
+    with:
+      dependency: postgres
 
   redis:
-    name: Build redis
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - uses: actions/cache@v3
-        id: cache
-        with:
-          key: ${{ hashFiles('dependencies/redis/**') }}
-          path: |
-            dependencies/**/*.snap
-
-      - name: Build snap package
-        uses: snapcore/action-build@v1
-        if: steps.cache.outputs.cache-hit != 'true'
-        id: build
-        with:
-          path: dependencies/redis
-
-      - name: Save snap package as an artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: redis
-          if-no-files-found: error
-          path: |
-            dependencies/**/*.snap
+    uses: ./.github/workflows/dependency.yaml
+    with:
+      dependency: redis
 
   typesense:
-    name: Download typesense
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - uses: actions/cache@v3
-        id: cache
-        with:
-          key: ${{ hashFiles('dependencies/typesense/**') }}
-          path: |
-            dependencies/**/*.snap
-
-      - name: Build snap package
-        uses: snapcore/action-build@v1
-        if: steps.cache.outputs.cache-hit != 'true'
-        id: build
-        with:
-          path: dependencies/typesense
-
-      - name: Save snap package as an artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: typesense
-          if-no-files-found: error
-          path: |
-            dependencies/**/*.snap
+    uses: ./.github/workflows/dependency.yaml
+    with:
+      dependency: typesense
 
   ffmpeg:
-    name: Download ffmpeg
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - uses: actions/cache@v3
-        id: cache
-        with:
-          key: ${{ hashFiles('dependencies/ffmpeg/**') }}
-          path: |
-            dependencies/**/*.snap
-
-      - name: Build snap package
-        uses: snapcore/action-build@v1
-        if: steps.cache.outputs.cache-hit != 'true'
-        id: build
-        with:
-          path: dependencies/ffmpeg
-
-      - name: Save snap package as an artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: ffmpeg
-          if-no-files-found: error
-          path: |
-            dependencies/**/*.snap
+    uses: ./.github/workflows/dependency.yaml
+    with:
+      dependency: ffmpeg
 
   prepare-dependencies:
     name: Prepare dependencies
