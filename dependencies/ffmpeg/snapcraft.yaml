@@ -1,6 +1,6 @@
 name: immich-distribution-ffmpeg
 base: core20
-adopt-info: ffmpeg
+version: 6.0-dist2
 summary: ffmpeg packaged for Immich Distribution
 description: |
   ffmpeg packaged for Immich Distribution, this is not intended to be consumed directly.
