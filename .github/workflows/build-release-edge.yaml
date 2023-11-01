@@ -282,6 +282,36 @@ jobs:
           path: |
             dependencies/**/*.snap
 
+  ffmpeg:
+    name: Download ffmpeg
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - uses: actions/cache@v3
+        id: cache
+        with:
+          key: ${{ hashFiles('dependencies/ffmpeg/**') }}
+          path: |
+            dependencies/**/*.snap
+
+      - name: Build snap package
+        uses: snapcore/action-build@v1
+        if: steps.cache.outputs.cache-hit != 'true'
+        id: build
+        with:
+          path: dependencies/ffmpeg
+
+      - name: Save snap package as an artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: ffmpeg
+          if-no-files-found: error
+          path: |
+            dependencies/**/*.snap
+
   prepare-dependencies:
     name: Prepare dependencies
     runs-on: ubuntu-latest
@@ -295,6 +325,7 @@ jobs:
       - postgres
       - redis
       - typesense
+      - ffmpeg
 
     steps:
       - name: Download artifacts
