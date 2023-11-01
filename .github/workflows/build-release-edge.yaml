@@ -13,7 +13,7 @@ on:
 
 jobs:
   haproxy:
-    uses: .github/workflows/dependency.yaml
+    uses: .github/workflows/dependency.yaml@master
     with:
       dependency: haproxy
 
