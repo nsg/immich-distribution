@@ -388,7 +388,7 @@ jobs:
             workdir.tar.gz
   
   build:
-    name: Build, Test and Release Snap Package
+    name: Build and Test Immich & Release Snap Package
     runs-on: ubuntu-latest
     needs: prepare-dependencies
 
