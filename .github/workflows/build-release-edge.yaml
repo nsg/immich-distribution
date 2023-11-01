@@ -333,8 +333,8 @@ jobs:
             done
 
             # Stage files
-            mv workdir/$artifact/* workdir/stage
-            rmdir workdir/$artifact
+            rsync -av workdir/$artifact/* workdir/stage/
+            rm -ef workdir/$artifact
           done
 
           mv workdir/stage/* workdir
