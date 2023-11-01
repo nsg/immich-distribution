@@ -334,7 +334,7 @@ jobs:
 
             # Stage files
             rsync -av workdir/$artifact/* workdir/stage/
-            rm -ef workdir/$artifact
+            rm -rf workdir/$artifact
           done
 
           mv workdir/stage/* workdir
