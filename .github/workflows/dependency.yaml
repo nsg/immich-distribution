@@ -19,7 +19,7 @@ jobs:
       - uses: actions/cache@v3
         id: cache
         with:
-          key: ${{ hashFiles(format('dependencies/', inputs.dependency, '/**')) }}
+          key: ${{ hashFiles(format('dependencies/', inputs.dependency, '/**')) }}-key1
           path: |
             dependencies/**/*.snap
 

@@ -54,8 +54,8 @@ jobs:
     with:
       dependency: ffmpeg
 
-  prepare-dependencies:
-    name: Prepare dependencies
+  process-dependencies:
+    name: Merge dependency artifacts
     runs-on: ubuntu-latest
     needs:
       - haproxy
