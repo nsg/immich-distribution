@@ -1,0 +1,130 @@
+name: Build all dependencies
+
+on:
+  workflow_call:
+
+jobs:
+  haproxy:
+    uses: ./.github/workflows/dependency.yaml
+    with:
+      dependency: haproxy
+
+  python:
+    uses: ./.github/workflows/dependency.yaml
+    with:
+      dependency: python
+
+  lego:
+    uses: ./.github/workflows/dependency.yaml
+    with:
+      dependency: lego
+
+  libvips:
+    uses: ./.github/workflows/dependency.yaml
+    with:
+      dependency: libvips
+
+  mimalloc:
+    uses: ./.github/workflows/dependency.yaml
+    with:
+      dependency: mimalloc
+
+  node:
+    uses: ./.github/workflows/dependency.yaml
+    with:
+      dependency: node
+
+  postgres:
+    uses: ./.github/workflows/dependency.yaml
+    with:
+      dependency: postgres
+
+  redis:
+    uses: ./.github/workflows/dependency.yaml
+    with:
+      dependency: redis
+
+  typesense:
+    uses: ./.github/workflows/dependency.yaml
+    with:
+      dependency: typesense
+
+  ffmpeg:
+    uses: ./.github/workflows/dependency.yaml
+    with:
+      dependency: ffmpeg
+
+  prepare-dependencies:
+    name: Prepare dependencies
+    runs-on: ubuntu-latest
+    needs:
+      - haproxy
+      - python
+      - lego
+      - libvips
+      - mimalloc
+      - node
+      - postgres
+      - redis
+      - typesense
+      - ffmpeg
+
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
+        with:
+          path: dependencies/artifacts
+
+      - name: List snap dependency artifacts
+        run: |
+          find dependencies
+
+      - name: Extract and validate snap packages
+        run: |
+          find dependencies/artifacts
+          mkdir -p workdir
+          for artifact in $(cd dependencies/artifacts; ls -1); do
+
+            unsquashfs -d workdir/$artifact dependencies/artifacts/$artifact/$artifact/*.snap
+
+            # Clean up snap package
+            rm -rf workdir/$artifact/meta
+            rm -rf workdir/$artifact/snap
+
+            # Make sure we have a stage directory
+            mkdir -p workdir/stage
+
+            # Check for conflicting files
+            for file in $(cd workdir/$artifact; find . -type f -print); do
+              if [ -f workdir/stage/$file ]; then
+                echo "File $file already exists in stage directory, compare files hashes"
+                if [ "$(sha256sum workdir/$artifact/$file | awk '{print $1}')" != "$(sha256sum workdir/stage/$file | awk '{print $1}')" ]; then
+                  echo "File $file has different content in stage directory, aborting"
+                  exit 1
+                fi
+              fi
+            done
+
+            # Stage files
+            rsync -av workdir/$artifact/* workdir/stage/
+            rm -rf workdir/$artifact
+          done
+
+          mv workdir/stage/* workdir
+          rmdir workdir/stage
+
+      - name: Compress workdir
+        run: |
+          tar -czf workdir.tar.gz workdir
+
+      - name: List workdir
+        run: |
+          find workdir
+
+      - name: Save workdir
+        uses: actions/upload-artifact@v3
+        with:
+          name: workdir
+          if-no-files-found: error
+          path: |
+            workdir.tar.gz
