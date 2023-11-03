@@ -21,7 +21,7 @@ jobs:
         with:
           key: ${{ hashFiles(format('dependencies/', inputs.dependency, '/**')) }}-key1
           path: |
-            dependencies/**/*.snap
+            dependencies/${{ inputs.dependency }}/*.snap
 
       - name: Build snap package
         uses: snapcore/action-build@v1
@@ -36,4 +36,4 @@ jobs:
           name: ${{ inputs.dependency }}
           if-no-files-found: error
           path: |
-            dependencies/**/*.snap
+            dependencies/${{ inputs.dependency }}/*.snap
