@@ -16,12 +16,6 @@ build: immich ${POETRY_ENV}
 		--no-root \
 		--only main
 
-	${POETRY} run \
-		-C immich/machine-learning \
-		pip install \
-			--no-deps \
-			-r immich/machine-learning/requirements.txt
-
 immich:
 	git clone --branch ${IMMICH_VERSION} https://github.com/immich-app/immich.git
 
