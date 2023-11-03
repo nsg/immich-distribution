@@ -85,7 +85,7 @@ jobs:
           mkdir -p workdir
           for artifact in $(cd dependencies/artifacts; ls -1); do
 
-            unsquashfs -d workdir/$artifact dependencies/artifacts/$artifact/$artifact/*.snap
+            unsquashfs -d workdir/$artifact dependencies/artifacts/$artifact/*.snap
 
             # Clean up snap package
             rm -rf workdir/$artifact/meta
