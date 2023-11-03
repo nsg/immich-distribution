@@ -1,6 +1,6 @@
---- web/src/lib/components/shared-components/version-announcement-box.svelte	2023-08-19 10:50:26.428774805 +0200
-+++ web/src/lib/components/shared-components/version-announcement-box-snap.svelte	2023-08-19 10:51:08.320877048 +0200
-@@ -48,20 +48,28 @@
+--- web/src/lib/components/shared-components/version-announcement-box.svelte	2023-11-03 16:39:01.955002164 +0100
++++ web/src/lib/components/shared-components/version-announcement-box-snap.svelte	2023-11-03 16:45:13.033353862 +0100
+@@ -40,20 +40,28 @@
        <p class="mb-4 text-2xl">🎉 NEW VERSION AVAILABLE 🎉</p>
  
        <div>
@@ -33,5 +33,5 @@
 -      <div class="mt-4 font-medium">Your friend, Alex</div>
 -
        <div class="font-sm mt-8">
-         <code>Server Version: {serverVersionName}</code>
+         <code>Server Version: {serverVersion}</code>
          <br />
