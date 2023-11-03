@@ -1,4 +1,4 @@
-IMMICH_VERSION := v1.83.0
+IMMICH_VERSION := v1.84.0
 
 # Use our own Python, over the older one in core20
 export PATH := ${SNAPCRAFT_PART_BUILD}/../../dependencies/install/usr/local/bin:$(PATH)
@@ -15,12 +15,6 @@ build: immich ${POETRY_ENV}
 		--no-ansi \
 		--no-root \
 		--only main
-
-	${POETRY} run \
-		-C immich/machine-learning \
-		pip install \
-			--no-deps \
-			-r immich/machine-learning/requirements.txt
 
 immich:
 	git clone --branch ${IMMICH_VERSION} https://github.com/immich-app/immich.git
