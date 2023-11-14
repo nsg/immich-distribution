@@ -90,8 +90,7 @@ class TestImmichWeb(BaseCase):
         self.type("input[id='email']", "foo@example.com")
         self.type("input[id='password']", "secret")
         self.type("input[id='confirmPassword']", "secret")
-        self.type("input[id='firstName']", "Ture")
-        self.type("input[id='lastName']", "Test")
+        self.type("input[id='name']", "Ture Test")
         self.click("button")
 
     def login(self):
