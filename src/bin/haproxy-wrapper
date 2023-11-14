@@ -10,4 +10,4 @@ if [ "x$HTTPS_ENABLED" == "xtrue" ]; then
     ln -s "$ACME_CONFIG_PATH/certificates/$ACME_DOMAIN.key" $ACME_CONFIG_PATH/haproxy/cert.crt.key
 fi
 
-exec $@
+$SNAP/bin/haproxy -W -f $SNAP/etc/$HAPROXY_CONF_FILE -p $SNAP_DATA/haproxy.pid

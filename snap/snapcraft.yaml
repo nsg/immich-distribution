@@ -116,9 +116,7 @@ apps:
       - network
 
   haproxy:
-    command-chain:
-      - bin/haproxy-chain
-    command: bin/haproxy -W -f $SNAP/etc/$HAPROXY_CONF_FILE -p $SNAP_DATA/haproxy.pid
+    command: bin/haproxy-wrapper
     daemon: simple
     plugs:
       - network-bind
