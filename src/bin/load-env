@@ -53,7 +53,7 @@ export HTTPS_ENABLED="$(snapctl get https-enabled)"
 if [ "x$HTTPS_ENABLED" == "xtrue" ]; then
     export HAPROXY_HTTPS_FRONTEND_DATA=""
 else
-    export HAPROXY_HTTPS_FRONTEND_DATA="disabled"
+    export HAPROXY_HTTPS_FRONTEND_DATA="\"disabled\""
 fi
 
 export HAPROXY_HTTP_BIND="$(snapctl get haproxy-http-bind)"
