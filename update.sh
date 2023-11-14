@@ -47,8 +47,6 @@ CHECK_FILES="
     server/Dockerfile
     server/start-server.sh
     server/start-microservices.sh
-    server/bin/install-ffmpeg.sh
-    server/build-lock.json
     web/README.md
     web/entrypoint.sh
     web/Dockerfile
