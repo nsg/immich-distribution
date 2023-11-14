@@ -49,6 +49,14 @@ jobs:
         uses: snapcore/action-build@v1
         id: build
 
+      - name: Save snap artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: edge-snap
+          if-no-files-found: error
+          path: |
+            ${{ steps.build.outputs.snap }}
+
       - name: TEST | Install package
         run: sudo snap install --dangerous ${{ steps.build.outputs.snap }}
 
