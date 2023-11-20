@@ -42,6 +42,9 @@ else
     NEW_RELEASE_TAG="$2"
 fi
 
+# Check out the new release
+git checkout $NEW_RELEASE_TAG
+
 CHECK_FILES="
     server/src/infra/migrations
     server/Dockerfile
@@ -63,12 +66,9 @@ CHECK_FILES="
 for F in $CHECK_FILES; do
     if [ ! -e "$F" ]; then
         echo "Error, $F do not exists"
-        exit 1
+    else
+        vdiff "$F"
     fi
-done
-
-for F in $CHECK_FILES; do
-    vdiff "$F"
 done | less -R
 
 cd -
