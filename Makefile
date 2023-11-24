@@ -7,7 +7,7 @@ all: build install
 	:
 
 .PHONY: build
-build: dependencies
+build: workdir
 	snapcraft --debug
 
 .PHONY: install
@@ -40,8 +40,8 @@ selenium:
 docs:
 	cd docs && poetry run mkdocs serve
 
-.PHONY: dependencies
-dependencies: ${WORKDIR_SNAPS}
+workdir:
+	make ${WORKDIR_SNAPS}
 	mv workdir/stage/* workdir
 	rm -rf workdir/stage
 
