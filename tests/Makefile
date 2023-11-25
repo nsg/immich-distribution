@@ -1,11 +1,11 @@
 test: .env/bin/seleniumbase prepare-test-file wait check-selenium
-	.env/bin/pytest tests_selenium.py --server=127.0.0.1 --port=4444 --headed --html=report.html
+	.env/bin/pytest tests_selenium.py --server=127.0.0.1 --port=4444 --headed --dashboard --html=report/index.html ${EXTRA_ARGS}
 
 trace: .env/bin/seleniumbase prepare-test-file wait
-	.env/bin/pytest tests_selenium.py --server=127.0.0.1 --port=4444 --headed --html=report.html --trace
+	.env/bin/pytest tests_selenium.py --server=127.0.0.1 --port=4444 --headed --dashboard --html=report/index.html --trace
 
 ci: prepare-test-file wait
-	pytest tests_selenium.py --server=127.0.0.1 --port=4444 --html=report.html
+	pytest tests_selenium.py --server=127.0.0.1 --port=4444 --dashboard --html=report/index.html
 
 prepare-test-file: external-test-files update-snap-symlinks-for-user
 	mkdir -p ${HOME}/snap/immich-distribution/current/tests
