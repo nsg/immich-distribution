@@ -5,6 +5,7 @@ import requests
 import threading
 import time
 import signal
+from datetime import datetime
 
 from watchfiles import watch, Change
 
@@ -95,6 +96,24 @@ class ImmichAPI:
         r = requests.delete(f"{self.host}/asset", headers=self.headers, json=data)
         return r.json()
 
+    def upload_asset(self, file_handler, device_asset_id, file_created_at, file_modified_at):
+        data = {
+            "deviceAssetId": device_asset_id,
+            "deviceId": "sync-service",
+            "fileCreatedAt": file_created_at,
+            "fileModifiedAt": file_modified_at,
+            "isFavorite": "false",
+        }
+
+        response = requests.post(
+            f"{self.host}/asset/upload",
+            headers=self.headers,
+            data=data,
+            files={"assetData": file_handler}
+        )
+
+        return response
+
 def hash_file(path: str) -> bytes:
     file_hash = hashlib.sha1()
     with open(path, "rb") as f:
@@ -124,27 +143,22 @@ def hash_all_files(db: ImmichDatabase, user_id: str, path: str) -> None:
             db.save_hash(user_id, relative_path, hash_file(file_path))
             log(f"Hash {file_path} and store in database")
 
-def import_asset(db: ImmichDatabase, api: ImmichAPI, key: str, base_path: str, asset_path: str) -> None:
-    snap_path = os.getenv("SNAP")
+def import_asset(db: ImmichDatabase, api: ImmichAPI, base_path: str, asset_path: str) -> None:
     relative_path = os.path.relpath(asset_path, base_path)
-    import_command = [
-        f"{snap_path}/bin/immich-cli", "upload",
-        "--server", os.getenv("IMMICH_SERVER_ADDRESS"),
-        "--key", key,
-        "--yes",
-        asset_path
-    ]
+    filename = os.path.basename(asset_path)
+    stats = os.stat(asset_path)
 
-    if snap_path:
-        result = subprocess.run(import_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    else:
-        result = subprocess.CompletedProcess([], 0)
-        log(f"MOC: {import_command}")
+    response = api.upload_asset(
+        file_handler=open(asset_path, "rb"),
+        device_asset_id=f"{filename}-{stats.st_mtime}",
+        file_created_at=datetime.fromtimestamp(stats.st_ctime),
+        file_modified_at=datetime.fromtimestamp(stats.st_mtime)
+    )
 
-    if result and result.returncode != 0:
-        log(f"Error: Failed to import {asset_path}")
-        log(f"CLI (stdout): {result.stdout.decode('utf-8')}")
-        log(f"CLI (stderr): {result.stderr.decode('utf-8')}")
+    if response.status_code not in [200, 201]:
+        log(f"Failed to upload asset {asset_path}, status code {response.status_code}. Response: {response.text}")
+    elif response.json().get("id") == None:
+        log(f"Failed to upload asset {asset_path}, response: {response.text}")
     else:
         checksum = hash_file(asset_path)
         user_id = api.get_user_id()
@@ -171,10 +185,10 @@ def file_watcher(event: threading.Event, db: ImmichDatabase, api: ImmichAPI, api
 
             if c_type == Change.added:
                 log(f"{c_path} added, import asset to Immich")
-                import_asset(db, api, api_key, user_path, c_path)
+                import_asset(db, api, user_path, c_path)
             elif c_type == Change.modified:
                 log(f"{c_path} modified, re-import asset to Immich")
-                import_asset(db, api, api_key, user_path, c_path)
+                import_asset(db, api, user_path, c_path)
             elif c_type == Change.deleted:
                 log(f"{c_path} deleted, mark asset as removed")
                 delete_asset(db, api, c_path, user_path)
@@ -206,7 +220,7 @@ def main():
     )
 
     api_key = os.environ["IMMICH_API_KEY"]
-    immich = ImmichAPI(os.environ["IMMICH_SERVER_URL"], api_key)
+    immich = ImmichAPI(f"{os.environ['IMMICH_SERVER_URL']}/api", api_key)
     snap_common = os.environ["SNAP_COMMON"]
     user_id = immich.get_user_id()
     user_path = f"{snap_common}/sync/{user_id}"

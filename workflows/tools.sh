@@ -53,15 +53,6 @@ create_issue() {
     gh issue create --title "Immich $new_version_major_minor released" --label new-version --body-file -
 }
 
-new_cli_version() {
-    latest_immich_cli_version=$(curl -s https://api.github.com/repos/immich-app/CLI/releases/latest | jq -r '.tag_name')
-    if grep -q $latest_immich_cli_version snap/snapcraft.yaml; then
-        echo "No new immich-cli version available."
-    else
-        echo "Note, new immich-cli version available: $latest_immich_cli_version"
-    fi
-}
-
 create_issue_body() {
     local new_version="$1"
     local new_version_major_minor=$(echo $new_version | cut -d. -f1-2)

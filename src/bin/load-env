@@ -25,10 +25,7 @@ export DB_DATABASE_NAME="immich"
 
 export REDIS_HOSTNAME="127.0.0.1"
 
-export IMMICH_WEB_URL="http://127.0.0.1:3000"
-export IMMICH_SERVER_URL="http://127.0.0.1:3001"
-export IMMICH_SERVER_ADDRESS="$IMMICH_SERVER_URL" # CLI
-
+export IMMICH_SERVER_URL="http://127.0.0.1:3001" # Not used by Immich anymore, but still used by Immich Distribution
 export IMMICH_MACHINE_LEARNING_URL="http://127.0.0.1:3003"
 export MACHINE_LEARNING_LOG_LEVEL="warning"
 export MACHINE_LEARNING_IP="127.0.0.1"

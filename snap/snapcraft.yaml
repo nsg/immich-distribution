@@ -86,23 +86,6 @@ apps:
       - network-bind
       - network
 
-  immich-web:
-    command: bin/immich-web
-    daemon: simple
-    restart-delay: 10s
-    after:
-      - redis-server
-      - postgres
-      - immich-server
-    plugs:
-      - network-bind
-      - network
-
-  cli:
-    command: bin/immich-cli
-    plugs:
-      - network
-
   immich-machine-learning:
     command: bin/immich-machine-learning
     daemon: simple
@@ -163,44 +146,29 @@ apps:
       - network-bind
 
 parts:
-  # "npm run build" builds: server, microservices, cli
   server:
-    plugin: npm
-    npm-node-version: "20.8.0"
+    plugin: nil
     source: https://github.com/immich-app/immich.git
-    source-tag: v1.87.0
-    source-subdir: server
+    source-tag: v1.88.0
     override-build: |
       snapcraftctl set-version "$(git describe --tags)-dist1"
+
+      mkdir -p $SNAPCRAFT_PART_INSTALL/usr/src/app
+
+      # Build the server (and microservices, ml, etc.)
       cd server
       npm ci
       npm run build
       npm prune --omit=dev --omit=optional
-      mkdir -p $SNAPCRAFT_PART_INSTALL/usr/src/app
-      cp -r node_modules $SNAPCRAFT_PART_INSTALL/usr/src/app
-      cp -r dist $SNAPCRAFT_PART_INSTALL/usr/src/app
-      cp -r bin $SNAPCRAFT_PART_INSTALL/usr/src/app
-      cp package.json $SNAPCRAFT_PART_INSTALL/usr/src/app
-      cp start-server.sh start-microservices.sh $SNAPCRAFT_PART_INSTALL/usr/src/app
-    after:
-      - dependencies
+      cp -r {node_modules,dist,bin,assets} $SNAPCRAFT_PART_INSTALL/usr/src/app
+      cp package.json package-lock.json $SNAPCRAFT_PART_INSTALL/usr/src/app
 
-  web:
-    plugin: npm
-    npm-node-version: "20.8.0"
-    source: https://github.com/immich-app/immich.git
-    source-tag: v1.87.0
-    source-subdir: web
-    override-build: |
+      # Build the web app
       patch -p0 -i $SNAPCRAFT_PART_SRC/../../patches/src/001-version-announcement-box.patch -d $SNAPCRAFT_PART_BUILD
-      cd web
+      cd ../web
       npm ci
       npm run build
-      npm prune --omit=dev
-      mkdir -p $SNAPCRAFT_PART_INSTALL/usr/src/web
-      cp -r node_modules $SNAPCRAFT_PART_INSTALL/usr/src/web
-      cp -r build $SNAPCRAFT_PART_INSTALL/usr/src/web
-      cp package.json package-lock.json $SNAPCRAFT_PART_INSTALL/usr/src/web
+      cp -r build $SNAPCRAFT_PART_INSTALL/usr/src/app/www
     after:
       - dependencies
       - patches
@@ -212,21 +180,6 @@ parts:
       - git
     stage-packages:
       - libgomp1
-    after:
-      - dependencies
-
-  cli:
-    plugin: npm
-    npm-node-version: "20.8.0"
-    source: https://github.com/immich-app/CLI.git
-    source-tag: v0.41.0
-    override-build: |
-      npm install
-      npm run build
-      mkdir -p $SNAPCRAFT_PART_INSTALL/usr/src/cli
-      cp -r node_modules $SNAPCRAFT_PART_INSTALL/usr/src/cli
-      cp -r bin $SNAPCRAFT_PART_INSTALL/usr/src/cli
-      cp package.json package-lock.json $SNAPCRAFT_PART_INSTALL/usr/src/cli
     after:
       - dependencies
 
@@ -247,7 +200,7 @@ parts:
   sync:
     plugin: nil
     override-build:
-      ../../dependencies/install/usr/local/bin/python3 ../../dependencies/install/usr/local/bin/pip3 install watchfiles requests psycopg2-binary --target $SNAPCRAFT_PART_INSTALL/opt/pipsyncenv
+      ../../dependencies/install/usr/local/bin/python3 ../../dependencies/install/usr/local/bin/pip3 install watchfiles requests psycopg2-binary pyyaml --target $SNAPCRAFT_PART_INSTALL/opt/pipsyncenv
     after:
       - dependencies
 

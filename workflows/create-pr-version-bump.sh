@@ -66,9 +66,6 @@ echo "
 This PR bumps the version from **$OLD_VERSION** to **$NEW_VERSION**.
 Please review the changes and merge this PR if everything looks good.
 
-## New immich-cli version
-$(new_cli_version)
-
 ## Upstream release notes
 * https://github.com/immich-app/immich/releases/tag/$NEW_VERSION
 

@@ -66,6 +66,8 @@ jobs:
         with:
           name: selenium-test-report
           path: |
-            tests/report.html
-            tests/assets/style.css
             tests/latest_logs
+            tests/report/
+            tests/assets/live.js
+            tests/assets/pytest_style.css
+            tests/dashboard.html

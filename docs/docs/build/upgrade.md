@@ -22,18 +22,6 @@ The pull request will be containing various information. A human needs to verify
 
     Furthermore, by default, the logic employs the latest release of the oldest open tracking issue as the new version. However, if this latest release is already mentioned in the VERSION file, then the next tracking issue in line is used.
 
-## Immich CLI
-
-Because the CLI is included I always check for a [release of the CLI](https://github.com/immich-app/CLI/releases). Make sure to pick a release that existed when Immich was released so the versions match. Update `snapcraft.yaml` with the new release version.
-
-```yaml hl_lines="5"
-  cli:
-    plugin: npm
-    npm-node-version: "18.16.0"
-    source: https://github.com/immich-app/CLI.git
-    source-tag: v0.39.0
-```
-
 ## Investigate the new release
 
 !!! Tip "Hard to follow"

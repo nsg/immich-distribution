@@ -8,7 +8,10 @@ __pycache__
 /docs/site
 /tests/secret.txt
 /tests/latest_logs
-/tests/report.html
-/tests/assets/style.css
-/tests/assets/tests_selenium.py__*
+/tests/report/
+/tests/assets/live.js
+/tests/assets/pytest_style.css
+/tests/dashboard.html
 /tests/external-test-files
+/workdir
+/dependencies/*.snap
