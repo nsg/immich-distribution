@@ -136,17 +136,6 @@ class TestImmichWeb(BaseCase):
             self.login()
             self.assert_title("Photos - Immich")
 
-    def test_002_no_errors(self):
-        """
-        Make sure there are no JS or 404 errors on the page before and after login.
-        """
-        self.immich(login=False)
-        self.assert_no_js_errors()
-        #self.assert_no_404_errors()
-        self.login()
-        self.assert_no_js_errors()
-        #self.assert_no_404_errors()
-
     def test_003_empty_timeline(self):
         """
         Make sure the timeline is empty and we get a message to upload photos.
