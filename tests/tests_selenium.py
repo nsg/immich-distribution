@@ -6,6 +6,7 @@ import subprocess
 import shutil
 import requests
 import time
+import yaml
 
 from seleniumbase import BaseCase
 BaseCase.main(__name__, __file__)
@@ -146,11 +147,18 @@ class TestImmichWeb(BaseCase):
         with open("secret.txt", "w") as f:
             f.write(secret)
 
+    def test_09_auth_cli(self):
+        """
+        Login to the CLI using the generated API key.
+        """
+        p = subprocess.run(["immich-distribution.cli", "login-key", "http://127.0.0.1:3001/api", get_secret()])
+        self.assertEqual(p.returncode, 0)
+
     def test_10_verify_cli(self):
         """
         Verify that the CLI is installed and can be executed.
         """
-        p = subprocess.run(["immich-distribution.cli", "-h"])
+        p = subprocess.run(["immich-distribution.cli", "server-info"])
         self.assertEqual(p.returncode, 0)
 
     def test_005_upload_assets_with_cli(self):
@@ -164,25 +172,29 @@ class TestImmichWeb(BaseCase):
             "snap/immich-distribution/current/"
         )
 
-        subprocess.run(
+        p = subprocess.run(
             [
                 "immich-distribution.cli",
                 "upload",
-                "--key", secret,
-                "--yes",
+                "--recursive",
                 f"{snap_readable_path}/tests"
-            ]
+            ],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
         )
+        self.assertEqual(p.returncode, 0)
 
-        subprocess.run(
+        p = subprocess.run(
             [
                 "immich-distribution.cli",
                 "upload",
-                "--key", secret,
-                "--yes",
+                "--recursive",
                 f"{snap_readable_path}/tests_external"
-            ]
+            ],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
         )
+        self.assertEqual(p.returncode, 0)
 
         # ML models are downloaded in the background when we upload assets
         # Wait for them to complete, and the queue to be empty before continuing

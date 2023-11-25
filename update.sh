@@ -53,13 +53,14 @@ CHECK_FILES="
     web/README.md
     web/Dockerfile
     web/src/lib/components/shared-components/version-announcement-box.svelte
-    nginx
+    cli/README.md
     machine-learning/README.md
     machine-learning/Dockerfile
     machine-learning/start.sh
     docker/example.env
     docker/docker-compose.yml
     docs/docs/install/environment-variables.md
+    docs/docs/features/command-line-interface.md
 "
 
 for F in $CHECK_FILES; do

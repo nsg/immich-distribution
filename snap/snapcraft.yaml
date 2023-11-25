@@ -189,16 +189,16 @@ parts:
       - dependencies
 
   cli:
-    plugin: npm
-    npm-node-version: "20.8.0"
-    source: https://github.com/immich-app/CLI.git
-    source-tag: v0.41.0
+    plugin: nil
+    source: https://github.com/immich-app/immich.git
+    source-tag: v1.88.0
     override-build: |
-      npm install
+      cd cli
+      npm ci
       npm run build
       mkdir -p $SNAPCRAFT_PART_INSTALL/usr/src/cli
       cp -r node_modules $SNAPCRAFT_PART_INSTALL/usr/src/cli
-      cp -r bin $SNAPCRAFT_PART_INSTALL/usr/src/cli
+      cp -r dist $SNAPCRAFT_PART_INSTALL/usr/src/cli
       cp package.json package-lock.json $SNAPCRAFT_PART_INSTALL/usr/src/cli
     after:
       - dependencies
@@ -220,7 +220,7 @@ parts:
   sync:
     plugin: nil
     override-build:
-      ../../dependencies/install/usr/local/bin/python3 ../../dependencies/install/usr/local/bin/pip3 install watchfiles requests psycopg2-binary --target $SNAPCRAFT_PART_INSTALL/opt/pipsyncenv
+      ../../dependencies/install/usr/local/bin/python3 ../../dependencies/install/usr/local/bin/pip3 install watchfiles requests psycopg2-binary pyyaml --target $SNAPCRAFT_PART_INSTALL/opt/pipsyncenv
     after:
       - dependencies
 

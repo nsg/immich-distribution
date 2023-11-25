@@ -5,6 +5,7 @@ import requests
 import threading
 import time
 import signal
+import yaml
 
 from watchfiles import watch, Change
 
@@ -127,11 +128,10 @@ def hash_all_files(db: ImmichDatabase, user_id: str, path: str) -> None:
 def import_asset(db: ImmichDatabase, api: ImmichAPI, key: str, base_path: str, asset_path: str) -> None:
     snap_path = os.getenv("SNAP")
     relative_path = os.path.relpath(asset_path, base_path)
+
+    cli_auth(key)
     import_command = [
         f"{snap_path}/bin/immich-cli", "upload",
-        "--server", os.getenv("IMMICH_SERVER_ADDRESS"),
-        "--key", key,
-        "--yes",
         asset_path
     ]
 
@@ -150,6 +150,15 @@ def import_asset(db: ImmichDatabase, api: ImmichAPI, key: str, base_path: str, a
         user_id = api.get_user_id()
         db.save_hash(user_id, relative_path, checksum)
         log(f"Hash {relative_path} and store in database for user {user_id})")
+
+def cli_auth(key):
+    yaml_directory_path = f"{os.getenv('HOME')}/.config/immich/"
+    os.makedirs(yaml_directory_path, exist_ok=True)
+    with open(f"{yaml_directory_path}/auth.yaml", "w") as f:
+        yaml.dump({
+            "instanceUrl": f"{os.getenv('IMMICH_SERVER_ADDRESS')}/api",
+            "apiKey": key,
+        }, f)
 
 def delete_asset(db: ImmichDatabase, api: ImmichAPI, asset_path: str, base_path: str) -> None:
     relative_path = os.path.relpath(asset_path, base_path)
