@@ -7,7 +7,6 @@ nav:
   - Installation: install.md
   - Configuration:
     - Introduction: configuration/index.md
-    - configuration/cli.md
     - configuration/security.md
     - HTTPS: configuration/https.md
     - configuration/storage.md

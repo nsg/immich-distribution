@@ -13,7 +13,7 @@ Almost fully two-way synchronization between your phone and Immich. Add or remov
 graph LR
 P("📱 Phone")
 S("🌹 Immich")
-CLI{{"Immich CLI Upload Image"}}
+CLI{{"Immich API Upload Image"}}
 API{{"Immich API Delete Image"}}
 
 P -- "🌄 New picture" ---> CLI --> S
@@ -73,7 +73,7 @@ P("📱 Phone (Camera)")
 IS("🌹 Immich Server")
 IW("🌹 Immich Web")
 SY("/var/snap/.../sync/UUID/phone")
-CLI{{"Immich CLI Upload Image"}}
+CLI{{"Immich API Upload Image"}}
 API{{"Immich API Delete Image"}}
 SYNC{{"Sync Service"}}
 
