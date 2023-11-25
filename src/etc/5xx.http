@@ -86,9 +86,6 @@ Content-Type: text/html
                 <div id="backend-be_server" class="unset">
                     Immich Server
                 </div>
-                <div id="backend-be_web" class="unset">
-                    Immich Web
-                </div>
                 <div id="backend-be_microservices" class="unset">
                     Microservices
                 </div>

@@ -51,7 +51,6 @@ CHECK_FILES="
     server/start-server.sh
     server/start-microservices.sh
     web/README.md
-    web/entrypoint.sh
     web/Dockerfile
     web/src/lib/components/shared-components/version-announcement-box.svelte
     nginx
