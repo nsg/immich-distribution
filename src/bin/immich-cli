@@ -1,6 +1,0 @@
-#!/bin/bash
-
-. $SNAP/bin/load-env
-
-cd $SNAP/usr/src/cli
-node dist/index.js "$@"

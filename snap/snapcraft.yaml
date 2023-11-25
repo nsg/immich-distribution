@@ -86,11 +86,6 @@ apps:
       - network-bind
       - network
 
-  cli:
-    command: bin/immich-cli
-    plugs:
-      - network
-
   immich-machine-learning:
     command: bin/immich-machine-learning
     daemon: simple
@@ -185,21 +180,6 @@ parts:
       - git
     stage-packages:
       - libgomp1
-    after:
-      - dependencies
-
-  cli:
-    plugin: nil
-    source: https://github.com/immich-app/immich.git
-    source-tag: v1.88.0
-    override-build: |
-      cd cli
-      npm ci
-      npm run build
-      mkdir -p $SNAPCRAFT_PART_INSTALL/usr/src/cli
-      cp -r node_modules $SNAPCRAFT_PART_INSTALL/usr/src/cli
-      cp -r dist $SNAPCRAFT_PART_INSTALL/usr/src/cli
-      cp package.json package-lock.json $SNAPCRAFT_PART_INSTALL/usr/src/cli
     after:
       - dependencies
 

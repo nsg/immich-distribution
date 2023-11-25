@@ -24,7 +24,7 @@ external-test-files: update-snap-symlinks-for-user
 	done
 
 update-snap-symlinks-for-user:
-	immich-distribution.cli -h > /dev/null 2>&1
+	immich-distribution.backup -h 2>&1 | grep -q root
 
 wait:
 	./test_haproxy.sh

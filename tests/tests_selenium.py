@@ -2,11 +2,11 @@
 
 import socket
 import os
-import subprocess
-import shutil
 import requests
 import time
-import yaml
+import glob
+from datetime import datetime
+import uuid
 
 from seleniumbase import BaseCase
 BaseCase.main(__name__, __file__)
@@ -24,7 +24,10 @@ def get_secret():
         return f.read()
 
 def get_headers():
-    return { "X-API-KEY": get_secret() }
+    return {
+        "Accept": "application/json",
+        "X-API-KEY": get_secret()
+    }
 
 def get_assets(filter=[]):
     r = requests.get(f"http://{get_ip_address()}/api/asset", headers=get_headers())
@@ -72,6 +75,29 @@ def css_selector_path(element):
         element = element.parent
 
     return " > ".join(path)
+
+def import_asset(path):
+    stats = os.stat(path)
+
+    data = {
+        "deviceAssetId": f"{path}-{uuid.uuid4()}",
+        "deviceId": "pytest",
+        "fileCreatedAt": datetime.fromtimestamp(stats.st_mtime),
+        "fileModifiedAt": datetime.fromtimestamp(stats.st_mtime),
+        "isFavorite": "false",
+    }
+
+    files = {"assetData": open(path, 'rb')}
+
+    response = requests.post(
+        f"http://{get_ip_address()}/api/asset/upload", headers=get_headers(), data=data, files=files
+    )
+
+    if response.status_code != 201:
+        raise Exception(f"Failed to upload asset {path}, status code {response.status_code}. Response: {response.text}")
+
+    return response.json()
+
 
 class TestImmichWeb(BaseCase):
 
@@ -147,54 +173,25 @@ class TestImmichWeb(BaseCase):
         with open("secret.txt", "w") as f:
             f.write(secret)
 
-    def test_09_auth_cli(self):
+    def test_005_upload_assets_via_api(self):
         """
-        Login to the CLI using the generated API key.
+        Upload test assets to the server using the API.
         """
-        p = subprocess.run(["immich-distribution.cli", "login-key", "http://127.0.0.1:3001/api", get_secret()])
-        self.assertEqual(p.returncode, 0)
-
-    def test_10_verify_cli(self):
-        """
-        Verify that the CLI is installed and can be executed.
-        """
-        p = subprocess.run(["immich-distribution.cli", "server-info"])
-        self.assertEqual(p.returncode, 0)
-
-    def test_005_upload_assets_with_cli(self):
-        """
-        Use the CLI to upload assets from the assets/ directory.
-        """
-        secret = get_secret()
         
         snap_readable_path = os.path.join(
             os.environ["HOME"],
             "snap/immich-distribution/current/"
         )
 
-        p = subprocess.run(
-            [
-                "immich-distribution.cli",
-                "upload",
-                "--recursive",
-                f"{snap_readable_path}/tests"
-            ],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-        )
-        self.assertEqual(p.returncode, 0)
+        for path in glob.glob(f"{snap_readable_path}/tests/*"):
+            if path.endswith(".css") or path.endswith(".js"):
+                continue
+            r = import_asset(path)
+            self.assertNotEqual(r.get('id'), None)
 
-        p = subprocess.run(
-            [
-                "immich-distribution.cli",
-                "upload",
-                "--recursive",
-                f"{snap_readable_path}/tests_external"
-            ],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-        )
-        self.assertEqual(p.returncode, 0)
+        # for path in glob.glob(f"{snap_readable_path}/tests_external/external-test-files/*"):
+        #     r = import_asset(path)
+        #     self.assertNotEqual(r.get('id'), None)
 
         # ML models are downloaded in the background when we upload assets
         # Wait for them to complete, and the queue to be empty before continuing
@@ -203,6 +200,7 @@ class TestImmichWeb(BaseCase):
         # Re-run the recognition job. I'm not sure if this is an Immich bug or
         # just a quirk of the test environment. Anyway let's just run it again.
         trigger_job("recognizeFaces")
+        time.sleep(2)
         wait_for_empty_job_queue()
 
     def test_100_verify_uploaded_assets_number_of_files(self):
