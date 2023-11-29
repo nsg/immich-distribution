@@ -73,6 +73,18 @@ class ImmichDatabase:
             """, (asset_path, user_id))
             return cur.fetchone()
 
+    def get_asset_id_by_checksum(self, user_id: str, checksum: bytes) -> psycopg2.extras.RealDictRow | None:
+        with self.conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+            cur.execute("""
+                SELECT assets.id
+                FROM assets
+                INNER JOIN assets_filesync_lookup
+                ON assets.checksum = assets_filesync_lookup.checksum
+                WHERE assets_filesync_lookup.checksum = %s
+                AND assets_filesync_lookup.user_id = %s
+            """, (checksum, user_id))
+            return cur.fetchone()
+
     def close(self):
         self.conn.commit()
         self.conn.close()
@@ -90,10 +102,11 @@ class ImmichAPI:
         r = requests.get(f"{self.host}/user/me", headers=self.headers)
         return r.json()["id"]
     
-    def delete_asset(self, asset_id: str) -> dict:
+    def delete_asset(self, asset_id: str) -> None:
         data = { "ids": [ asset_id ] }
         r = requests.delete(f"{self.host}/asset", headers=self.headers, json=data)
-        return r.json()
+        if r.status_code not in [204]:
+            raise Exception(f"Failed to delete asset {asset_id}, status code {r.status_code}. Response: {r.text}")
 
     def upload_asset(self, file_buffer, device_asset_id, file_created_at, file_modified_at):
 
@@ -137,17 +150,6 @@ def ignored_paths(path: str) -> bool:
     
     return False
 
-def hash_all_files(db: ImmichDatabase, user_id: str, path: str) -> None:
-    for root, _, files in os.walk(path):
-        for file in files:
-            if ignored_paths(file):
-                continue
-
-            file_path = os.path.join(root, file)
-            relative_path = os.path.relpath(file_path, path)
-            db.save_hash(user_id, relative_path, hash_file(file_path))
-            log(f"Hash {file_path} and store in database")
-
 def import_asset(db: ImmichDatabase, api: ImmichAPI, base_path: str, asset_path: str) -> None:
     relative_path = os.path.relpath(asset_path, base_path)
     filename = os.path.basename(asset_path)
@@ -179,6 +181,42 @@ def delete_asset(db: ImmichDatabase, api: ImmichAPI, asset_path: str, base_path:
         api.delete_asset(asset["id"])
     else:
         log(f"Asset {relative_path} not found in database")
+
+def import_watcher(event: threading.Event, db: ImmichDatabase, api: ImmichAPI, user_path: str) -> None:
+    log("Import watcher thread running...")
+    while not event.is_set():
+        for root, _, files in os.walk(user_path):
+            for file in files:
+                if ignored_paths(file):
+                    continue
+
+                file_path = os.path.join(root, file)
+                relative_path = os.path.relpath(file_path, user_path)
+                user_id = api.get_user_id()
+                checksum = hash_file(file_path)
+
+                #
+                # Update hash lookup table
+                #
+                # Always do this, even if the asset is already in the database.
+                # The heavy operation is the hash calculation, it's relatively
+                # fast to check if update all records in the database.
+                #
+                # The idea is that the file may have been renamed or moved so this
+                # is a way to keep the database up to date. There is a constraint
+                # that prevents duplicate records.
+                #
+                db.save_hash(user_id, relative_path, checksum)
+
+                #
+                # Import assets that are missing in the database. This operation is
+                # heavier and should be done only when needed.
+                #
+                if db.get_asset_id_by_checksum(api.get_user_id(), checksum) == None:
+                    log(f"{file_path} not found in database, import asset to Immich")
+                    import_asset(db, api, user_path, file_path)
+
+        time.sleep(86400)
 
 def file_watcher(event: threading.Event, db: ImmichDatabase, api: ImmichAPI, api_key: str, user_path: str) -> None:
     log("File watcher thread running...")
@@ -232,10 +270,12 @@ def main():
 
     log(f"Starting sync for user {user_id} at {user_path}")
 
-    log(f"Initial file hash import of all files in {user_path}")
-    hash_all_files(db, user_id, user_path)
-
     stop_event = threading.Event()
+
+    import_thread = threading.Thread(
+        target=import_watcher,
+        args=(stop_event, db, immich, user_path)
+    )
 
     watch_thread = threading.Thread(
         target=file_watcher,
@@ -247,12 +287,15 @@ def main():
         args=(stop_event, db, immich, user_path)
     )
 
+    import_thread.start()
     watch_thread.start()
     database_thread.start()
 
     signal.signal(signal.SIGTERM, lambda signum, frame: stop_event.set())
 
     while True:
+        if not import_thread.is_alive():
+            log("Critical: Thread import is not alive")
         if not watch_thread.is_alive():
             log("Critical: Thread watch is not alive")
         if not database_thread.is_alive():
