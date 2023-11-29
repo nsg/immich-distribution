@@ -95,7 +95,7 @@ class ImmichAPI:
         r = requests.delete(f"{self.host}/asset", headers=self.headers, json=data)
         return r.json()
 
-    def upload_asset(self, file_handler, device_asset_id, file_created_at, file_modified_at):
+    def upload_asset(self, file_buffer, device_asset_id, file_created_at, file_modified_at):
 
         headers = {
             'Accept': 'application/json',
@@ -114,7 +114,7 @@ class ImmichAPI:
             f"{self.host}/asset/upload",
             headers=headers,
             data=data,
-            files={"assetData": file_handler}
+            files={"assetData": file_buffer}
         )
 
         return response
@@ -154,7 +154,7 @@ def import_asset(db: ImmichDatabase, api: ImmichAPI, base_path: str, asset_path:
     stats = os.stat(asset_path)
 
     response = api.upload_asset(
-        file_handler=open(asset_path, "rb"),
+        file_buffer=open(asset_path, "rb"),
         device_asset_id=f"{filename}-{stats.st_mtime}",
         file_created_at=datetime.fromtimestamp(stats.st_ctime),
         file_modified_at=datetime.fromtimestamp(stats.st_mtime)
