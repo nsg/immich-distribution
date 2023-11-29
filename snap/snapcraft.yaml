@@ -139,7 +139,7 @@ parts:
   server:
     plugin: nil
     source: https://github.com/immich-app/immich.git
-    source-tag: v1.88.2
+    source-tag: v1.89.0
     override-build: |
       snapcraftctl set-version "$(git describe --tags)-dist1"
 

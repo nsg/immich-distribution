@@ -1,4 +1,4 @@
-IMMICH_VERSION := v1.88.2
+IMMICH_VERSION := v1.89.0
 
 # Use our own Python, over the older one in core20
 export PATH := ${SNAPCRAFT_PART_BUILD}/../../dependencies/install/usr/local/bin:$(PATH)
