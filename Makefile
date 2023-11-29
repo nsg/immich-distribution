@@ -18,6 +18,10 @@ install:
 remove:
 	sudo snap remove --purge immich-distribution
 
+testprod:
+	cat ${SNAP_FILE} | ssh d -- lxc file push - immich-prod/root/${SNAP_FILE}
+	ssh d lxc exec immich-prod -- snap install --dangerous /root/${SNAP_FILE}
+
 beta: build
 	cat ${SNAP_FILE} | ssh d -- lxc file push - immich-beta/root/${SNAP_FILE}
 	ssh d lxc exec immich-beta -- snap install --dangerous /root/${SNAP_FILE}
