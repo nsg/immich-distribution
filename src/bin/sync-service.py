@@ -97,6 +97,12 @@ class ImmichAPI:
         return r.json()
 
     def upload_asset(self, file_handler, device_asset_id, file_created_at, file_modified_at):
+
+        headers = {
+            'Accept': 'application/json',
+            'x-api-key': self.headers['x-api-key']
+        }
+
         data = {
             "deviceAssetId": device_asset_id,
             "deviceId": "sync-service",
@@ -107,7 +113,7 @@ class ImmichAPI:
 
         response = requests.post(
             f"{self.host}/asset/upload",
-            headers=self.headers,
+            headers=headers,
             data=data,
             files={"assetData": file_handler}
         )
