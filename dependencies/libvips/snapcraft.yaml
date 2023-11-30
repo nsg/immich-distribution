@@ -52,12 +52,12 @@ parts:
       - libimagequant-dev
       - libgirepository1.0-dev
       - liblqr-1-0-dev
-      - libheif-dev
       - libtiff-dev
       - libltdl-dev
     after:
       - cgif
       - imagemagick
+      - libheif
     stage-packages:
       - libaec0
       - libasn1-8-heimdal
@@ -103,6 +103,25 @@ parts:
     organize:
       usr/local: usr
 
+  libheif:
+    plugin: cmake
+    source: https://github.com/strukturag/libheif.git
+    source-tag: "v1.17.5"
+    after:
+      - libde265
+      - x265
+
+  libde265:
+    plugin: cmake
+    source: https://github.com/strukturag/libde265.git
+    source-tag: "v1.0.14"
+
+  x265:
+    plugin: cmake
+    source: https://bitbucket.org/multicoreware/x265_git.git
+    source-tag: "3.5"
+    source-subdir: source
+
   imagemagick:
     plugin: make
     source: https://github.com/ImageMagick/ImageMagick/archive/7.1.1-17.tar.gz
@@ -136,13 +155,11 @@ parts:
       - libxml2-dev
       - libxt-dev
       - zlib1g-dev
-      - libheif-dev
       - libzstd-dev
       - wget
     stage-packages:
       - libcairo2
       - libdatrie1
-      - libde265-0
       - libdjvulibre21
       - libfontconfig1
       - libfreetype6
@@ -150,7 +167,6 @@ parts:
       - libgomp1
       - libgraphite2-3
       - libharfbuzz0b
-      - libheif1
       - libicu66
       - libilmbase24
       - libjbig0
@@ -173,7 +189,6 @@ parts:
       - libwebpmux3
       - libwmf0.2-7
       - libx11-6
-      - libx265-179
       - libxau6
       - libxcb-render0
       - libxcb-shm0
@@ -192,6 +207,9 @@ parts:
       - -usr/share/X11
     after:
       - libraw
+      - x265
+      - libheif
+      - libde265
 
   libraw:
     plugin: autotools
