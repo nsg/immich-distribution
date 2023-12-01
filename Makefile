@@ -1,13 +1,13 @@
 SNAP_FILE = $(shell ls -1t *.snap | head -1)
 DEPENDENCIES = $(shell find dependencies -mindepth 1 -type d -print)
 DEPENDENCIES_SNAPS += $(addsuffix .snap, $(DEPENDENCIES))
-WORKDIR_SNAPS := $(subst dependencies/,workdir/,$(DEPENDENCIES_SNAPS))
+DEPENDENCIES_NAMES := $(subst dependencies/,,$(DEPENDENCIES))
 
 all: build install
 	:
 
 .PHONY: build
-build: workdir
+build: ${DEPENDENCIES_SNAPS}
 	snapcraft --debug
 
 .PHONY: install
@@ -44,34 +44,35 @@ selenium:
 docs:
 	cd docs && poetry run mkdocs serve
 
-workdir:
-	make ${WORKDIR_SNAPS}
-	mv workdir/stage/* workdir
-	rm -rf workdir/stage
-
-dependencies/%.snap:
+dependencies/%.snap: dependencies/%/snapcraft.yaml
+	@echo ">>> Building $*"
 	cd dependencies/$* && snapcraft
 	mv dependencies/$*/*.snap dependencies/$*.snap
+	multipass stop snapcraft-immich-distribution-$* || true
 
-workdir/%: dependencies/%
+	@echo ">>> Staging $*"
+	mkdir -p temp
 	mkdir -p workdir
-	rm -rf workdir/$*
-	unsquashfs -d workdir/$* $<
-	rm -rf workdir/$*/meta
-	rm -rf workdir/$*/snap
-	mkdir -p workdir/stage
-	for file in $$(cd workdir/$*; find . -type f -print); do \
-		if [ -f workdir/stage/$$file ]; then \
-			echo "File $$file already exists in stage directory, compare files hashes"; \
-			if [ "$$(sha256sum workdir/$*/$$file | awk '{print $$1}')" != "$$(sha256sum workdir/stage/$$file | awk '{print $$1}')" ]; then \
-				echo "File $file has different content in stage directory, aborting"; \
+	rm -rf temp/$*
+	unsquashfs -d temp/$* dependencies/$*.snap
+	rm -rf temp/$*/meta
+	rm -rf temp/$*/snap
+	for file in $$(cd temp/$*; find . -type f -print); do \
+		if [ -f workdir/$$file ]; then \
+			if [ "$$(sha256sum temp/$*/$$file | awk '{print $$1}')" != "$$(sha256sum workdir/$$file | awk '{print $$1}')" ]; then \
+				echo "File $$file has different content in stage directory, aborting"; \
 				exit 1; \
 			fi; \
 		fi; \
 	done
-	rsync -av workdir/$*/* workdir/stage/
-	rm -rf workdir/$*
+	rsync -a temp/$*/* workdir
+	rm -rf temp/$*
 
 clean:
-	rm -rf SNAP_COMMON tests/latest_logs/ *.snap
-	snapcraft clean
+	for dependency in ${DEPENDENCIES_NAMES}; do \
+		multipass delete snapcraft-immich-distribution-$$dependency || true; \
+	done
+	multipass purge
+	snapcraft clean || true
+	rm -rf SNAP_COMMON workdir temp tests/latest_logs/ *.snap
+	rm -rf dependencies/*.snap
