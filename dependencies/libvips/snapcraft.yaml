@@ -107,6 +107,8 @@ parts:
     plugin: cmake
     source: https://github.com/strukturag/libheif.git
     source-tag: "v1.17.5"
+    cmake-parameters:
+      - -DENABLE_PLUGIN_LOADING=0
     after:
       - libde265
       - x265
