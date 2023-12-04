@@ -14,7 +14,7 @@ parts:
   node:
     plugin: nil
     override-build: |
-      export VERSION="$(curl -s https://nodejs.org/dist/index.tab | awk '/^v20.8/{ print $1 }' | sort -V | tail -1)"
+      export VERSION="$(curl -s https://nodejs.org/dist/index.tab | awk '/^v20.10/{ print $1 }' | sort -V | tail -1)"
       snapcraftctl set-version "${VERSION}-dist1"
 
       if [ ! -f "$SNAPCRAFT_PART_INSTALL/bin/node" ]; then
