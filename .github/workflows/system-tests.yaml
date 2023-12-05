@@ -60,6 +60,14 @@ jobs:
       - name: TEST | Run Selenium Tests
         run: make ci -C tests
 
+      - name: Save snap artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: development-snap-package
+          if-no-files-found: error
+          path: |
+            ${{ steps.build.outputs.snap }}
+
       - name: Upload test report
         uses: actions/upload-artifact@v3
         if: always()
