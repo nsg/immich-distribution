@@ -1,5 +1,17 @@
 SNAP_FILE = $(shell ls -1t *.snap | head -1)
-DEPENDENCIES = $(shell find dependencies -mindepth 1 -type d -print)
+
+DEPENDENCIES = \
+	dependencies/libvips \
+	dependencies/node \
+	dependencies/haproxy \
+	dependencies/postgres \
+	dependencies/typesense \
+	dependencies/redis \
+	dependencies/mimalloc \
+	dependencies/ffmpeg \
+	dependencies/python \
+	dependencies/lego
+
 DEPENDENCIES_SNAPS += $(addsuffix .snap, $(DEPENDENCIES))
 DEPENDENCIES_NAMES := $(subst dependencies/,,$(DEPENDENCIES))
 
@@ -45,28 +57,14 @@ docs:
 	cd docs && poetry run mkdocs serve
 
 dependencies/%.snap: dependencies/%/snapcraft.yaml
-	@echo ">>> Building $*"
-	cd dependencies/$* && snapcraft
-	mv dependencies/$*/*.snap dependencies/$*.snap
-	multipass stop snapcraft-immich-distribution-$* || true
+	./dependency.py -b immich-distribution-$* -w workdir
+	mv dependencies/$*/immich-distribution-$*.snap dependencies/$*.snap
 
-	@echo ">>> Staging $*"
-	mkdir -p temp
-	mkdir -p workdir
-	rm -rf temp/$*
-	unsquashfs -d temp/$* dependencies/$*.snap
-	rm -rf temp/$*/meta
-	rm -rf temp/$*/snap
-	for file in $$(cd temp/$*; find . -type f -print); do \
-		if [ -f workdir/$$file ]; then \
-			if [ "$$(sha256sum temp/$*/$$file | awk '{print $$1}')" != "$$(sha256sum workdir/$$file | awk '{print $$1}')" ]; then \
-				echo "File $$file has different content in stage directory, aborting"; \
-				exit 1; \
-			fi; \
-		fi; \
+workdir:
+	for name in ${DEPENDENCIES_NAMES}; do \
+		./dependency.py -b immich-distribution-$${name} -w workdir; \
+		mv dependencies/$${name}/immich-distribution-$${name}.snap dependencies/$${name}.snap; \
 	done
-	rsync -a temp/$*/* workdir
-	rm -rf temp/$*
 
 clean:
 	for dependency in ${DEPENDENCIES_NAMES}; do \

@@ -94,6 +94,8 @@ parts:
       - libssh-4
       - libsz2
       - libwind0-heimdal
+    stage:
+      - -usr/share/doc
 
   cgif:
     plugin: meson
@@ -108,7 +110,7 @@ parts:
     source: https://github.com/strukturag/libheif.git
     source-tag: "v1.17.5"
     cmake-parameters:
-      - -DENABLE_PLUGIN_LOADING=0
+      - -DENABLE_PLUGIN_LOADING="OFF"
     after:
       - libde265
       - x265

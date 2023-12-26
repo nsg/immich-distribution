@@ -1,7 +1,7 @@
 name: immich-distribution
 title: Immich Distribution
 base: core20
-adopt-info: server
+version: "v1.88.2"
 summary: This is an Immich Distribution packaged by the community.
 description: |
   This is an Immich Distribution packaged inside a snap package.
@@ -86,6 +86,12 @@ apps:
       - network-bind
       - network
 
+  debug:
+    command: bin/debug
+    plugs:
+      - network-bind
+      - network
+
   immich-machine-learning:
     command: bin/immich-machine-learning
     daemon: simple
@@ -137,45 +143,51 @@ apps:
 
 parts:
   server:
-    plugin: nil
-    source: https://github.com/immich-app/immich.git
-    source-tag: v1.88.2
-    override-build: |
-      snapcraftctl set-version "$(git describe --tags)-dist1"
-
-      mkdir -p $SNAPCRAFT_PART_INSTALL/usr/src/app
-
-      # Build the server (and microservices, ml, etc.)
-      cd server
-      npm ci
-      npm run build
-      npm prune --omit=dev --omit=optional
-      cp -r {node_modules,dist,bin,assets} $SNAPCRAFT_PART_INSTALL/usr/src/app
-      cp package.json package-lock.json $SNAPCRAFT_PART_INSTALL/usr/src/app
-
-      # Build the web app
-      patch -p0 -i $SNAPCRAFT_PART_SRC/../../patches/src/001-version-announcement-box.patch -d $SNAPCRAFT_PART_BUILD
-      cd ../web
-      npm ci
-      npm run build
-      cp -r build $SNAPCRAFT_PART_INSTALL/usr/src/app/www
+    plugin: make
+    source: parts/immich-server
     after:
       - dependencies
       - patches
+    build-packages:
+      - git
+      - pkg-config
+      - libglib2.0-dev
+      - libexpat1-dev
+      - libgsf-1-dev
+      - libfftw3-dev
+      - libcfitsio-dev
+      - libimagequant-dev
+      - libexif-dev
+      - libjpeg-dev
+      - libpng-dev
+      - libwebp-dev
+      - libpango1.0-dev
+      - libtiff-dev
+      - librsvg2-dev
+      - libopenslide-dev
+      - libmatio-dev
+      - liblcms2-dev
+      - libopenexr-dev
+      - liborc-0.4-dev
+      - libpoppler-glib-dev
 
   machine-learning:
     plugin: make
     source: parts/machine-learning
     build-packages:
       - git
-    stage-packages:
-      - libgomp1
     after:
       - dependencies
 
   dependencies:
     plugin: dump
     source: workdir
+
+  debug:
+    plugin: dump
+    source: parts/debug
+    after:
+      - dependencies
 
   scripts:
     source: src
