@@ -1,13 +1,13 @@
 IMMICH_VERSION := v1.88.2
 
 # Use our own Python, over the older one in core20
-export PATH := ${SNAPCRAFT_PART_BUILD}/../../dependencies/install/usr/local/bin:$(PATH)
+export PATH := ${SNAPCRAFT_PART_BUILD}/../../python/install/usr/local/bin:$(PATH)
 
 POETRY_ENV = ${HOME}/poetry
 POETRY = ${POETRY_ENV}/bin/poetry
 
 .PHONY: build
-build: immich ${POETRY_ENV}
+build: immich ${POETRY}
 	${POETRY} install \
 		-C immich/machine-learning \
 		--sync \
@@ -21,6 +21,8 @@ immich:
 
 ${POETRY_ENV}:
 	python3 -m venv ${POETRY_ENV}
+
+${POETRY}: ${POETRY_ENV}
 	${POETRY_ENV}/bin/pip install -U pip setuptools
 	${POETRY_ENV}/bin/pip install poetry
 

@@ -13,5 +13,3 @@ __pycache__
 /tests/assets/pytest_style.css
 /tests/dashboard.html
 /tests/external-test-files
-/workdir
-/dependencies/*.snap
