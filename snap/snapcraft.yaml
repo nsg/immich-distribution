@@ -148,20 +148,20 @@ apps:
   # import:
   #   command: bin/import
 
-  # lets-encrypt:
-  #   command: bin/acme-init
-  #   plugs:
-  #     - network
-  #     - network-bind
+  lets-encrypt:
+    command: bin/acme-init
+    plugs:
+      - network
+      - network-bind
 
-  # acme:
-  #   command: bin/acme-service
-  #   daemon: simple
-  #   restart-delay: 60s
-  #   timer: "00:00-24:00/2"
-  #   plugs:
-  #     - network
-  #     - network-bind
+  acme:
+    command: bin/acme-service
+    daemon: simple
+    restart-delay: 60s
+    timer: "00:00-24:00/2"
+    plugs:
+      - network
+      - network-bind
 
 #
 # Dependency graph of build dependencies of the different parts.
@@ -306,17 +306,17 @@ parts:
     stage:
       - -usr
 
-  # lego:
-  #   source: https://github.com/go-acme/lego.git
-  #   source-tag: v4.10.2
-  #   plugin: go
-  #   build-environment:
-  #     - GO111MODULE: "on"
-  #   override-build: |
-  #     snapcraftctl set-version "$(git describe --tags)-dist1"
-  #     make build
-  #     mkdir -p $CRAFT_PART_INSTALL/bin
-  #     cp dist/lego $CRAFT_PART_INSTALL/bin
+  lego:
+    source: https://github.com/go-acme/lego.git
+    source-tag: v4.10.2
+    plugin: go
+    build-environment:
+      - GO111MODULE: "on"
+    override-build: |
+      make build
+      mkdir -p $CRAFT_PART_INSTALL/bin
+      cp dist/lego $CRAFT_PART_INSTALL/bin
+    build-snaps: [go/latest/stable]
 
   # mimalloc:
   #   source: https://github.com/microsoft/mimalloc.git
