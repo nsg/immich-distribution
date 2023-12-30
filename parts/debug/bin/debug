@@ -1,18 +1,52 @@
 #!/bin/bash
 
-LD_LIBRARY_PATH_FRAGMENT="
-    $SNAP/usr/local/pgsql/lib
-    $SNAP/usr/lib/x86_64-linux-gnu/pulseaudio
-    $SNAP/usr/lib/x86_64-linux-gnu/libfswatch
-    $SNAP/usr/local/lib/x86_64-linux-gnu
-    $SNAP/usr/local/lib
-    $SNAP/usr/lib
-"
+log() {
+  echo -e "\n#"
+  echo -e "# $@"
+  echo -e "#\n"
+}
 
-for LDP in $LD_LIBRARY_PATH_FRAGMENT; do
-    if [ -d $LDP ]; then
-        export LD_LIBRARY_PATH="$LDP:$LD_LIBRARY_PATH"
-    fi
-done
+cat > $SNAP_USER_DATA/versions.js <<EOF
+const sharp = require('/snap/immich-distribution/current/lib/node_modules/immich/node_modules/sharp');
+console.log(sharp.versions)
+EOF
 
-$SNAP/usr/src/app/node_modules/sharp/build/Release/sharp-linux-x64.node
+log "Versions"
+node --version
+node $SNAP_USER_DATA/versions.js
+
+log "Download sample file"
+curl -so $SNAP_USER_DATA/dwsample.heic "https://www.dwsamplefiles.com/?dl_id=25"
+curl -so $SNAP_USER_DATA/zfs-broken.png "https://nsg.cc/images/2023/zfs-broken.png"
+
+log "Run debug.js"
+
+cat > $SNAP_USER_DATA/debug.js <<EOF
+const sharp = require('/snap/immich-distribution/current/lib/node_modules/immich/node_modules/sharp');
+
+async function resize() {
+    await sharp("$SNAP_USER_DATA/zfs-broken.png").toFile("$SNAP_USER_DATA/zfs-broken.jpg");
+    await sharp("$SNAP_USER_DATA/dwsample.heic").heif({ compression: 'hevc' }).toFile("$SNAP_USER_DATA/dwsample.png");
+    await sharp("$SNAP_USER_DATA/dwsample.heic").toFile("$SNAP_USER_DATA/dwsample.2.png");
+}
+
+resize();
+EOF
+node $SNAP_USER_DATA/debug.js
+
+log "Run vips"
+vips copy $SNAP_USER_DATA/dwsample.heic $SNAP_USER_DATA/dwsample.vips.png
+
+log "Run heif-convert"
+heif-convert $SNAP_USER_DATA/dwsample.heic $SNAP_USER_DATA/dwsample.heif.png
+
+log "Run image magic convert"
+convert $SNAP_USER_DATA/dwsample.heic $SNAP_USER_DATA/dwsample.imagemagic.png
+
+log "List files"
+ls -l $SNAP_USER_DATA/dwsample.heic
+ls -l $SNAP_USER_DATA/dwsample.png
+ls -l $SNAP_USER_DATA/dwsample.2.png
+ls -l $SNAP_USER_DATA/dwsample.vips.png
+ls -l $SNAP_USER_DATA/dwsample.heif.png
+ls -l $SNAP_USER_DATA/dwsample.imagemagic.png
