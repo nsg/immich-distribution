@@ -58,17 +58,17 @@ layout:
     symlink: $SNAP/usr/lib/ImageMagick-7.1.1
 
 apps:
-  # psql:
-  #   command: bin/psql
-  #   plugs:
-  #     - network
+  psql:
+    command: bin/psql
+    plugs:
+      - network
 
-  # postgres:
-  #   command: bin/postgres
-  #   daemon: simple
-  #   restart-delay: 10s
-  #   plugs:
-  #     - network-bind
+  postgres:
+    command: bin/postgres
+    daemon: simple
+    restart-delay: 10s
+    plugs:
+      - network-bind
 
   # redis-server:
   #   command: bin/redis-server $SNAP/etc/redis.conf
@@ -382,24 +382,24 @@ parts:
   #   prime:
   #     - bin/redis-server
 
-  # postgres:
-  #   source: https://ftp.postgresql.org/pub/source/v15.2/postgresql-15.2.tar.bz2
-  #   plugin: make
-  #   build-packages:
-  #     - libreadline-dev
-  #     - zlib1g-dev
-  #     - uuid-dev
-  #   override-build: |
-  #     ./configure --enable-thread-safety --with-uuid=e2fs --with-gnu-ld
-  #     snapcraftctl build
-  #     cd contrib
-  #     make
-  #     make install DESTDIR=$CRAFT_PART_INSTALL
-  #   stage:
-  #     # headers
-  #     - -usr/local/pgsql/include
-  #     # examples
-  #     - -usr/local/share/doc
+  postgres:
+    source: https://ftp.postgresql.org/pub/source/v15.2/postgresql-15.2.tar.bz2
+    plugin: make
+    build-packages:
+      - libreadline-dev
+      - zlib1g-dev
+      - uuid-dev
+    override-build: |
+      ./configure --enable-thread-safety --with-uuid=e2fs --with-gnu-ld
+      snapcraftctl build
+      cd contrib
+      make
+      make install DESTDIR=$CRAFT_PART_INSTALL
+    stage:
+      # headers
+      - -usr/local/pgsql/include
+      # examples
+      - -usr/local/share/doc
 
   libvips:
     plugin: meson

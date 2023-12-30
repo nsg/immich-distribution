@@ -7,9 +7,9 @@ random_string() {
 mkdir -p $SNAP_COMMON/{pgsql,redis,reverse-geocoding-dump,upload,typesense,sync,backups,acme,cache}
 chown snap_daemon:snap_daemon $SNAP_COMMON/pgsql
 
-# if [[ $(snapctl get database-password) == "" ]]; then
-#     snapctl set database-password="$(random_string)"
-# fi
+if [[ $(snapctl get database-password) == "" ]]; then
+    snapctl set database-password="$(random_string)"
+fi
 
 # if [[ $(snapctl get typesense-key) == "" ]]; then
 #     snapctl set typesense-key="$(random_string)"
@@ -24,7 +24,7 @@ chown snap_daemon:snap_daemon $SNAP_COMMON/pgsql
 # fi
 
 # # Restart services
-# snapctl restart immich-distribution.postgres
+snapctl restart immich-distribution.postgres
 # snapctl restart immich-distribution.typesense
 # snapctl restart immich-distribution.haproxy
 # snapctl restart immich-distribution.sync-service
