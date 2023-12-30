@@ -70,12 +70,12 @@ apps:
     plugs:
       - network-bind
 
-  # redis-server:
-  #   command: bin/redis-server $SNAP/etc/redis.conf
-  #   daemon: simple
-  #   restart-delay: 10s
-  #   plugs:
-  #     - network-bind
+  redis-server:
+    command: bin/redis-server $SNAP/etc/redis.conf
+    daemon: simple
+    restart-delay: 10s
+    plugs:
+      - network-bind
 
   # typesense:
   #   command: bin/typesense
@@ -369,18 +369,14 @@ parts:
   #   stage:
   #     - bin
 
-  # redis:
-  #   source: https://github.com/redis/redis.git
-  #   source-tag: 7.0.9
-  #   plugin: make
-  #   build-packages:
-  #     - pkg-config
-  #   override-build: |
-  #     snapcraftctl set-version "$(git describe --tags)-dist1"
-  #     make
-  #     make PREFIX=$CRAFT_PART_INSTALL install
-  #   prime:
-  #     - bin/redis-server
+  redis:
+    source: https://github.com/redis/redis.git
+    source-tag: 7.0.9
+    plugin: make
+    build-packages:
+      - pkg-config
+    prime:
+      - bin/redis-server
 
   postgres:
     source: https://ftp.postgresql.org/pub/source/v15.2/postgresql-15.2.tar.bz2
