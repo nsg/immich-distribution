@@ -126,12 +126,12 @@ apps:
   #     - network-bind
   #     - network
 
-  # haproxy:
-  #   command: bin/haproxy-wrapper
-  #   daemon: simple
-  #   plugs:
-  #     - network-bind
-  #     - network
+  haproxy:
+    command: bin/haproxy-wrapper
+    daemon: simple
+    plugs:
+      - network-bind
+      - network
 
   # sync-service:
   #   command: bin/sync-service.sh
@@ -287,27 +287,24 @@ parts:
   #     cp $CRAFT_PART_SRC/ffmpeg $CRAFT_PART_INSTALL/bin
   #     cp $CRAFT_PART_SRC/ffprobe $CRAFT_PART_INSTALL/bin
 
-  # haproxy:
-  #   source: http://git.haproxy.org/git/haproxy-2.6.git
-  #   source-tag: v2.6.15
-  #   plugin: make
-  #   override-build: |
-  #     snapcraftctl set-version "$(git describe --tags)-dist1"
-  #     snapcraftctl build
-  #   make-parameters:
-  #     - TARGET=linux-glibc
-  #     - USE_OPENSSL=1
-  #     - USE_ZLIB=1
-  #     - USE_PCRE=1
-  #   build-packages:
-  #     - build-essential
-  #     - libssl-dev
-  #     - libpcre3-dev
-  #     - libz-dev
-  #   organize:
-  #     usr/local/sbin/haproxy: bin/haproxy
-  #   stage:
-  #     - -usr
+  haproxy:
+    source: http://git.haproxy.org/git/haproxy-2.6.git
+    source-tag: v2.6.15
+    plugin: make
+    make-parameters:
+      - TARGET=linux-glibc
+      - USE_OPENSSL=1
+      - USE_ZLIB=1
+      - USE_PCRE=1
+    build-packages:
+      - build-essential
+      - libssl-dev
+      - libpcre3-dev
+      - libz-dev
+    organize:
+      usr/local/sbin/haproxy: bin/haproxy
+    stage:
+      - -usr
 
   # lego:
   #   source: https://github.com/go-acme/lego.git
@@ -373,6 +370,8 @@ parts:
     source: https://github.com/redis/redis.git
     source-tag: 7.0.9
     plugin: make
+    build-environment:
+      - PREFIX: $CRAFT_PART_INSTALL
     build-packages:
       - pkg-config
     prime:
