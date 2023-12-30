@@ -142,11 +142,11 @@ apps:
   #   plugs:
   #     - network
 
-  # backup:
-  #   command: bin/backup
+  backup:
+    command: bin/backup
 
-  # import:
-  #   command: bin/import
+  import:
+    command: bin/import
 
   lets-encrypt:
     command: bin/acme-init
