@@ -323,40 +323,41 @@ parts:
   #   source-tag: v2.1.2
   #   plugin: cmake
 
-  # python:
-  #   source: https://www.python.org/ftp/python/3.11.4/Python-3.11.4.tgz
-  #   plugin: make
-  #   override-build: |
-  #     ./configure --enable-optimizations --with-ensurepip=install
-  #     snapcraftctl build
-  #   build-packages:
-  #     - libssl-dev
-  #     - zlib1g-dev
-  #     - libbz2-dev
-  #     - liblzma-dev
-  #     - libreadline-dev
-  #     - libsqlite3-dev
-  #     - xz-utils
-  #     - libffi-dev
-  #     - libncurses5-dev
-  #     - libgdbm-dev
-  #     - libnss3-dev
-  #   stage-packages:
-  #     - libtcl8.6
-  #     - libtk8.6
-  #     - libxft2
-  #     - libgdbm6
-  #   stage:
-  #     - -etc/init.d
-  #     - -etc/X11
-  #     - -usr/bin
-  #     - -usr/include
-  #     - -usr/lib/X11
-  #     - -usr/share/doc
-  #     - -usr/share/doc-base
-  #     - -usr/share/lintian
-  #     - -usr/share/man
-  #     - -usr/share/X11
+  python:
+    source: https://www.python.org/ftp/python/3.11.7/Python-3.11.7.tgz
+    source-checksum: md5/ef61f81ec82c490484219c7f0ec96783
+    plugin: make
+    override-build: |
+      ./configure --enable-optimizations --with-ensurepip=install
+      craftctl default
+    build-packages:
+      - libssl-dev
+      - zlib1g-dev
+      - libbz2-dev
+      - liblzma-dev
+      - libreadline-dev
+      - libsqlite3-dev
+      - xz-utils
+      - libffi-dev
+      - libncurses5-dev
+      - libgdbm-dev
+      - libnss3-dev
+    stage-packages:
+      - libtcl8.6
+      - libtk8.6
+      - libxft2
+      - libgdbm6
+    stage:
+      - -etc/init.d
+      - -etc/X11
+      - -usr/bin
+      - -usr/include
+      - -usr/lib/X11
+      - -usr/share/doc
+      - -usr/share/doc-base
+      - -usr/share/lintian
+      - -usr/share/man
+      - -usr/share/X11
 
   typesense:
     source: https://dl.typesense.org/releases/0.24.1/typesense-server-0.24.1-linux-amd64.tar.gz
