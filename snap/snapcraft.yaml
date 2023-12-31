@@ -133,14 +133,14 @@ apps:
       - network-bind
       - network
 
-  # sync-service:
-  #   command: bin/sync-service.sh
-  #   daemon: simple
-  #   restart-delay: 10s
-  #   after:
-  #     - immich-server
-  #   plugs:
-  #     - network
+  sync-service:
+    command: bin/sync-service.sh
+    daemon: simple
+    restart-delay: 10s
+    # after:
+    #   - immich-server
+    plugs:
+      - network
 
   backup:
     command: bin/backup
@@ -263,12 +263,11 @@ parts:
       - jq
       - xz-utils
 
-  # sync:
-  #   plugin: nil
-  #   override-build:
-  #     ../../python/install/usr/local/bin/python3 ../../python/install/usr/local/bin/pip3 install watchfiles requests psycopg2-binary pyyaml --target $CRAFT_PART_INSTALL/opt/pipsyncenv
-  #   after:
-  #     - python
+  sync:
+    plugin: make
+    source: parts/sync
+    after:
+      - python
 
   patches:
     source: patches

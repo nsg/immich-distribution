@@ -23,8 +23,8 @@ if [[ $(snapctl get haproxy-https-bind) == "" ]]; then
     snapctl set haproxy-https-bind="*:443"
 fi
 
-# # Restart services
+# Restart services
 snapctl restart immich-distribution.postgres
 snapctl restart immich-distribution.typesense
 snapctl restart immich-distribution.haproxy
-# snapctl restart immich-distribution.sync-service
+snapctl restart immich-distribution.sync-service
