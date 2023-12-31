@@ -241,13 +241,13 @@ parts:
     stage-snaps:
       - node/20/stable
 
-  # machine-learning:
-  #   plugin: make
-  #   source: parts/machine-learning
-  #   build-packages:
-  #     - git
-  #   after:
-  #     - python
+  machine-learning:
+    plugin: make
+    source: parts/machine-learning
+    build-packages:
+      - git
+    after:
+      - python
 
   debug:
     plugin: dump

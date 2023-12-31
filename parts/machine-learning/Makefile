@@ -1,7 +1,7 @@
 IMMICH_VERSION := v1.88.2
 
-# Use our own Python, over the older one in core20
-export PATH := ${SNAPCRAFT_PART_BUILD}/../../python/install/usr/local/bin:$(PATH)
+# Use our own Python, over the older included one
+export PATH := ${CRAFT_PART_BUILD}/../../python/install/usr/local/bin:$(PATH)
 
 POETRY_ENV = ${HOME}/poetry
 POETRY = ${POETRY_ENV}/bin/poetry
@@ -28,21 +28,21 @@ ${POETRY}: ${POETRY_ENV}
 
 .PHONY: install
 install:
-	mkdir -p ${SNAPCRAFT_PART_INSTALL}/app/machine-learning
-	mkdir -p ${SNAPCRAFT_PART_INSTALL}/bin
+	mkdir -p ${CRAFT_PART_INSTALL}/app/machine-learning
+	mkdir -p ${CRAFT_PART_INSTALL}/bin
 
 	# Deploy application
-	cp immich/machine-learning/log_conf.json ${SNAPCRAFT_PART_INSTALL}/app/machine-learning/
-	cp -r immich/machine-learning/app ${SNAPCRAFT_PART_INSTALL}/app/machine-learning/app
+	cp immich/machine-learning/log_conf.json ${CRAFT_PART_INSTALL}/app/machine-learning/
+	cp -r immich/machine-learning/app ${CRAFT_PART_INSTALL}/app/machine-learning/app
 	
 	# Deploy Python packages (installed with Poetry & pip in the build step)
 	cp -r $(shell ${POETRY} -C immich/machine-learning env info -p)/lib/python3.11/site-packages \
-		${SNAPCRAFT_PART_INSTALL}/app/machine-learning/python-packages
+		${CRAFT_PART_INSTALL}/app/machine-learning/python-packages
 
 	# Deploy gunicorn (installed with Poetry) and remove shebang
 	cp $(shell ${POETRY} -C immich/machine-learning env info -p)/bin/gunicorn \
-		${SNAPCRAFT_PART_INSTALL}/bin/gunicorn
-	sed -i '1d' ${SNAPCRAFT_PART_INSTALL}/bin/gunicorn
+		${CRAFT_PART_INSTALL}/bin/gunicorn
+	sed -i '1d' ${CRAFT_PART_INSTALL}/bin/gunicorn
 
 	# Deploy immich-machine-learning script
-	cp immich-machine-learning ${SNAPCRAFT_PART_INSTALL}/bin/immich-machine-learning
+	cp immich-machine-learning ${CRAFT_PART_INSTALL}/bin/immich-machine-learning
