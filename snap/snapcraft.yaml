@@ -169,8 +169,8 @@ apps:
 # depend on each other at runtime.
 #
 #         server
-#        /   |  \
-#      node  |  patches
+#            |  \
+#            |  patches
 #            |
 #         libvips_________
 #        /       \        \
@@ -278,7 +278,7 @@ parts:
     plugin: dump
     # These builds are linked from the official ffmpeg site, so I assume they are safe.
     # It's a little annoying that there is not a stable URL, this link will be updated in the future and
-    # the checksum will change... when that happens select the same release from "old-releases".
+    # the checksum will change... when that happens, bump it or select the same release from "old-releases".
     source: https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz
     source-checksum: md5/8a34e2ab52b72777a8dcd3ff5defbcd8
     override-build: |
