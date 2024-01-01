@@ -84,29 +84,29 @@ apps:
     plugs:
       - network-bind
 
-  # immich-server:
-  #   command: bin/immich-server
-  #   daemon: simple
-  #   restart-delay: 10s
-  #   after:
-  #     - redis-server
-  #     - postgres
-  #     - typesense
-  #   plugs:
-  #     - network-bind
-  #     - network
+  immich-server:
+    command: bin/immich-server
+    daemon: simple
+    restart-delay: 10s
+    after:
+      - redis-server
+      - postgres
+      - typesense
+    plugs:
+      - network-bind
+      - network
 
-  # immich-microservices:
-  #   command: bin/immich-microservices
-  #   daemon: simple
-  #   restart-delay: 10s
-  #   after:
-  #     - redis-server
-  #     - postgres
-  #     - immich-server
-  #   plugs:
-  #     - network-bind
-  #     - network
+  immich-microservices:
+    command: bin/immich-microservices
+    daemon: simple
+    restart-delay: 10s
+    after:
+      - redis-server
+      - postgres
+      - immich-server
+    plugs:
+      - network-bind
+      - network
 
   debug:
     command: bin/debug
@@ -114,17 +114,12 @@ apps:
       - network-bind
       - network
 
-  # immich-machine-learning:
-  #   command: bin/immich-machine-learning
-  #   daemon: simple
-  #   restart-delay: 10s
-  #   after:
-  #     - redis-server
-  #     - postgres
-  #     - immich-server
-  #   plugs:
-  #     - network-bind
-  #     - network
+  immich-machine-learning:
+    command: bin/immich-machine-learning
+    daemon: simple
+    plugs:
+      - network-bind
+      - network
 
   haproxy:
     command: bin/haproxy-wrapper
@@ -137,8 +132,8 @@ apps:
     command: bin/sync-service.sh
     daemon: simple
     restart-delay: 10s
-    # after:
-    #   - immich-server
+    after:
+      - immich-server
     plugs:
       - network
 
@@ -169,8 +164,6 @@ apps:
 # depend on each other at runtime.
 #
 #         server
-#            |  \
-#            |  patches
 #            |
 #         libvips_________
 #        /       \        \
@@ -190,28 +183,8 @@ apps:
 
 parts:
   server:
-    plugin: npm
-    source: https://github.com/immich-app/immich.git
-    source-tag: "v1.88.2"
-    source-subdir: server
-    override-build: |
-      cd server
-      npm update sharp
-      craftctl default
-
-    #   npm install node-addon-api node-gyp
-    #   npm install --verbose sharp --build-from-source
-
-    #   #npm run build
-    #   #npm prune --omit=dev --omit=optional
-
-    #   mkdir -p ${CRAFT_PART_INSTALL}/usr/src/app
-    #   cp -r node_modules ${CRAFT_PART_INSTALL}/usr/src/app
-    #   #cp -r dist ${CRAFT_PART_INSTALL}/usr/src/app
-    #   #cp -r bin ${CRAFT_PART_INSTALL}/usr/src/app
-    #   #cp -r assets ${CRAFT_PART_INSTALL}/usr/src/app
-    #   cp package.json package-lock.json ${CRAFT_PART_INSTALL}/usr/src/app
-
+    plugin: make
+    source: parts/immich-server
     after:
       - libvips
     build-packages:
@@ -268,11 +241,6 @@ parts:
     source: parts/sync
     after:
       - python
-
-  patches:
-    source: patches
-    plugin: dump
-    stage: []
 
   ffmpeg:
     plugin: dump
