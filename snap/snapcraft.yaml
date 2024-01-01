@@ -44,8 +44,6 @@ system-usernames:
   snap_daemon: shared
 
 layout:
-  $SNAP/usr/src/app/.reverse-geocoding-dump:
-    symlink: $SNAP_COMMON/reverse-geocoding-dump
   $SNAP/usr/src/app/upload:
     symlink: $SNAP_COMMON/upload
   /usr/lib/x86_64-linux-gnu/libheif:
