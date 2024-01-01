@@ -19,13 +19,9 @@ on:
   workflow_dispatch:
 
 jobs:
-  dependencies:
-    uses: ./.github/workflows/dependencies.yaml
-
   build:
     name: Build and Test Snap Package
     runs-on: ubuntu-latest
-    needs: dependencies
 
     services:
       selenium:
@@ -37,15 +33,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-
-      - name: Download artifacts
-        uses: actions/download-artifact@v3
-        with:
-          name: workdir
-
-      - name: Extract workdir
-        run: |
-          tar -xzf workdir.tar.gz
 
       - name: Build snap package
         uses: snapcore/action-build@v1
@@ -59,6 +46,14 @@ jobs:
 
       - name: TEST | Run Selenium Tests
         run: make ci -C tests
+
+      - name: Save snap artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: development-snap-package
+          if-no-files-found: error
+          path: |
+            ${{ steps.build.outputs.snap }}
 
       - name: Upload test report
         uses: actions/upload-artifact@v3

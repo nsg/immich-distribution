@@ -1,26 +1,44 @@
 name: immich-distribution
 title: Immich Distribution
-base: core20
-adopt-info: server
-summary: This is an Immich Distribution packaged by the community.
-description: |
-  This is an Immich Distribution packaged inside a snap package.
-  The package is inspired of the official Immich images. It will be
-  similar, but not identical with the official Docker-based
-  installation. It will ship the same software, but with limited
-  customability. Extra tools are included, they should be
-  non-intrusive and you can ignore them if you prefer.
-
-  **More information:** https://github.com/nsg/immich-distribution
-
-  This is **NOT** an official package. For support, open an issue on
-  the link above.
+version: "v1.88.2"
+base: core22
 grade: stable
 confinement: strict
 architectures:
-  - amd64
+  - build-on: [amd64]
+    build-for: [amd64]
 assumes:
   - command-chain
+website: https://immich-distribution.nsg.cc
+contact: https://github.com/nsg/immich-distribution/issues
+source-code: https://github.com/nsg/immich-distribution
+issues: https://github.com/nsg/immich-distribution/issues
+summary: This is an Immich Distribution packaged by the community.
+description: |
+  This is an Immich Distribution packaged inside a snap package.
+  The package is inspired of the official Immich images.
+  It will be similar, but not identical with the official
+  Docker-based installation.
+
+  Immich Distribution will ship the same software, but with limited
+  customization. The main focus is ease of use, a simple
+  `snap install immich-distribution` on a publicly available server 
+  should yield a fully working Immich installation. Extra tools are
+  included, they should be non-intrusive and you can ignore them if
+  you prefer.
+
+  **Extra tools**
+
+  * Simple Backup / Restore
+  * Folder Sync - Synchronize (read & write) a folder (with a few caveats) with Immich
+
+  **Resources**
+
+  * https://immich-distribution.nsg.cc
+  * https://github.com/nsg/immich-distribution
+
+  This is **NOT** an official Immich package.
+  For support, open an issue on the link above.
 
 system-usernames:
   snap_daemon: shared
@@ -30,6 +48,10 @@ layout:
     symlink: $SNAP_COMMON/reverse-geocoding-dump
   $SNAP/usr/src/app/upload:
     symlink: $SNAP_COMMON/upload
+  /usr/lib/x86_64-linux-gnu/libheif:
+    symlink: $SNAP/usr/lib/x86_64-linux-gnu/libheif
+  /usr/lib/vips-modules-8.15:
+    symlink: $SNAP/usr/lib/vips-modules-8.15
   /usr/etc/ImageMagick-7:
     symlink: $SNAP/usr/etc/ImageMagick-7
   /usr/lib/ImageMagick-7.1.1:
@@ -86,14 +108,15 @@ apps:
       - network-bind
       - network
 
+  debug:
+    command: bin/debug
+    plugs:
+      - network-bind
+      - network
+
   immich-machine-learning:
     command: bin/immich-machine-learning
     daemon: simple
-    restart-delay: 10s
-    after:
-      - redis-server
-      - postgres
-      - immich-server
     plugs:
       - network-bind
       - network
@@ -135,47 +158,73 @@ apps:
       - network
       - network-bind
 
+#
+# Dependency graph of build dependencies of the different parts.
+# This is not a runtime dependency graph. Different parts may
+# depend on each other at runtime.
+#
+#         server
+#            |
+#         libvips_________
+#        /       \        \
+#    cgif    imagemagick   \
+#              /   | \  \   \
+#           libraw |  \  libheif
+#                  |   \  /  |
+#                  |   x265  |
+#                   \       /
+#                    \     /
+#                    libde265
+#
+#   machine-learning     sync
+#                 \     /
+#                  python
+#
+
 parts:
   server:
-    plugin: nil
-    source: https://github.com/immich-app/immich.git
-    source-tag: v1.88.2
-    override-build: |
-      snapcraftctl set-version "$(git describe --tags)-dist1"
-
-      mkdir -p $SNAPCRAFT_PART_INSTALL/usr/src/app
-
-      # Build the server (and microservices, ml, etc.)
-      cd server
-      npm ci
-      npm run build
-      npm prune --omit=dev --omit=optional
-      cp -r {node_modules,dist,bin,assets} $SNAPCRAFT_PART_INSTALL/usr/src/app
-      cp package.json package-lock.json $SNAPCRAFT_PART_INSTALL/usr/src/app
-
-      # Build the web app
-      patch -p0 -i $SNAPCRAFT_PART_SRC/../../patches/src/001-version-announcement-box.patch -d $SNAPCRAFT_PART_BUILD
-      cd ../web
-      npm ci
-      npm run build
-      cp -r build $SNAPCRAFT_PART_INSTALL/usr/src/app/www
+    plugin: make
+    source: parts/immich-server
     after:
-      - dependencies
-      - patches
+      - libvips
+    build-packages:
+      - git
+      - pkg-config
+      # - libglib2.0-dev
+      # - libexpat1-dev
+      # - libgsf-1-dev
+      # - libfftw3-dev
+      # - libcfitsio-dev
+      # - libimagequant-dev
+      # - libexif-dev
+      # - libjpeg-dev
+      # - libpng-dev
+      # - libwebp-dev
+      # - libpango1.0-dev
+      # - libtiff-dev
+      # - librsvg2-dev
+      # - libopenslide-dev
+      # - libmatio-dev
+      # - liblcms2-dev
+      # - libopenexr-dev
+      # - liborc-0.4-dev
+      # - libpoppler-glib-dev
+    build-snaps:
+      - node/20/stable
+    stage-snaps:
+      - node/20/stable
 
   machine-learning:
     plugin: make
     source: parts/machine-learning
     build-packages:
       - git
-    stage-packages:
-      - libgomp1
     after:
-      - dependencies
+      - python
 
-  dependencies:
+  debug:
     plugin: dump
-    source: workdir
+    source: parts/debug
 
   scripts:
     source: src
@@ -188,13 +237,350 @@ parts:
       - xz-utils
 
   sync:
-    plugin: nil
-    override-build:
-      ../../dependencies/install/usr/local/bin/python3 ../../dependencies/install/usr/local/bin/pip3 install watchfiles requests psycopg2-binary pyyaml --target $SNAPCRAFT_PART_INSTALL/opt/pipsyncenv
+    plugin: make
+    source: parts/sync
     after:
-      - dependencies
+      - python
 
-  patches:
-    source: patches
+  ffmpeg:
     plugin: dump
-    stage: []
+    # These builds are linked from the official ffmpeg site, so I assume they are safe.
+    # It's a little annoying that there is not a stable URL, this link will be updated in the future and
+    # the checksum will change... when that happens, bump it or select the same release from "old-releases".
+    source: https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz
+    source-checksum: md5/8a34e2ab52b72777a8dcd3ff5defbcd8
+    override-build: |
+      mkdir -p $CRAFT_PART_INSTALL/bin
+      cp $CRAFT_PART_SRC/ffmpeg $CRAFT_PART_INSTALL/bin
+      cp $CRAFT_PART_SRC/ffprobe $CRAFT_PART_INSTALL/bin
+
+  haproxy:
+    source: http://git.haproxy.org/git/haproxy-2.6.git
+    source-tag: v2.6.15
+    plugin: make
+    make-parameters:
+      - TARGET=linux-glibc
+      - USE_OPENSSL=1
+      - USE_ZLIB=1
+      - USE_PCRE=1
+    build-packages:
+      - build-essential
+      - libssl-dev
+      - libpcre3-dev
+      - libz-dev
+    organize:
+      usr/local/sbin/haproxy: bin/haproxy
+    stage:
+      - -usr
+
+  lego:
+    source: https://github.com/go-acme/lego.git
+    source-tag: v4.10.2
+    plugin: go
+    build-environment:
+      - GO111MODULE: "on"
+    override-build: |
+      make build
+      mkdir -p $CRAFT_PART_INSTALL/bin
+      cp dist/lego $CRAFT_PART_INSTALL/bin
+    build-snaps: [go/latest/stable]
+
+  # mimalloc:
+  #   source: https://github.com/microsoft/mimalloc.git
+  #   source-tag: v2.1.2
+  #   plugin: cmake
+
+  python:
+    source: https://www.python.org/ftp/python/3.11.7/Python-3.11.7.tgz
+    source-checksum: md5/ef61f81ec82c490484219c7f0ec96783
+    plugin: make
+    override-build: |
+      ./configure --enable-optimizations --with-ensurepip=install
+      craftctl default
+    build-packages:
+      - libssl-dev
+      - zlib1g-dev
+      - libbz2-dev
+      - liblzma-dev
+      - libreadline-dev
+      - libsqlite3-dev
+      - xz-utils
+      - libffi-dev
+      - libncurses5-dev
+      - libgdbm-dev
+      - libnss3-dev
+    stage-packages:
+      - libtcl8.6
+      - libtk8.6
+      - libxft2
+      - libgdbm6
+    stage:
+      - -etc/init.d
+      - -etc/X11
+      - -usr/bin
+      - -usr/include
+      - -usr/lib/X11
+      - -usr/share/doc
+      - -usr/share/doc-base
+      - -usr/share/lintian
+      - -usr/share/man
+      - -usr/share/X11
+
+  typesense:
+    source: https://dl.typesense.org/releases/0.24.1/typesense-server-0.24.1-linux-amd64.tar.gz
+    plugin: dump
+    organize:
+      typesense-server: bin/typesense-server
+    stage:
+      - bin
+
+  redis:
+    source: https://github.com/redis/redis.git
+    source-tag: 7.0.9
+    plugin: make
+    build-environment:
+      - PREFIX: $CRAFT_PART_INSTALL
+    build-packages:
+      - pkg-config
+    prime:
+      - bin/redis-server
+
+  postgres:
+    source: https://ftp.postgresql.org/pub/source/v15.2/postgresql-15.2.tar.bz2
+    plugin: make
+    build-packages:
+      - libreadline-dev
+      - zlib1g-dev
+      - uuid-dev
+    override-build: |
+      ./configure --enable-thread-safety --with-uuid=e2fs --with-gnu-ld
+      snapcraftctl build
+      cd contrib
+      make
+      make install DESTDIR=$CRAFT_PART_INSTALL
+    stage:
+      # headers
+      - -usr/local/pgsql/include
+      # examples
+      - -usr/local/share/doc
+
+  libvips:
+    plugin: meson
+    meson-parameters:
+      - --buildtype=release
+      - --prefix=/usr
+      - --libdir=lib
+      - --default-library=shared
+    source: https://github.com/libvips/libvips/releases/download/v8.15.1/vips-8.15.1.tar.xz
+    source-checksum: "sha256/06811f5aed3e7bc03e63d05537ff4b501de5283108c8ee79396c60601a00830c"
+    build-packages:
+      - meson
+      - ninja-build
+
+      # Based on https://github.com/libvips/libvips/wiki/Build-for-Ubuntu
+      - libfftw3-dev
+      - libopenexr-dev
+      - libgsf-1-dev
+      - libglib2.0-dev
+      - liborc-dev
+      - libopenslide-dev
+      - libmatio-dev
+      - libwebp-dev
+      - libjpeg-turbo8-dev
+      - libexpat1-dev
+      - libexif-dev
+      - libtiff5-dev
+      - libcfitsio-dev
+      - libpoppler-glib-dev
+      - librsvg2-dev
+      - libpango1.0-dev
+      - libopenjp2-7-dev
+      - libimagequant-dev
+    stage-packages:
+      - libfftw3-3
+      - libopenexr25
+      - libgsf-1-114
+      - libglib2.0-0
+      - liborc-0.4-0
+      - libopenslide0
+      - libmatio11
+      - libwebp7
+      - libjpeg-turbo8
+      - libexpat1
+      - libexif12
+      - libtiff5
+      - libcfitsio9
+      - libpoppler-glib8
+      - librsvg2-2
+      - libpango1.0-0
+      - libopenjp2-7
+      - libimagequant0
+      - libwebpmux3
+      - libwebpdemux2
+    after:
+       - cgif
+       - libheif
+       - imagemagick
+
+  cgif:
+    plugin: meson
+    source: https://github.com/dloebl/cgif.git
+    source-tag: "V0.3.2"
+    meson-parameters:
+      - --prefix=/usr
+    build-packages: [meson, ninja-build]
+
+  libheif:
+    plugin: cmake
+    source: https://github.com/strukturag/libheif.git
+    source-tag: "v1.17.5"
+    cmake-parameters:
+      - -DCMAKE_INSTALL_PREFIX=/usr
+      - --preset=release
+    build-packages:
+      - cmake
+      - pkg-config
+      - zlib1g-dev
+      - libsharp-dev
+      - libjpeg-turbo8-dev
+      - libpng-dev
+      - libaom-dev
+    stage-packages:
+      - zlib1g
+      - libsharp0
+      - libjpeg-turbo8
+      - libpng16-16
+      - libaom3
+    organize: 
+      usr/local: usr
+    after:
+      - libde265
+      - x265
+
+  libde265:
+    plugin: cmake
+    source: https://github.com/strukturag/libde265.git
+    source-tag: "v1.0.14"
+    build-packages: [cmake]
+    cmake-parameters:
+      - -DCMAKE_INSTALL_PREFIX=/usr
+
+  x265:
+    plugin: cmake
+    source: https://bitbucket.org/multicoreware/x265_git.git
+    source-tag: "3.5"
+    source-subdir: source
+    build-packages: [cmake, nasm]
+    cmake-parameters:
+      - -DCMAKE_INSTALL_PREFIX=/usr
+
+  imagemagick:
+    plugin: make
+    source: https://github.com/ImageMagick/ImageMagick.git
+    source-tag: 7.1.1-24
+    override-build: |
+      ./configure --with-modules --enable-static=yes --with-x=no --with-raw=yes --prefix=/usr
+      snapcraftctl build
+    build-packages:
+      - libltdl-dev
+      - libbz2-dev
+      - libdjvulibre-dev
+      - libexif-dev
+      - libfftw3-dev
+      - libfontconfig1-dev
+      - libfreetype6-dev
+      - libjpeg-dev
+      - liblcms2-dev
+      - liblqr-1-0-dev
+      - liblzma-dev
+      - libopenexr-dev
+      - libpango1.0-dev
+      - libperl-dev
+      - libpng-dev
+      - librsvg2-bin
+      - librsvg2-dev
+      - libtiff-dev
+      - libwebp-dev
+      - libwmf-dev
+      - libx11-dev
+      - libxext-dev
+      - libxml2-dev
+      - libxt-dev
+      - zlib1g-dev
+      - libzstd-dev
+    stage-packages:
+      - libcairo2
+      - libdatrie1
+      - libdjvulibre21
+      - libfontconfig1
+      - libfreetype6
+      - libfribidi0
+      - libgomp1
+      - libgraphite2-3
+      - libharfbuzz0b
+      - libicu70
+      - libilmbase25
+      - libjbig0
+      - libjpeg-turbo8
+      - liblcms2-2
+      - liblqr-1-0
+      - libltdl7
+      - libnuma1
+      - libopenexr25
+      - libopenjp2-7
+      - libpango-1.0-0
+      - libpangocairo-1.0-0
+      - libpangoft2-1.0-0
+      - libpixman-1-0
+      - libpng16-16
+      - libthai0
+      - libtiff5
+      - libwebp7
+      - libwebpdemux2
+      - libwebpmux3
+      - libwmf0.2-7
+      - libx11-6
+      - libxau6
+      - libxcb-render0
+      - libxcb-shm0
+      - libxcb1
+      - libxdmcp6
+      - libxext6
+      - libxml2
+      - libxrender1
+    stage:
+      - -usr/share/apport
+      - -usr/share/djvu
+      - -usr/share/docs
+      - -usr/share/doc
+      - -usr/share/lintian
+      - -usr/share/man
+      - -usr/share/X11
+    after:
+      - libraw
+      - x265
+      - libheif
+      - libde265
+
+  libraw:
+    plugin: autotools
+    source: https://github.com/libraw/libraw/archive/0.21.1.tar.gz
+    source-checksum: "sha256/b63d7ffa43463f74afcc02f9083048c231349b41cc9255dec0840cf8a67b52e0"
+    autotools-configure-parameters:
+      - --disable-examples
+      - --prefix=/usr
+      - --enable-jpeg
+      - --enable-zlib
+    override-build: |
+      autoreconf --install
+      craftctl default
+    build-packages:
+      - zlib1g-dev
+      - libjpeg8-dev
+      - pkg-config
+    stage-packages:
+      - libgomp1
+      - libjpeg-turbo8
+      - liblcms2-2
+    stage:
+      - -usr/share

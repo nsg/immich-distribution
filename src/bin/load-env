@@ -8,9 +8,14 @@ snapctl() {
     fi
 }
 
-export PATH="$SNAP/usr/local/bin:$PATH"
-export LD_LIBRARY_PATH="$SNAP/usr/local/pgsql/lib:$SNAP/usr/lib/x86_64-linux-gnu/pulseaudio:$SNAP/usr/lib/x86_64-linux-gnu/libfswatch:$SNAP/usr/local/lib/x86_64-linux-gnu/:$LD_LIBRARY_PATH"
+LD_LIBRARY_PATH="$SNAP/usr/lib/x86_64-linux-gnu/libfswatch:$LD_LIBRARY_PATH"
+LD_LIBRARY_PATH="$SNAP/usr/lib/x86_64-linux-gnu/pulseaudio:$LD_LIBRARY_PATH"
+LD_LIBRARY_PATH="$SNAP/usr/lib/x86_64-linux-gnu/libheif:$LD_LIBRARY_PATH"
+LD_LIBRARY_PATH="$SNAP/usr/local/pgsql/lib:$LD_LIBRARY_PATH"
 
+export LD_LIBRARY_PATH
+
+export PATH="$SNAP/usr/local/bin:$PATH"
 export PGDATA="$SNAP_COMMON/pgsql/data"
 
 export LC_ALL="C"
