@@ -219,6 +219,7 @@ parts:
     source: parts/machine-learning
     build-packages:
       - git
+      - execstack
     after:
       - python
 
