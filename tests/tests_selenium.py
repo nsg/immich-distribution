@@ -126,15 +126,22 @@ class TestImmichWeb(BaseCase):
         self.click("button")
         self.wait_for_element("p:contains('Photos')")
 
-    def test_001_register_and_login(self):
+    def test_001_register(self):
         """
-        Register a new user and login, make sure we end up on the photos page.
+        Register a new user
         """
-        if not is_dirty_state():
-            self.immich(login=False)
-            self.register()
-            self.login()
-            self.assert_title("Photos - Immich")
+
+        self.immich(login=False)
+        self.register()
+        self.assert_title("Login - Immich")
+
+    def test_002_register_and_login(self):
+        """
+        Login and make sure we end up on the photos page.
+        """
+
+        self.immich()
+        self.assert_title("Photos - Immich")
 
     def test_003_empty_timeline(self):
         """
@@ -177,10 +184,6 @@ class TestImmichWeb(BaseCase):
                 continue
             r = import_asset(path)
             self.assertNotEqual(r.get('id'), None)
-
-        # for path in glob.glob(f"{snap_readable_path}/tests_external/external-test-files/*"):
-        #     r = import_asset(path)
-        #     self.assertNotEqual(r.get('id'), None)
 
         # ML models are downloaded in the background when we upload assets
         # Wait for them to complete, and the queue to be empty before continuing
