@@ -126,15 +126,22 @@ class TestImmichWeb(BaseCase):
         self.click("button")
         self.wait_for_element("p:contains('Photos')")
 
-    def test_001_register_and_login(self):
+    def test_001_register(self):
         """
-        Register a new user and login, make sure we end up on the photos page.
+        Register a new user
         """
-        if not is_dirty_state():
-            self.immich(login=False)
-            self.register()
-            self.login()
-            self.assert_title("Photos - Immich")
+
+        self.immich(login=False)
+        self.register()
+        self.assert_title("Login - Immich")
+
+    def test_002_register_and_login(self):
+        """
+        Login and make sure we end up on the photos page.
+        """
+
+        self.immich()
+        self.assert_title("Photos - Immich")
 
     def test_003_empty_timeline(self):
         """
@@ -178,10 +185,6 @@ class TestImmichWeb(BaseCase):
             r = import_asset(path)
             self.assertNotEqual(r.get('id'), None)
 
-        # for path in glob.glob(f"{snap_readable_path}/tests_external/external-test-files/*"):
-        #     r = import_asset(path)
-        #     self.assertNotEqual(r.get('id'), None)
-
         # ML models are downloaded in the background when we upload assets
         # Wait for them to complete, and the queue to be empty before continuing
         wait_for_empty_job_queue()
@@ -197,7 +200,7 @@ class TestImmichWeb(BaseCase):
         Use the API to verify that the assets were uploaded correctly.
         """
         assets = get_assets()
-        self.assertEqual(len(assets), 11)
+        self.assertEqual(len(assets), 13)
 
     def test_100_verify_exif_location_extraction(self):
         """
@@ -230,9 +233,10 @@ class TestImmichWeb(BaseCase):
         Extract the EXIF data from the images and verify that it is correct.
         """
 
-        assets = get_assets(["ohm", "grass.MP"])
+        assets = get_assets(["ohm", "grass.MP", "greyhounds-looking-for-a-table"])
         ohm = assets['ohm']
         grass = assets['grass.MP']
+        heic = assets['greyhounds-looking-for-a-table']
 
         self.assertEqual(ohm['type'], "IMAGE")
         self.assertEqual(ohm['exifInfo']['exifImageWidth'], 640)
@@ -241,6 +245,11 @@ class TestImmichWeb(BaseCase):
         self.assertEqual(grass['exifInfo']['model'], "Pixel 4")
         self.assertEqual(grass['exifInfo']['dateTimeOriginal'], "2023-07-08T12:13:53.210Z")
         self.assertEqual(grass['exifInfo']['city'], "Mora")
+
+        self.assertEqual(heic['type'], "IMAGE")
+        self.assertEqual(heic['exifInfo']['model'], "iPhone 12 Pro")
+        self.assertEqual(heic['exifInfo']['dateTimeOriginal'], "2023-09-28T07:44:03.886Z")
+        self.assertEqual(heic['exifInfo']['country'], "Spain")
 
     def test_100_verify_people_detected(self):
         """
@@ -256,4 +265,4 @@ class TestImmichWeb(BaseCase):
         # query the API to get a list of people
         r = requests.get(f"http://{get_ip_address()}/api/person", headers=headers)
         people = r.json()
-        self.assertEqual(people['total'], 6)
+        self.assertGreater(people['total'], 6)

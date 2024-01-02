@@ -4,6 +4,9 @@ random_string() {
     cat /dev/urandom | tr -dc '[:alpha:]' | fold -w ${1:-20} | head -n 1
 }
 
+# Clean up old reverse geocoding data. This information is stored in Postgres since Immich v1.89
+rm -rf $SNAP_COMMON/reverse-geocoding-dump
+
 mkdir -p $SNAP_COMMON/{pgsql,redis,reverse-geocoding-dump,upload,typesense,sync,backups,acme,cache}
 chown snap_daemon:snap_daemon $SNAP_COMMON/pgsql
 

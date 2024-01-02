@@ -9,18 +9,17 @@ ci: prepare-test-file wait
 
 prepare-test-file: external-test-files update-snap-symlinks-for-user
 	mkdir -p ${HOME}/snap/immich-distribution/current/tests
-	mkdir -p ${HOME}/snap/immich-distribution/current/tests_external
 	for asset in assets/*; do \
 		echo $$asset | grep -q py__ \
 			|| cp $$asset ${HOME}/snap/immich-distribution/current/tests/; \
 	done
-	cp -r external-test-files ${HOME}/snap/immich-distribution/current/tests_external
+	cp external-test-files/* ${HOME}/snap/immich-distribution/current/tests
 
 external-test-files: update-snap-symlinks-for-user
 	mkdir -p external-test-files
 
 	cd external-test-files && for file in $(shell cat external-test-files.list); do \
-		wget -c $$file; \
+		wget --content-disposition -c $$file; \
 	done
 
 update-snap-symlinks-for-user:

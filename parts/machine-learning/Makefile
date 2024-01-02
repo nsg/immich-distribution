@@ -1,4 +1,4 @@
-IMMICH_VERSION := v1.88.2
+IMMICH_VERSION := v1.89.0
 
 # Use our own Python, over the older included one
 export PATH := ${CRAFT_PART_BUILD}/../../python/install/usr/local/bin:$(PATH)
@@ -46,3 +46,7 @@ install:
 
 	# Deploy immich-machine-learning script
 	cp immich-machine-learning ${CRAFT_PART_INSTALL}/bin/immich-machine-learning
+
+	# Mark binary or shared library as not requiring executable stack.
+	# Snapcraft security policy requires that I strip the executable stack for libraries.
+	execstack --clear-execstack ${CRAFT_PART_INSTALL}/app/machine-learning/python-packages/onnxruntime/capi/onnxruntime_pybind11_state.cpython-311-x86_64-linux-gnu.so

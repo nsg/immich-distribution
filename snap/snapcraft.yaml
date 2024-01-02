@@ -1,6 +1,6 @@
 name: immich-distribution
 title: Immich Distribution
-version: "v1.88.2"
+version: "v1.89.0"
 base: core22
 grade: stable
 confinement: strict
@@ -44,10 +44,10 @@ system-usernames:
   snap_daemon: shared
 
 layout:
-  $SNAP/usr/src/app/.reverse-geocoding-dump:
-    symlink: $SNAP_COMMON/reverse-geocoding-dump
   $SNAP/usr/src/app/upload:
     symlink: $SNAP_COMMON/upload
+  /usr/src/resources:
+    symlink: $SNAP/usr/src/app/resources
   /usr/lib/x86_64-linux-gnu/libheif:
     symlink: $SNAP/usr/lib/x86_64-linux-gnu/libheif
   /usr/lib/vips-modules-8.15:
@@ -219,6 +219,7 @@ parts:
     source: parts/machine-learning
     build-packages:
       - git
+      - execstack
     after:
       - python
 
@@ -241,6 +242,26 @@ parts:
     source: parts/sync
     after:
       - python
+
+  geodata:
+    # Download geodata from geonames.org, based Immich Server base image
+    # https://github.com/immich-app/base-images/blob/main/server/Dockerfile
+    plugin: dump
+    source: https://download.geonames.org/export/dump/cities500.zip
+    override-build: |
+      # Download cities500.zip and unpack it as cities500.txt
+      craftctl default
+
+      # Create folder structure and write geodata-date.txt
+      mkdir -p $CRAFT_PART_INSTALL/usr/src/app/resources
+      date --iso-8601=seconds | tr -d "\n" > $CRAFT_PART_INSTALL/usr/src/app/resources/geodata-date.txt
+
+      # Download admin1CodesASCII.txt and admin2Codes.txt and move cities500.txt to resources
+      mv $CRAFT_PART_INSTALL/cities500.txt $CRAFT_PART_INSTALL/usr/src/app/resources/cities500.txt
+      curl https://download.geonames.org/export/dump/admin1CodesASCII.txt -o $CRAFT_PART_INSTALL/usr/src/app/resources/admin1CodesASCII.txt
+      curl https://download.geonames.org/export/dump/admin2Codes.txt -o $CRAFT_PART_INSTALL/usr/src/app/resources/admin2Codes.txt
+    build-packages:
+      - curl
 
   ffmpeg:
     plugin: dump

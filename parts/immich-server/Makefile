@@ -1,4 +1,4 @@
-IMMICH_VERSION := v1.88.2
+IMMICH_VERSION := v1.89.0
 IMMICH_REPO := https://github.com/immich-app/immich.git
 
 #
@@ -39,7 +39,7 @@ immich-server-install: ${SNAPCRAFT_PART_INSTALL}/usr/src/app
 	cp -r immich/server/node_modules ${SNAPCRAFT_PART_INSTALL}/usr/src/app
 	cp -r immich/server/dist ${SNAPCRAFT_PART_INSTALL}/usr/src/app
 	cp -r immich/server/bin ${SNAPCRAFT_PART_INSTALL}/usr/src/app
-	cp -r immich/server/assets ${SNAPCRAFT_PART_INSTALL}/usr/src/app
+	cp -r immich/server/resources ${SNAPCRAFT_PART_INSTALL}/usr/src/app
 	cp immich/server/package.json immich/server/package-lock.json ${SNAPCRAFT_PART_INSTALL}/usr/src/app
 	cp ${SNAPCRAFT_PART_SRC}/scripts/immich-server ${SNAPCRAFT_PART_INSTALL}/bin
 	cp ${SNAPCRAFT_PART_SRC}/scripts/immich-microservices ${SNAPCRAFT_PART_INSTALL}/bin
