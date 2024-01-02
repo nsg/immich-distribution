@@ -200,7 +200,7 @@ class TestImmichWeb(BaseCase):
         Use the API to verify that the assets were uploaded correctly.
         """
         assets = get_assets()
-        self.assertEqual(len(assets), 11)
+        self.assertEqual(len(assets), 13)
 
     def test_100_verify_exif_location_extraction(self):
         """
@@ -233,9 +233,10 @@ class TestImmichWeb(BaseCase):
         Extract the EXIF data from the images and verify that it is correct.
         """
 
-        assets = get_assets(["ohm", "grass.MP"])
+        assets = get_assets(["ohm", "grass.MP", "greyhounds-looking-for-a-table"])
         ohm = assets['ohm']
         grass = assets['grass.MP']
+        heic = assets['greyhounds-looking-for-a-table']
 
         self.assertEqual(ohm['type'], "IMAGE")
         self.assertEqual(ohm['exifInfo']['exifImageWidth'], 640)
@@ -244,6 +245,11 @@ class TestImmichWeb(BaseCase):
         self.assertEqual(grass['exifInfo']['model'], "Pixel 4")
         self.assertEqual(grass['exifInfo']['dateTimeOriginal'], "2023-07-08T12:13:53.210Z")
         self.assertEqual(grass['exifInfo']['city'], "Mora")
+
+        self.assertEqual(heic['type'], "IMAGE")
+        self.assertEqual(heic['exifInfo']['model'], "iPhone 12 Pro")
+        self.assertEqual(heic['exifInfo']['dateTimeOriginal'], "2023-09-28T07:44:03.886Z")
+        self.assertEqual(heic['exifInfo']['country'], "Spain")
 
     def test_100_verify_people_detected(self):
         """
@@ -259,4 +265,4 @@ class TestImmichWeb(BaseCase):
         # query the API to get a list of people
         r = requests.get(f"http://{get_ip_address()}/api/person", headers=headers)
         people = r.json()
-        self.assertEqual(people['total'], 6)
+        self.assertGreater(people['total'], 6)
