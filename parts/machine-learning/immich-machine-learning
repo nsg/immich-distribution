@@ -11,8 +11,9 @@ echo "LD_PRELOAD: $LD_PRELOAD"
 
 cd $SNAP/app/machine-learning
 python3 $SNAP/bin/gunicorn app.main:app \
- 	-k uvicorn.workers.UvicornWorker \
+	-k app.config.CustomUvicornWorker \
  	-w $MACHINE_LEARNING_WORKERS \
  	-b $MACHINE_LEARNING_HOST:$MACHINE_LEARNING_PORT \
 	-t $MACHINE_LEARNING_WORKER_TIMEOUT \
- 	--log-config-json log_conf.json
+	--log-config-json log_conf.json \
+	--graceful-timeout 0
