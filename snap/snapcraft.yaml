@@ -77,13 +77,6 @@ apps:
     plugs:
       - network-bind
 
-  typesense:
-    command: bin/typesense
-    daemon: simple
-    restart-delay: 10s
-    plugs:
-      - network-bind
-
   immich-server:
     command: bin/immich-server
     daemon: simple
@@ -91,7 +84,6 @@ apps:
     after:
       - redis-server
       - postgres
-      - typesense
     plugs:
       - network-bind
       - network
@@ -346,14 +338,6 @@ parts:
       - -usr/share/lintian
       - -usr/share/man
       - -usr/share/X11
-
-  typesense:
-    source: https://dl.typesense.org/releases/0.24.1/typesense-server-0.24.1-linux-amd64.tar.gz
-    plugin: dump
-    organize:
-      typesense-server: bin/typesense-server
-    stage:
-      - bin
 
   redis:
     source: https://github.com/redis/redis.git

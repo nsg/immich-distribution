@@ -7,7 +7,11 @@ random_string() {
 # Clean up old reverse geocoding data. This information is stored in Postgres since Immich v1.89
 rm -rf $SNAP_COMMON/reverse-geocoding-dump
 
-mkdir -p $SNAP_COMMON/{pgsql,redis,reverse-geocoding-dump,upload,typesense,sync,backups,acme,cache}
+# Clean up old typesense data. This information is stored in Postgres since Immich v1.91
+rm -rf $SNAP_COMMON/typesense
+snapctl unset typesense-key
+
+mkdir -p $SNAP_COMMON/{pgsql,redis,reverse-geocoding-dump,upload,sync,backups,acme,cache}
 chown snap_daemon:snap_daemon $SNAP_COMMON/pgsql
 
 if [[ $(snapctl get database-password) == "" ]]; then
@@ -28,6 +32,5 @@ fi
 
 # Restart services
 snapctl restart immich-distribution.postgres
-snapctl restart immich-distribution.typesense
 snapctl restart immich-distribution.haproxy
 snapctl restart immich-distribution.sync-service

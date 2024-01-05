@@ -40,11 +40,6 @@ export MACHINE_LEARNING_PORT=3003
 export MACHINE_LEARNING_WORKERS=1
 export MACHINE_LEARNING_WORKER_TIMEOUT=120
 
-export TYPESENSE_API_KEY="$(snapctl get typesense-key)"
-export TYPESENSE_DATA_DIR="$SNAP_COMMON/typesense"
-export TYPESENSE_API_ADDRESS="127.0.0.1"
-export TYPESENSE_HOST="127.0.0.1"
-
 export ACME_DOMAIN="$(snapctl get acme-domain)"
 export ACME_EMAIL="$(snapctl get acme-email)"
 export ACME_STAGING="$(snapctl get acme-staging)"
