@@ -1,0 +1,7 @@
+#!/bin/bash
+
+. $SNAP/bin/load-env
+
+# Enable vectors.so extension in postgresql.conf
+# NOTE: This the #, this will only match once per installation
+sed -i "s/^#shared_preload_libraries.*/shared_preload_libraries = 'vectors.so' # Added pgvecto-rs/" $PGDATA/postgresql.conf

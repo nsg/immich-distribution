@@ -17,6 +17,8 @@ if [ ! -e "$PGDATA" ]; then
     rm /tmp/pwfile
 fi
 
+drop_privileges $SNAP/bin/postgres-configure
+
 (
     while ! $SNAP/usr/local/pgsql/bin/pg_isready; do
         sleep 1

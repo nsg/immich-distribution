@@ -350,6 +350,15 @@ parts:
     prime:
       - bin/redis-server
 
+  pgvecto-rs:
+    source: https://github.com/tensorchord/pgvecto.rs/releases/download/v0.1.13/vectors-pg15_0.1.13_amd64.deb
+    plugin: dump
+    organize:
+      usr/share/postgresql/15/extension: usr/local/pgsql/share/extension
+      usr/lib/postgresql/15/lib: usr/local/pgsql/lib
+    stage:
+      - -usr/share/doc
+
   postgres:
     source: https://ftp.postgresql.org/pub/source/v15.2/postgresql-15.2.tar.bz2
     plugin: make
