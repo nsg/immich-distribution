@@ -1,4 +1,4 @@
-IMMICH_VERSION := v1.89.0
+IMMICH_VERSION := v1.90.2
 IMMICH_REPO := https://github.com/immich-app/immich.git
 
 #
