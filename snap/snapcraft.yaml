@@ -1,6 +1,6 @@
 name: immich-distribution
 title: Immich Distribution
-version: "v1.90.2"
+version: "v1.91.4"
 base: core22
 grade: stable
 confinement: strict
