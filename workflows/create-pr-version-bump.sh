@@ -8,6 +8,7 @@ set -eo pipefail
 . workflows/tools.sh
 
 REMOTE_URL=$(git remote get-url origin)
+OLD_VERSION=$(cat VERSION)
 
 #
 # By default, use the oldest open tracking issues latest release as the new version
@@ -18,7 +19,7 @@ for n in $(list_tracking_issues | sort -n); do
     TRACKING_ISSUE_TITLE="$(get_issue_title $n)"
     TRACKING_ISSUE_VERSION_MAJOR_MINOR="$(echo $TRACKING_ISSUE_TITLE | awk '{ print $2 }')"
     NEW_VERSION=$(get_latest_release_for_major_minor $TRACKING_ISSUE_VERSION_MAJOR_MINOR)
-    if ! grep -q $NEW_VERSION VERSION; then
+    if [[ $(version_to_int "$NEW_VERSION") -gt $(version_to_int "$OLD_VERSION") ]]; then
         TRACKING_ISSUE=$n
         break
     fi
@@ -29,7 +30,6 @@ if [ -z "$TRACKING_ISSUE" ]; then
     exit 0
 fi
 
-OLD_VERSION=$(cat VERSION)
 BRANCH_NAME="bump/$NEW_VERSION"
 
 if has_any_pr_bump_open; then
