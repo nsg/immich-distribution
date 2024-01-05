@@ -92,9 +92,6 @@ Content-Type: text/html
                 <div id="backend-be_ml" class="unset">
                     Machine Learning
                 </div>
-                <div id="backend-be_typesense" class="unset">
-                    Typesense (Search Database)
-                </div>
                 <div id="backend-be_postgres" class="unset">
                     Postgres (Relational Database)
                 </div>
