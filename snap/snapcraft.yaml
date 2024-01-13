@@ -183,7 +183,7 @@ parts:
       npm install --save-dev node-gyp # needed for sharp to build from source
       npm ci
       npm run build
-      npm prune --omit=dev #--omit=optional
+      npm prune --omit=dev --omit=optional
 
       # Verify that sharp was built from source
       test -e node_modules/sharp/src/build/Release/sharp-linux-x64.node
