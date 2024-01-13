@@ -25,7 +25,6 @@ So overall if you configure your firewall limiting what Immich can access, it wo
     | psql | [network](https://snapcraft.io/docs/network-interface) | General network access |
     | postgres | [network-bind](https://snapcraft.io/docs/network-bind-interface) | Listen for incoming connections |
     | redis-server | [network-bind](https://snapcraft.io/docs/network-bind-interface) | Listen for incoming connections |
-    | typesense | [network-bind](https://snapcraft.io/docs/network-bind-interface) | Listen for incoming connections |
     | immich-server | [network](https://snapcraft.io/docs/network-interface), [network-bind](https://snapcraft.io/docs/network-bind-interface) | General network access, Listen for incoming connections |
     | immich-microservices | [network](https://snapcraft.io/docs/network-interface), [network-bind](https://snapcraft.io/docs/network-bind-interface) | General network access, Listen for incoming connections |
     | immich-web | [network](https://snapcraft.io/docs/network-interface), [network-bind](https://snapcraft.io/docs/network-bind-interface) | General network access, Listen for incoming connections |
@@ -49,7 +48,7 @@ So overall if you configure your firewall limiting what Immich can access, it wo
 
 The sandbox do not only limit what the application can see, it's also greatly limits where it can write. `/var/snap/immich-distribution/common/` is used as a writable area where all the state is saved.
 
-A process running inside a snap package only sees a limited view of your host system. `/` is based on a base image called "a core snap". Immich Distribution uses `core20` with is based on Ubuntu 20.04 LTS. A limited list of select paths are then exposed from the host by the snapd daemon, a snap package can request more paths to be exposed via permissions.
+A process running inside a snap package only sees a limited view of your host system. `/` is based on a base image called "a core snap". Immich Distribution uses `core22` with is based on Ubuntu 22.04 LTS. A limited list of select paths are then exposed from the host by the snapd daemon, a snap package can request more paths to be exposed via permissions.
 
 ## TLS and HTTPS
 

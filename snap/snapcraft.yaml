@@ -1,6 +1,6 @@
 name: immich-distribution
 title: Immich Distribution
-version: "v1.91.4"
+version: "v1.92.1"
 base: core22
 grade: stable
 confinement: strict
@@ -44,10 +44,6 @@ system-usernames:
   snap_daemon: shared
 
 layout:
-  $SNAP/usr/src/app/upload:
-    symlink: $SNAP_COMMON/upload
-  /usr/src/resources:
-    symlink: $SNAP/usr/src/app/resources
   /usr/lib/x86_64-linux-gnu/libheif:
     symlink: $SNAP/usr/lib/x86_64-linux-gnu/libheif
   /usr/lib/vips-modules-8.15:
@@ -177,7 +173,7 @@ parts:
   server:
     plugin: nil
     source: https://github.com/immich-app/immich.git
-    source-tag: v1.91.4
+    source-tag: v1.92.1
     override-build: |
       cd server
       npm install --save-dev node-gyp # needed for sharp to build from source
@@ -212,7 +208,7 @@ parts:
   web:
     plugin: nil
     source: https://github.com/immich-app/immich.git
-    source-tag: v1.91.4
+    source-tag: v1.92.1
     override-build: |
       patch -p0 -i ${CRAFT_PART_SRC}/../../parts-web/src/patches/001-version-announcement-box.patch
 
@@ -516,7 +512,7 @@ parts:
   imagemagick:
     plugin: make
     source: https://github.com/ImageMagick/ImageMagick.git
-    source-commit: d5974ce50c84bee43731270a899d7a4a9500cc17
+    source-commit: 963f5fa2a3c87b362e2b6b29a31bff447b75925b
     override-build: |
       ./configure --with-modules --enable-static=yes --with-x=no --with-raw=yes --prefix=/usr
       snapcraftctl build

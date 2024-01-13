@@ -33,13 +33,13 @@ See the documentation site at https://immich-distribution.nsg.cc/ for more infor
 | Immich Microservices | This service provides background processing of assets for Immich Server |
 | Immich Machine Learning | Object detection and image classifier, provides and API for Immich |
 | Immich Web | The Immich web pages |
-| Immich CLI | A CLI tool for bulk upload to Immich |
-| Postgres | Relational database used by Immich |
-| Redis | Fast key-value database used by Immich |
-| Typesense | Search focused database used by Immich |
-| HAProxy | Service that proxies traffic to Immich web and server |
+| Immich Distribution Sync | Synchronize (read & write) a external folder (with a few caveats) with Immich |
+| Immich Distribution Backup | Tool for easy backup and restore of Immich |
+| [Postgres](https://www.postgresql.org/) | Relational database used by Immich |
+| [Redis](https://redis.io/) | Fast key-value database used by Immich |
+| [HAProxy](https://www.haproxy.org/) | Service that proxies traffic to Immich web and server |
 | [uacme](https://github.com/ndilieto/uacme) | A Let's Encrypt ACME client used to checkout TLS certificates |
 
 ## License
 
-All files in this repository are released under the MIT license.  Upstream Immich is also licensed under the [MIT](https://github.com/immich-app/immich/blob/main/LICENSE) license.
+All files in this repository are released under the MIT license. Upstream Immich is also licensed under the [MIT](https://github.com/immich-app/immich/blob/main/LICENSE) license.

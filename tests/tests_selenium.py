@@ -124,7 +124,6 @@ class TestImmichWeb(BaseCase):
         self.type("input[id='email']", "foo@example.com")
         self.type("input[id='password']", "secret")
         self.click("button")
-        self.wait_for_element("p:contains('Photos')")
 
     def test_001_register(self):
         """
@@ -135,12 +134,26 @@ class TestImmichWeb(BaseCase):
         self.register()
         self.assert_title("Login - Immich")
 
-    def test_002_register_and_login(self):
+    def test_002_first_login(self):
         """
-        Login and make sure we end up on the photos page.
+        Login, follow the welcome flow and make sure we end up on the photos page.
         """
 
         self.immich()
+
+        # Check that we are on the onboarding page
+        self.assert_title("Onboarding - Immich")
+
+        # Press on "Theme" to select a theme
+        self.click("button:contains('Theme')")
+
+        # Press on "Storage Template" to manage storage templates
+        self.click("button:contains('Storage Template')")
+
+        # Do not enable the storage template feature, just click "Done"
+        self.click("button:contains('Done')")
+
+        # Verify that we are on the photos page
         self.assert_title("Photos - Immich")
 
     def test_003_empty_timeline(self):
