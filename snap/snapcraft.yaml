@@ -385,8 +385,8 @@ parts:
       - --prefix=/usr
       - --libdir=lib
       - --default-library=shared
-    source: https://github.com/libvips/libvips/releases/download/v8.15.1/vips-8.15.1.tar.xz
-    source-checksum: "sha256/06811f5aed3e7bc03e63d05537ff4b501de5283108c8ee79396c60601a00830c"
+    source: https://github.com/libvips/libvips.git
+    source-commit: 0144d503a4e90ee56830dda9ebc39b2f25ae8b1f
     build-packages:
       - meson
       - ninja-build
@@ -491,7 +491,7 @@ parts:
   imagemagick:
     plugin: make
     source: https://github.com/ImageMagick/ImageMagick.git
-    source-tag: 7.1.1-24
+    source-commit: d5974ce50c84bee43731270a899d7a4a9500cc17
     override-build: |
       ./configure --with-modules --enable-static=yes --with-x=no --with-raw=yes --prefix=/usr
       snapcraftctl build
@@ -578,8 +578,8 @@ parts:
 
   libraw:
     plugin: autotools
-    source: https://github.com/libraw/libraw/archive/0.21.1.tar.gz
-    source-checksum: "sha256/b63d7ffa43463f74afcc02f9083048c231349b41cc9255dec0840cf8a67b52e0"
+    source: https://github.com/libraw/libraw.git
+    source-commit: cccb97647fcee56801fa68231fa8a38aa8b52ef7
     autotools-configure-parameters:
       - --disable-examples
       - --prefix=/usr
