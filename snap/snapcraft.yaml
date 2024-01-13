@@ -46,8 +46,6 @@ system-usernames:
 layout:
   $SNAP/usr/src/app/upload:
     symlink: $SNAP_COMMON/upload
-  /usr/src/resources:
-    symlink: $SNAP/usr/src/app/resources
   /usr/lib/x86_64-linux-gnu/libheif:
     symlink: $SNAP/usr/lib/x86_64-linux-gnu/libheif
   /usr/lib/vips-modules-8.15:
