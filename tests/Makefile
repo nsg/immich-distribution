@@ -7,6 +7,9 @@ trace: .env/bin/seleniumbase prepare-test-file wait
 ci: prepare-test-file wait
 	pytest tests_selenium.py --server=127.0.0.1 --port=4444 --dashboard --html=report/index.html
 
+test_%: .env/bin/seleniumbase
+	.env/bin/pytest tests_selenium.py --server=127.0.0.1 --port=4444 --headed -k $*
+
 prepare-test-file: external-test-files update-snap-symlinks-for-user
 	mkdir -p ${HOME}/snap/immich-distribution/current/tests
 	for asset in assets/*; do \
