@@ -1,6 +1,6 @@
 name: immich-distribution
 title: Immich Distribution
-version: "v1.90.2"
+version: "v1.91.4"
 base: core22
 grade: stable
 confinement: strict
@@ -155,9 +155,9 @@ apps:
 # This is not a runtime dependency graph. Different parts may
 # depend on each other at runtime.
 #
-#         server
-#            |
-#         libvips_________
+#         server                     web
+#            |                        |
+#         libvips_________         parts-web
 #        /       \        \
 #    cgif    imagemagick   \
 #              /   | \  \   \
@@ -175,36 +175,61 @@ apps:
 
 parts:
   server:
-    plugin: make
-    source: parts/immich-server
+    plugin: nil
+    source: https://github.com/immich-app/immich.git
+    source-tag: v1.91.4
+    override-build: |
+      cd server
+      npm install --save-dev node-gyp # needed for sharp to build from source
+      npm ci
+      npm run build
+      npm prune --omit=dev --omit=optional
+
+      # Verify that sharp was built from source
+      test -e node_modules/sharp/src/build/Release/sharp-linux-x64.node
+
+      mkdir -p ${CRAFT_PART_INSTALL}/usr/src/app
+      cp -r node_modules ${CRAFT_PART_INSTALL}/usr/src/app
+      cp -r dist ${CRAFT_PART_INSTALL}/usr/src/app
+      cp -r bin ${CRAFT_PART_INSTALL}/usr/src/app
+      cp -r resources ${CRAFT_PART_INSTALL}/usr/src/app
+      cp package.json package-lock.json ${CRAFT_PART_INSTALL}/usr/src/app
+
     after:
       - libvips
     build-packages:
       - git
       - pkg-config
-      # - libglib2.0-dev
-      # - libexpat1-dev
-      # - libgsf-1-dev
-      # - libfftw3-dev
-      # - libcfitsio-dev
-      # - libimagequant-dev
-      # - libexif-dev
-      # - libjpeg-dev
-      # - libpng-dev
-      # - libwebp-dev
-      # - libpango1.0-dev
-      # - libtiff-dev
-      # - librsvg2-dev
-      # - libopenslide-dev
-      # - libmatio-dev
-      # - liblcms2-dev
-      # - libopenexr-dev
-      # - liborc-0.4-dev
-      # - libpoppler-glib-dev
     build-snaps:
       - node/20/stable
     stage-snaps:
       - node/20/stable
+
+  parts-server-scripts:
+    plugin: dump
+    source: parts/immich-server/scripts
+
+  web:
+    plugin: nil
+    source: https://github.com/immich-app/immich.git
+    source-tag: v1.91.4
+    override-build: |
+      patch -p0 -i ${CRAFT_PART_SRC}/../../parts-web/src/patches/001-version-announcement-box.patch
+
+      cd web
+      npm ci
+      npm run build
+
+      mkdir -p ${CRAFT_PART_INSTALL}/usr/src/app
+      cp -r build ${CRAFT_PART_INSTALL}/usr/src/app/www
+    after:
+      - parts-web
+    build-snaps:
+      - node/20/stable
+
+  parts-web:
+    plugin: nil
+    source: parts/immich-web
 
   machine-learning:
     plugin: make
@@ -351,7 +376,7 @@ parts:
       - bin/redis-server
 
   pgvecto-rs:
-    source: https://github.com/tensorchord/pgvecto.rs/releases/download/v0.1.13/vectors-pg15_0.1.13_amd64.deb
+    source: https://github.com/tensorchord/pgvecto.rs/releases/download/v0.1.11/vectors-pg15-v0.1.11-x86_64-unknown-linux-gnu.deb
     plugin: dump
     organize:
       usr/share/postgresql/15/extension: usr/local/pgsql/share/extension
@@ -385,8 +410,8 @@ parts:
       - --prefix=/usr
       - --libdir=lib
       - --default-library=shared
-    source: https://github.com/libvips/libvips/releases/download/v8.15.1/vips-8.15.1.tar.xz
-    source-checksum: "sha256/06811f5aed3e7bc03e63d05537ff4b501de5283108c8ee79396c60601a00830c"
+    source: https://github.com/libvips/libvips.git
+    source-commit: 0144d503a4e90ee56830dda9ebc39b2f25ae8b1f
     build-packages:
       - meson
       - ninja-build
@@ -491,7 +516,7 @@ parts:
   imagemagick:
     plugin: make
     source: https://github.com/ImageMagick/ImageMagick.git
-    source-tag: 7.1.1-24
+    source-commit: d5974ce50c84bee43731270a899d7a4a9500cc17
     override-build: |
       ./configure --with-modules --enable-static=yes --with-x=no --with-raw=yes --prefix=/usr
       snapcraftctl build
@@ -578,8 +603,8 @@ parts:
 
   libraw:
     plugin: autotools
-    source: https://github.com/libraw/libraw/archive/0.21.1.tar.gz
-    source-checksum: "sha256/b63d7ffa43463f74afcc02f9083048c231349b41cc9255dec0840cf8a67b52e0"
+    source: https://github.com/libraw/libraw.git
+    source-commit: cccb97647fcee56801fa68231fa8a38aa8b52ef7
     autotools-configure-parameters:
       - --disable-examples
       - --prefix=/usr

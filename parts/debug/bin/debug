@@ -7,7 +7,7 @@ log() {
 }
 
 cat > $SNAP_USER_DATA/versions.js <<EOF
-const sharp = require('/snap/immich-distribution/current/lib/node_modules/immich/node_modules/sharp');
+const sharp = require('/snap/immich-distribution/current/usr/src/app/node_modules/sharp');
 console.log(sharp.versions)
 EOF
 
@@ -22,7 +22,7 @@ curl -so $SNAP_USER_DATA/zfs-broken.png "https://nsg.cc/images/2023/zfs-broken.p
 log "Run debug.js"
 
 cat > $SNAP_USER_DATA/debug.js <<EOF
-const sharp = require('/snap/immich-distribution/current/lib/node_modules/immich/node_modules/sharp');
+const sharp = require('/snap/immich-distribution/current/usr/src/app/node_modules/sharp');
 
 async function resize() {
     await sharp("$SNAP_USER_DATA/zfs-broken.png").toFile("$SNAP_USER_DATA/zfs-broken.jpg");
