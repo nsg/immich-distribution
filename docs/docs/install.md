@@ -39,7 +39,7 @@ A computer with a relatively modern Intel or AMD based CPU, for example the AVX 
 
 ### Used ports
 
-Immich Distribution requires ports `3000-3003`, `5432`, `6379` and `8108` to be unused, port `80` is also required by default, and port `443` if you enable https. See [HAProxy](configuration/haproxy.md) if you like to change the http or https ports. Immich will fail to start if these ports are used by another application.
+Immich Distribution requires ports `3000-3003`, `5432` and `6379` to be unused, port `80` is also required by default, and port `443` if you enable https. See [HAProxy](configuration/haproxy.md) if you like to change the http or https ports. Immich will fail to start if these ports are used by another application.
 
 ??? Info "Used ports with service names"
 
@@ -50,7 +50,6 @@ Immich Distribution requires ports `3000-3003`, `5432`, `6379` and `8108` to be 
     | `3000-3003` | all | NO | Immich Services |
     | `5432` | lo | NO | Postgres - Relation database |
     | `6379` | lo | NO | Redis - In-memory KV database |
-    | `8108` | lo | NO | Typesense - Search database |
 
 ## Connecting to the server
 
