@@ -512,7 +512,7 @@ parts:
   imagemagick:
     plugin: make
     source: https://github.com/ImageMagick/ImageMagick.git
-    source-commit: d5974ce50c84bee43731270a899d7a4a9500cc17
+    source-commit: 963f5fa2a3c87b362e2b6b29a31bff447b75925b
     override-build: |
       ./configure --with-modules --enable-static=yes --with-x=no --with-raw=yes --prefix=/usr
       snapcraftctl build
