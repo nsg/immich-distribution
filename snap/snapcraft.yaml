@@ -1,6 +1,6 @@
 name: immich-distribution
 title: Immich Distribution
-version: "v1.91.4"
+version: "v1.92.1"
 base: core22
 grade: stable
 confinement: strict
@@ -177,7 +177,7 @@ parts:
   server:
     plugin: nil
     source: https://github.com/immich-app/immich.git
-    source-tag: v1.91.4
+    source-tag: v1.92.1
     override-build: |
       cd server
       npm install --save-dev node-gyp # needed for sharp to build from source
@@ -212,7 +212,7 @@ parts:
   web:
     plugin: nil
     source: https://github.com/immich-app/immich.git
-    source-tag: v1.91.4
+    source-tag: v1.92.1
     override-build: |
       patch -p0 -i ${CRAFT_PART_SRC}/../../parts-web/src/patches/001-version-announcement-box.patch
 
