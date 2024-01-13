@@ -155,9 +155,9 @@ apps:
 # This is not a runtime dependency graph. Different parts may
 # depend on each other at runtime.
 #
-#         server
-#            |
-#         libvips_________
+#         server                     web
+#            |                        |
+#         libvips_________         parts-web
 #        /       \        \
 #    cgif    imagemagick   \
 #              /   | \  \   \
@@ -175,36 +175,61 @@ apps:
 
 parts:
   server:
-    plugin: make
-    source: parts/immich-server
+    plugin: nil
+    source: https://github.com/immich-app/immich.git
+    source-tag: v1.91.4
+    override-build: |
+      cd server
+      npm install --save-dev node-gyp # needed for sharp to build from source
+      npm ci
+      npm run build
+      npm prune --omit=dev #--omit=optional
+
+      # Verify that sharp was built from source
+      test -e node_modules/sharp/src/build/Release/sharp-linux-x64.node
+
+      mkdir -p ${CRAFT_PART_INSTALL}/usr/src/app
+      cp -r node_modules ${CRAFT_PART_INSTALL}/usr/src/app
+      cp -r dist ${CRAFT_PART_INSTALL}/usr/src/app
+      cp -r bin ${CRAFT_PART_INSTALL}/usr/src/app
+      cp -r resources ${CRAFT_PART_INSTALL}/usr/src/app
+      cp package.json package-lock.json ${CRAFT_PART_INSTALL}/usr/src/app
+
     after:
       - libvips
     build-packages:
       - git
       - pkg-config
-      # - libglib2.0-dev
-      # - libexpat1-dev
-      # - libgsf-1-dev
-      # - libfftw3-dev
-      # - libcfitsio-dev
-      # - libimagequant-dev
-      # - libexif-dev
-      # - libjpeg-dev
-      # - libpng-dev
-      # - libwebp-dev
-      # - libpango1.0-dev
-      # - libtiff-dev
-      # - librsvg2-dev
-      # - libopenslide-dev
-      # - libmatio-dev
-      # - liblcms2-dev
-      # - libopenexr-dev
-      # - liborc-0.4-dev
-      # - libpoppler-glib-dev
     build-snaps:
       - node/20/stable
     stage-snaps:
       - node/20/stable
+
+  parts-server-scripts:
+    plugin: dump
+    source: parts/immich-server/scripts
+
+  web:
+    plugin: nil
+    source: https://github.com/immich-app/immich.git
+    source-tag: v1.91.4
+    override-build: |
+      patch -p0 -i ${CRAFT_PART_SRC}/../../parts-web/src/patches/001-version-announcement-box.patch
+
+      cd web
+      npm ci
+      npm run build
+
+      mkdir -p ${CRAFT_PART_INSTALL}/usr/src/app
+      cp -r build ${CRAFT_PART_INSTALL}/usr/src/app/www
+    after:
+      - parts-web
+    build-snaps:
+      - node/20/stable
+
+  parts-web:
+    plugin: nil
+    source: parts/immich-web
 
   machine-learning:
     plugin: make
