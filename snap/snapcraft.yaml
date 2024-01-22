@@ -408,6 +408,11 @@ parts:
       - --prefix=/usr
       - --libdir=lib
       - --default-library=shared
+
+      # TIFF support is disabled because libvips believes incorrectly that several RAW formats are tiff files.
+      # Vips sends unsupported file formats to ImageMagick, who handles them correctly.
+      - -Dtiff=disabled
+
     source: https://github.com/libvips/libvips.git
     source-commit: 0144d503a4e90ee56830dda9ebc39b2f25ae8b1f
     build-packages:
