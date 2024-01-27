@@ -329,10 +329,10 @@ parts:
       cp dist/lego $CRAFT_PART_INSTALL/bin
     build-snaps: [go/latest/stable]
 
-  # mimalloc:
-  #   source: https://github.com/microsoft/mimalloc.git
-  #   source-tag: v2.1.2
-  #   plugin: cmake
+  mimalloc:
+    source: https://github.com/microsoft/mimalloc.git
+    source-tag: v2.1.2
+    plugin: cmake
 
   python:
     source: https://www.python.org/ftp/python/3.11.7/Python-3.11.7.tgz
