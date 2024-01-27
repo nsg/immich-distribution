@@ -204,7 +204,7 @@ class TestImmichWeb(BaseCase):
 
         # Re-run the recognition job. I'm not sure if this is an Immich bug or
         # just a quirk of the test environment. Anyway let's just run it again.
-        trigger_job("recognizeFaces")
+        trigger_job("faceDetection")
         time.sleep(2)
         wait_for_empty_job_queue()
 
