@@ -43,6 +43,7 @@ export MACHINE_LEARNING_HOST="0.0.0.0"
 export MACHINE_LEARNING_PORT=3003
 export MACHINE_LEARNING_WORKERS=1
 export MACHINE_LEARNING_WORKER_TIMEOUT=120
+export TRANSFORMERS_CACHE="$SNAP_COMMON/transformers-cache"
 
 export ACME_DOMAIN="$(snapctl get acme-domain)"
 export ACME_EMAIL="$(snapctl get acme-email)"
