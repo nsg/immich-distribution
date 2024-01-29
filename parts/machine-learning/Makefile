@@ -1,4 +1,4 @@
-IMMICH_VERSION := v1.92.1
+IMMICH_VERSION := v1.93.0
 
 # Use our own Python, over the older included one
 export PATH := ${CRAFT_PART_BUILD}/../../python/install/usr/local/bin:$(PATH)
@@ -29,12 +29,14 @@ ${POETRY}: ${POETRY_ENV}
 .PHONY: install
 install:
 	mkdir -p ${CRAFT_PART_INSTALL}/app/machine-learning
+	mkdir -p ${CRAFT_PART_INSTALL}/app/machine-learning/ann
 	mkdir -p ${CRAFT_PART_INSTALL}/bin
 
 	# Deploy application
 	cp immich/machine-learning/log_conf.json ${CRAFT_PART_INSTALL}/app/machine-learning/
 	cp -r immich/machine-learning/app ${CRAFT_PART_INSTALL}/app/machine-learning/app
-	
+	cp -r immich/machine-learning/ann/ann.py ${CRAFT_PART_INSTALL}/app/machine-learning/ann/ann.py
+
 	# Deploy Python packages (installed with Poetry & pip in the build step)
 	cp -r $(shell ${POETRY} -C immich/machine-learning env info -p)/lib/python3.11/site-packages \
 		${CRAFT_PART_INSTALL}/app/machine-learning/python-packages

@@ -72,6 +72,11 @@ Please review the changes and merge this PR if everything looks good.
 ## Monitored upstream files
 $(./update.sh $OLD_VERSION $NEW_VERSION)
 
+## Base image
+Check the base images for recent relevant changes:
+
+* https://github.com/immich-app/base-images/commits/main/
+
 ## Checklist
 * Review the changes above
 * Possible write a news entry (and push it to this PR)
