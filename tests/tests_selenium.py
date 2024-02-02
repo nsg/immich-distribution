@@ -182,6 +182,22 @@ class TestImmichWeb(BaseCase):
         with open("secret.txt", "w") as f:
             f.write(secret)
 
+    def test_005_configure_immich(self):
+        """
+        Configure Immich via the API
+        """
+
+        old_config = requests.get(f"http://{get_ip_address()}/api/system-config", headers=get_headers())
+        self.assertEqual(old_config.status_code, 200)
+
+        data=old_config.json()
+        data["machineLearning"]["facialRecognition"]["minFaces"] = 1
+
+        response = requests.put(
+            f"http://{get_ip_address()}/api/system-config", headers=get_headers(), json=data
+        )
+        self.assertEqual(response.status_code, 200)
+
     def test_005_upload_assets_via_api(self):
         """
         Upload test assets to the server using the API.
