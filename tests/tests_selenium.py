@@ -200,26 +200,39 @@ class TestImmichWeb(BaseCase):
 
     def test_005_upload_assets_via_api(self):
         """
-        Upload test assets to the server using the API.
+        Upload test assets to the server using the API. I maintain a list of testfiles in assets/
+        The Makefile that runs this script should have cloned a specific version of the test-assets
+        repo from the upstream Immich repo that I handpicked a few interesting files from.
         """
-        
-        snap_readable_path = os.path.join(
-            os.environ["HOME"],
-            "snap/immich-distribution/current/"
-        )
 
-        for path in glob.glob(f"{snap_readable_path}/tests/*"):
-            if path.endswith(".css") or path.endswith(".js"):
-                continue
-            r = import_asset(path)
+        test_images = [
+            "assets/ai-apple.tiff",
+            "assets/ai-people1.png",
+            "assets/ai-people2.png",
+            "assets/ai-people3.png",
+            "assets/field.jpg",
+            "assets/grass.MP.jpg",
+            "assets/memory.jpg",
+            "assets/ohm.gif",
+            "assets/plane.jpg",
+            "assets/ship.mp4",
+            "assets/ship-vp9.webm",
+            "test-assets/formats/heic/IMG_2682.heic",
+            "test-assets/formats/webp/denali.webp",
+            "test-assets/formats/raw/Nikon/D80/glarus.nef",
+            "test-assets/formats/raw/Nikon/D700/philadelphia.nef",
+        ]
+
+        for test_image in test_images:
+            r = import_asset(test_image)
             self.assertNotEqual(r.get('id'), None)
 
         # ML models are downloaded in the background when we upload assets
         # Wait for them to complete, and the queue to be empty before continuing
         wait_for_empty_job_queue()
 
-        # Re-run the recognition job. I'm not sure if this is an Immich bug or
-        # just a quirk of the test environment. Anyway let's just run it again.
+        # # Re-run the recognition job. I'm not sure if this is an Immich bug or
+        # # just a quirk of the test environment. Anyway let's just run it again.
         trigger_job("faceDetection")
         time.sleep(2)
         wait_for_empty_job_queue()
@@ -229,7 +242,7 @@ class TestImmichWeb(BaseCase):
         Use the API to verify that the assets were uploaded correctly.
         """
         assets = get_assets()
-        self.assertEqual(len(assets), 13)
+        self.assertEqual(len(assets), 15)
 
     def test_100_verify_exif_location_extraction(self):
         """
@@ -262,10 +275,10 @@ class TestImmichWeb(BaseCase):
         Extract the EXIF data from the images and verify that it is correct.
         """
 
-        assets = get_assets(["ohm", "grass.MP", "greyhounds-looking-for-a-table"])
+        assets = get_assets(["ohm", "grass.MP", "IMG_2682"])
         ohm = assets['ohm']
         grass = assets['grass.MP']
-        heic = assets['greyhounds-looking-for-a-table']
+        heic = assets['IMG_2682']
 
         self.assertEqual(ohm['type'], "IMAGE")
         self.assertEqual(ohm['exifInfo']['exifImageWidth'], 640)
@@ -276,9 +289,9 @@ class TestImmichWeb(BaseCase):
         self.assertEqual(grass['exifInfo']['city'], "Mora")
 
         self.assertEqual(heic['type'], "IMAGE")
-        self.assertEqual(heic['exifInfo']['model'], "iPhone 12 Pro")
-        self.assertEqual(heic['exifInfo']['dateTimeOriginal'], "2023-09-28T07:44:03.886Z")
-        self.assertEqual(heic['exifInfo']['country'], "Spain")
+        self.assertEqual(heic['exifInfo']['model'], "iPhone 7")
+        self.assertEqual(heic['exifInfo']['dateTimeOriginal'], "2019-03-21T16:04:22.348Z")
+        self.assertEqual(heic['exifInfo']['country'], "United States of America")
 
     def test_100_verify_people_detected(self):
         """
@@ -294,4 +307,4 @@ class TestImmichWeb(BaseCase):
         # query the API to get a list of people
         r = requests.get(f"http://{get_ip_address()}/api/person", headers=headers)
         people = r.json()
-        self.assertGreater(people['total'], 6)
+        self.assertEqual(people['total'], 6)

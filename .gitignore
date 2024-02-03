@@ -12,5 +12,5 @@ __pycache__
 /tests/assets/live.js
 /tests/assets/pytest_style.css
 /tests/dashboard.html
-/tests/external-test-files
+/tests/test-assets
 /prime
