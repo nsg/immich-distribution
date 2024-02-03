@@ -14,7 +14,8 @@ build: immich ${POETRY}
 		--no-interaction \
 		--no-ansi \
 		--no-root \
-		--only main
+		--with cpu \
+		--without dev
 
 immich:
 	git clone --branch ${IMMICH_VERSION} https://github.com/immich-app/immich.git
