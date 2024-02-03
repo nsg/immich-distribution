@@ -1,29 +1,20 @@
-test: .env/bin/seleniumbase prepare-test-file wait check-selenium
+#
+# This Makefile is used to run tests for Immich Distribution.
+# The tests are written in Python and use the SeleniumBase framework.
+#
+
+test: .env/bin/seleniumbase test-assets wait check-selenium
 	.env/bin/pytest tests_selenium.py --server=127.0.0.1 --port=4444 --headed --dashboard --html=report/index.html ${EXTRA_ARGS}
 
-trace: .env/bin/seleniumbase prepare-test-file wait
-	.env/bin/pytest tests_selenium.py --server=127.0.0.1 --port=4444 --headed --dashboard --html=report/index.html --trace
-
-ci: prepare-test-file wait
+ci: test-assets wait
 	pytest tests_selenium.py --server=127.0.0.1 --port=4444 --dashboard --html=report/index.html
 
-test_%: .env/bin/seleniumbase
-	.env/bin/pytest tests_selenium.py --server=127.0.0.1 --port=4444 --headed -k $*
+test_%: .env/bin/seleniumbase test-assets
+	.env/bin/pytest tests_selenium.py --server=127.0.0.1 --port=4444 --headed -k $* --html=report/index.html
 
-prepare-test-file: external-test-files update-snap-symlinks-for-user
-	mkdir -p ${HOME}/snap/immich-distribution/current/tests
-	for asset in assets/*; do \
-		echo $$asset | grep -q py__ \
-			|| cp $$asset ${HOME}/snap/immich-distribution/current/tests/; \
-	done
-	cp external-test-files/* ${HOME}/snap/immich-distribution/current/tests
-
-external-test-files: update-snap-symlinks-for-user
-	mkdir -p external-test-files
-
-	cd external-test-files && for file in $(shell cat external-test-files.list); do \
-		wget --content-disposition -c $$file; \
-	done
+test-assets:
+	git clone https://github.com/immich-app/test-assets.git
+	cd test-assets && git checkout 61131e84ec91d316265aebe375b3155308baaa89
 
 update-snap-symlinks-for-user:
 	immich-distribution.backup -h 2>&1 | grep -q root
