@@ -44,7 +44,7 @@ docs:
 
 .PHONY: reset
 reset: clean
-	sudo snap remove immich-distribution
+	sudo snap remove --purge immich-distribution
 	sudo rm -rf prime
 
 .PHONY: clean

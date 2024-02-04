@@ -1,4 +1,4 @@
-IMMICH_VERSION := v1.93.3
+IMMICH_VERSION := v1.94.1
 
 # Use our own Python, over the older included one
 export PATH := ${CRAFT_PART_BUILD}/../../python/install/usr/local/bin:$(PATH)
@@ -14,7 +14,8 @@ build: immich ${POETRY}
 		--no-interaction \
 		--no-ansi \
 		--no-root \
-		--only main
+		--with cpu \
+		--without dev
 
 immich:
 	git clone --branch ${IMMICH_VERSION} https://github.com/immich-app/immich.git
