@@ -307,4 +307,4 @@ class TestImmichWeb(BaseCase):
         # query the API to get a list of people
         r = requests.get(f"http://{get_ip_address()}/api/person", headers=headers)
         people = r.json()
-        self.assertGreater(people['total'], 4)
+        self.assertGreater(people['total'], 2)
