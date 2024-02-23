@@ -382,7 +382,7 @@ parts:
       - bin/redis-server
 
   pgvecto-rs:
-    source: https://github.com/tensorchord/pgvecto.rs/releases/download/v0.1.11/vectors-pg15-v0.1.11-x86_64-unknown-linux-gnu.deb
+    source: https://github.com/tensorchord/pgvecto.rs/releases/download/v0.2.0/vectors-pg15_0.2.0_amd64.deb
     plugin: dump
     organize:
       usr/share/postgresql/15/extension: usr/local/pgsql/share/extension
