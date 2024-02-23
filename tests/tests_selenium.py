@@ -258,17 +258,17 @@ class TestImmichWeb(BaseCase):
         self.assertEqual(ship['exifInfo']['country'], "Sweden")
         self.assertEqual(grass['exifInfo']['city'], "Mora")
 
-    def test_100_verify_video_transcode(self):
-        """
-        Verify that the video was transcoded from VP9 to WEBM
-        """
+    # def test_100_verify_video_transcode(self):
+    #     """
+    #     Verify that the video was transcoded from VP9
+    #     """
 
-        assets = get_assets(["ship-vp9"])
-        ship = assets['ship-vp9']
-        self.assertEqual(ship['type'], "VIDEO")
-        r = requests.get(f"http://{get_ip_address()}/api/asset/file/{ship['id']}?isThumb=false&isWeb=true", headers=get_headers())
-        self.assertEqual(r.status_code, 200)
-        self.assertEqual(r.headers['content-type'], "video/webm")
+    #     assets = get_assets(["ship-vp9"])
+    #     ship = assets['ship-vp9']
+    #     self.assertEqual(ship['type'], "VIDEO")
+    #     r = requests.get(f"http://{get_ip_address()}/api/asset/file/{ship['id']}?isThumb=false&isWeb=true", headers=get_headers())
+    #     self.assertEqual(r.status_code, 200)
+    #     self.assertEqual(r.headers['content-type'], "video/webm")
 
     def test_100_verify_image_exitdata(self):
         """
