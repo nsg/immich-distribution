@@ -26,7 +26,6 @@ while sleep 5; do
         echo "Running manager migrations from version $MANAGER_MIGRATIONS_VERSION to $MANAGER_MIGRATIONS_VERSION_TARGET"
         while [[ $MANAGER_MIGRATIONS_VERSION -lt $MANAGER_MIGRATIONS_VERSION_TARGET ]]; do
             MANAGER_MIGRATIONS_VERSION=$((MANAGER_MIGRATIONS_VERSION + 1))
-            echo "Running manager migration $MANAGER_MIGRATIONS_VERSION"
             "manager_migration_$MANAGER_MIGRATIONS_VERSION"
             if [[ $? -ne 0 ]]; then
                 echo "Failed to run manager migration $MANAGER_MIGRATIONS_VERSION"

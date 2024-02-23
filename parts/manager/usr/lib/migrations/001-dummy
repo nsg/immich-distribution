@@ -1,4 +1,0 @@
-
-manager_migration_1() {
-    echo "A dummy migraion that does nothing. This is just a NOOP to test the manager"
-}
