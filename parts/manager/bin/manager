@@ -6,10 +6,12 @@ set -eu -o pipefail
 
 MANAGER_MIGRATIONS_VERSION_TARGET="1"
 
-if [[ ! $MANAGER_MIGRATIONS_VERSION =~ ^[0-9]+$ ]]; then
-    echo "Invalid manager-migrations-version: $MANAGER_MIGRATIONS_VERSION"
-    exit 1
-fi
+validate_version() {
+    if [[ ! $1 =~ ^[0-9]+$ ]]; then
+        echo "Invalid manager-migrations-version: $1"
+        exit 1
+    fi
+}
 
 # Load migrations
 for file in $SNAP/usr/lib/migrations/*; do
@@ -18,6 +20,7 @@ done
 
 while sleep 5; do
     MANAGER_MIGRATIONS_VERSION="$(snapctl get manager-migrations-version)"
+    validate_version "$MANAGER_MIGRATIONS_VERSION"
 
     if [[ $MANAGER_MIGRATIONS_VERSION -lt $MANAGER_MIGRATIONS_VERSION_TARGET ]]; then
         echo "Running manager migrations from version $MANAGER_MIGRATIONS_VERSION to $MANAGER_MIGRATIONS_VERSION_TARGET"
