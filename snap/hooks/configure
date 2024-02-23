@@ -30,6 +30,10 @@ if [[ $(snapctl get haproxy-https-bind) == "" ]]; then
     snapctl set haproxy-https-bind="*:443"
 fi
 
+if [[ $(snapctl get manager-migrations-version) == "" ]]; then
+    snapctl set manager-migrations-version="0"
+fi
+
 # Restart services
 snapctl restart immich-distribution.postgres
 snapctl restart immich-distribution.haproxy
