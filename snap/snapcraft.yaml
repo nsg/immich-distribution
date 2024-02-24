@@ -1,6 +1,6 @@
 name: immich-distribution
 title: Immich Distribution
-version: "v1.94.1"
+version: "v1.95.0"
 base: core22
 grade: stable
 confinement: strict
@@ -127,6 +127,14 @@ apps:
     plugs:
       - network
 
+  manager:
+    command: bin/manager
+    daemon: simple
+    restart-delay: 60s
+    after:
+      - immich-server
+      - immich-microservices
+
   backup:
     command: bin/backup
 
@@ -175,7 +183,7 @@ parts:
   server:
     plugin: nil
     source: https://github.com/immich-app/immich.git
-    source-tag: v1.94.1
+    source-tag: v1.95.0
     override-build: |
       cd server
       npm install --save-dev node-gyp # needed for sharp to build from source
@@ -210,7 +218,7 @@ parts:
   web:
     plugin: nil
     source: https://github.com/immich-app/immich.git
-    source-tag: v1.94.1
+    source-tag: v1.95.0
     override-build: |
       # Patch version announcement box with a version that refers to the snap instead of Docker
       patch -p0 -i ${CRAFT_PART_SRC}/../../parts-web/src/patches/001-version-announcement-box.patch
@@ -285,6 +293,10 @@ parts:
       curl https://download.geonames.org/export/dump/admin2Codes.txt -o $CRAFT_PART_INSTALL/usr/src/app/resources/admin2Codes.txt
     build-packages:
       - curl
+
+  manager:
+    plugin: dump
+    source: parts/manager
 
   ffmpeg:
     plugin: dump
@@ -382,7 +394,7 @@ parts:
       - bin/redis-server
 
   pgvecto-rs:
-    source: https://github.com/tensorchord/pgvecto.rs/releases/download/v0.1.11/vectors-pg15-v0.1.11-x86_64-unknown-linux-gnu.deb
+    source: https://github.com/tensorchord/pgvecto.rs/releases/download/v0.2.0/vectors-pg15_0.2.0_amd64.deb
     plugin: dump
     organize:
       usr/share/postgresql/15/extension: usr/local/pgsql/share/extension

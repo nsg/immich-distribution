@@ -1,5 +1,5 @@
---- web/src/lib/components/shared-components/version-announcement-box.svelte	2023-11-03 16:39:01.955002164 +0100
-+++ web/src/lib/components/shared-components/version-announcement-box-snap.svelte	2023-11-03 16:45:13.033353862 +0100
+--- web/src/lib/components/shared-components/version-announcement-box.svelte	2024-02-23 20:55:55.785325284 +0100
++++ web/src/lib/components/shared-components/version-announcement-box-snap.svelte	2024-02-23 20:58:52.129510730 +0100
 @@ -40,20 +40,28 @@
        <p class="mb-4 text-2xl">🎉 NEW VERSION AVAILABLE 🎉</p>
  

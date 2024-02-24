@@ -1,0 +1,39 @@
+#!/bin/bash
+set -eu -o pipefail
+
+# The manager is a small service that run different maintenance tasks in the
+# background that can't be run from the hooks during installation/upgrade.
+
+MANAGER_MIGRATIONS_VERSION_TARGET="1"
+
+validate_version() {
+    if [[ ! $1 =~ ^[0-9]+$ ]]; then
+        echo "Invalid manager-migrations-version: $1"
+        exit 1
+    fi
+}
+
+# Load migrations
+for file in $SNAP/usr/lib/migrations/*; do
+    . "$file"
+done
+
+while sleep 5; do
+    MANAGER_MIGRATIONS_VERSION="$(snapctl get manager-migrations-version)"
+    validate_version "$MANAGER_MIGRATIONS_VERSION"
+
+    if [[ $MANAGER_MIGRATIONS_VERSION -lt $MANAGER_MIGRATIONS_VERSION_TARGET ]]; then
+        echo "Running manager migrations from version $MANAGER_MIGRATIONS_VERSION to $MANAGER_MIGRATIONS_VERSION_TARGET"
+        while [[ $MANAGER_MIGRATIONS_VERSION -lt $MANAGER_MIGRATIONS_VERSION_TARGET ]]; do
+            MANAGER_MIGRATIONS_VERSION=$((MANAGER_MIGRATIONS_VERSION + 1))
+            "manager_migration_$MANAGER_MIGRATIONS_VERSION"
+            if [[ $? -ne 0 ]]; then
+                echo "Failed to run manager migration $MANAGER_MIGRATIONS_VERSION"
+                exit 1
+            fi
+            snapctl set manager-migrations-version="$MANAGER_MIGRATIONS_VERSION"
+        done
+    else
+        sleep 60
+    fi
+done
