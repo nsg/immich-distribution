@@ -55,12 +55,17 @@ def trigger_job(job_name):
     return r.json()
 
 def wait_for_empty_job_queue():
-    for job_name, job_data in get_all_jobs().items():
-        status = job_data['queueStatus']['isActive']
-        if status == True:
-            print(f"Queue {job_name} is running")
-            time.sleep(1)
-            return wait_for_empty_job_queue()
+    while True:
+        time.sleep(1)
+        running_or_paused_jobs = 0
+        for _, job_data in get_all_jobs().items():
+            paused = job_data['queueStatus']['isPaused']
+            active = job_data['queueStatus']['isActive']
+            if paused or active:
+                running_or_paused_jobs += 1
+
+        if running_or_paused_jobs == 0:
+            break
 
 def css_selector_path(element):
     """ Returns a CSS selector that will uniquely select the given element. """
@@ -109,21 +114,10 @@ class TestImmichWeb(BaseCase):
             if self.is_element_present("button:contains('Acknowledge')"):
                 self.click("button:contains('Acknowledge')")
 
-    def register(self):
-        # Welcome page, click button
-        if "Welcome" in self.get_title():
-            self.click("button")
-
-        self.type("input[id='email']", "foo@example.com")
-        self.type("input[id='password']", "secret")
-        self.type("input[id='confirmPassword']", "secret")
-        self.type("input[id='name']", "Ture Test")
-        self.click("button")
-
     def login(self):
         self.type("input[id='email']", "foo@example.com")
         self.type("input[id='password']", "secret")
-        self.click("button")
+        self.click("button:contains('Login')")
 
     def test_001_register(self):
         """
@@ -131,7 +125,18 @@ class TestImmichWeb(BaseCase):
         """
 
         self.immich(login=False)
-        self.register()
+
+        # Welcome page, click button
+        if "Welcome" in self.get_title():
+            self.click("button")
+
+        # Register a new user
+        self.type("input[id='email']", "foo@example.com")
+        self.type("input[id='password']", "secret")
+        self.type("input[id='confirmPassword']", "secret")
+        self.type("input[id='name']", "Ture Test")
+        self.click("button:contains('Sign up')")
+
         self.assert_title("Login - Immich")
 
     def test_002_first_login(self):
