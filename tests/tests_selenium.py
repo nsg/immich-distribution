@@ -255,9 +255,10 @@ class TestImmichWeb(BaseCase):
         correctly as a named location.
         """
 
-        assets = get_assets(["ship", "grass.MP"])
-        ship = assets['ship']
-        grass = assets['grass.MP']
+        assets = get_assets(["ship.mp4", "grass.MP.jpg"])
+
+        ship = assets['ship.mp4']
+        grass = assets['grass.MP.jpg']
 
         self.assertEqual(ship['type'], "VIDEO")
         self.assertEqual(ship['exifInfo']['country'], "Sweden")
@@ -280,10 +281,10 @@ class TestImmichWeb(BaseCase):
         Extract the EXIF data from the images and verify that it is correct.
         """
 
-        assets = get_assets(["ohm", "grass.MP", "IMG_2682"])
-        ohm = assets['ohm']
-        grass = assets['grass.MP']
-        heic = assets['IMG_2682']
+        assets = get_assets(["ohm.gif", "grass.MP.jpg", "IMG_2682.heic"])
+        ohm = assets['ohm.gif']
+        grass = assets['grass.MP.jpg']
+        heic = assets['IMG_2682.heic']
 
         self.assertEqual(ohm['type'], "IMAGE")
         self.assertEqual(ohm['exifInfo']['exifImageWidth'], 640)
