@@ -1,4 +1,4 @@
-IMMICH_VERSION := v1.98.1
+IMMICH_VERSION := v1.98.2
 
 # Use our own Python, over the older included one
 export PATH := ${CRAFT_PART_BUILD}/../../python/install/usr/local/bin:$(PATH)
