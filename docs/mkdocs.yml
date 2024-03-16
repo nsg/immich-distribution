@@ -10,7 +10,7 @@ nav:
     - configuration/security.md
     - HTTPS: configuration/https.md
     - Library:
-      - Default Library: configuration/library/default.md
+      - Storage Locations: configuration/library/storage.md
       - External Library: configuration/library/external.md
       - How To: configuration/library/howto.md
     - configuration/backup-restore.md
