@@ -9,7 +9,10 @@ nav:
     - Introduction: configuration/index.md
     - configuration/security.md
     - HTTPS: configuration/https.md
-    - configuration/storage.md
+    - Library:
+      - Storage Locations: configuration/library/storage.md
+      - External Library: configuration/library/external.md
+      - How To: configuration/library/howto.md
     - configuration/backup-restore.md
     - configuration/postgres.md
     - configuration/haproxy.md
@@ -18,6 +21,7 @@ nav:
     - Upgrade: build/upgrade.md
     - Patches: build/patches.md
     - Tests: build/tests.md
+    - Statistics: build/statistics.md
 
 theme:
   name: material
