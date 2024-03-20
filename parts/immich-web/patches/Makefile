@@ -1,4 +1,4 @@
-VERSION=v1.98.2
+VERSION=v1.99.0
 SOURCE_FILE_PATH=https://raw.githubusercontent.com/immich-app/immich/${VERSION}/web/src/lib/components/shared-components/version-announcement-box.svelte
 
 download-patch:
