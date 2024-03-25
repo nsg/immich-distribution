@@ -186,7 +186,10 @@ parts:
     source-tag: v1.99.0
     override-build: |
       cd server
-      npm install --save-dev node-gyp # needed for sharp to build from source
+
+      # needed for sharp to build from source
+      npm install --save-dev node-addon-api node-gyp
+
       npm ci
       npm run build
       npm prune --omit=dev --omit=optional
