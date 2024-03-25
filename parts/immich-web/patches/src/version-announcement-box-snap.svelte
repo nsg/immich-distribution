@@ -40,8 +40,7 @@
       <p class="mb-4 text-2xl">🎉 NEW VERSION AVAILABLE 🎉</p>
 
       <div>
-        You are running an community build of
-        <span class="font-immich-title font-bold text-immich-primary dark:text-immich-dark-primary">IMMICH</span>,
+        You are running an community build of IMMICH,
         packaged in a
         <span class="font-medium underline"
           ><a href="https://snapcraft.io/immich-distribution" target="_blank" rel="noopener noreferrer"

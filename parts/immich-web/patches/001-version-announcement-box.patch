@@ -1,13 +1,11 @@
---- web/src/lib/components/shared-components/version-announcement-box.svelte	2024-03-12 09:00:13.798182416 +0100
-+++ web/src/lib/components/shared-components/version-announcement-box-snap.svelte	2024-03-12 09:00:57.426235766 +0100
-@@ -40,20 +40,28 @@
+--- web/src/lib/components/shared-components/version-announcement-box.svelte	2024-03-25 18:30:50.900292074 +0100
++++ web/src/lib/components/shared-components/version-announcement-box-snap.svelte	2024-03-25 18:32:08.964627303 +0100
+@@ -40,18 +40,27 @@
        <p class="mb-4 text-2xl">🎉 NEW VERSION AVAILABLE 🎉</p>
  
        <div>
--        Hi friend, there is a new release of
-+        You are running an community build of
-         <span class="font-immich-title font-bold text-immich-primary dark:text-immich-dark-primary">IMMICH</span>,
--        please take your time to visit the
+-        Hi friend, there is a new version of the application please take your time to visit the
++        You are running an community build of IMMICH,
 +        packaged in a
 +        <span class="font-medium underline"
 +          ><a href="https://snapcraft.io/immich-distribution" target="_blank" rel="noopener noreferrer"
