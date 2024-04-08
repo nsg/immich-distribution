@@ -10,7 +10,7 @@ build:
 
 .PHONY: try
 try:
-	snapcraft try --debug
+	snapcraft try --debug --verbosity debug
 	sudo snap try prime
 
 .PHONY: shell
