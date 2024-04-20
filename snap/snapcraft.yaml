@@ -1,6 +1,6 @@
 name: immich-distribution
 title: Immich Distribution
-version: "v1.101.0"
+version: "v1.102.0"
 base: core22
 grade: stable
 confinement: strict
@@ -183,7 +183,7 @@ parts:
   server:
     plugin: nil
     source: https://github.com/immich-app/immich.git
-    source-tag: v1.101.0
+    source-tag: v1.102.0
     override-build: |
       craftctl default
 
@@ -245,7 +245,7 @@ parts:
   web:
     plugin: nil
     source: https://github.com/immich-app/immich.git
-    source-tag: v1.101.0
+    source-tag: v1.102.0
     override-build: |
       # Patch version announcement box with a version that refers to the snap instead of Docker
       patch -p0 -i ${CRAFT_PART_SRC}/../../parts-web/src/patches/001-version-announcement-box.patch
