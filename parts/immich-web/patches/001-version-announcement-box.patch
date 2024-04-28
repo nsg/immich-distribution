@@ -1,35 +1,36 @@
---- web/src/lib/components/shared-components/version-announcement-box.svelte	2024-03-25 18:30:50.900292074 +0100
-+++ web/src/lib/components/shared-components/version-announcement-box-snap.svelte	2024-03-25 18:32:08.964627303 +0100
-@@ -40,18 +40,27 @@
-       <p class="mb-4 text-2xl">🎉 NEW VERSION AVAILABLE 🎉</p>
+--- web/src/lib/components/shared-components/version-announcement-box.svelte	2024-04-28 22:29:03.615361123 +0200
++++ web/src/lib/components/shared-components/version-announcement-box-snap.svelte	2024-04-28 22:36:08.752493074 +0200
+@@ -35,17 +35,23 @@
+ {#if showModal}
+   <FullScreenModal id="new-version-modal" title="🎉 NEW VERSION AVAILABLE" onClose={() => (showModal = false)}>
+     <div>
+-      Hi friend, there is a new version of the application please take your time to visit the
+-      <span class="font-medium underline"
+-        ><a href="https://github.com/immich-app/immich/releases/latest" target="_blank" rel="noopener noreferrer"
+-          >release notes</a
+-        ></span
+-      >
+-      and ensure your <code>docker-compose</code>, and <code>.env</code> setup is up-to-date to prevent any misconfigurations,
+-      especially if you use WatchTower or any mechanism that handles updating your application automatically.
+-    </div>
  
-       <div>
--        Hi friend, there is a new version of the application please take your time to visit the
-+        You are running an community build of IMMICH,
-+        packaged in a
-+        <span class="font-medium underline"
-+          ><a href="https://snapcraft.io/immich-distribution" target="_blank" rel="noopener noreferrer"
-+            >snap package</a
-+          >.</span
-+        >
-+        The snap package should update automatically in a few days, you can inspect the progress at
-+        <span class="font-medium underline"
-+          ><a href="https://github.com/nsg/immich-distribution/labels/new-version" target="_blank" rel="noopener noreferrer"
-+            >the issue tracker</a
-+          >.</span>
-+        If this breaks compability with the mobile client please provide this information, otherwise relax and give us time. Look at the
-         <span class="font-medium underline"
-           ><a href="https://github.com/immich-app/immich/releases/latest" target="_blank" rel="noopener noreferrer"
-             >release notes</a
-           ></span
-         >
--        and ensure your <code>docker-compose</code>, and <code>.env</code> setup is up-to-date to prevent any misconfigurations,
--        especially if you use WatchTower or any mechanism that handles updating your application automatically.
-+        for news and information of what the new release contains.
-       </div>
+-    <div class="mt-4 font-medium">Your friend, Alex</div>
++      You are running an community build of IMMICH, packaged in a
++      <span class="font-medium underline">
++        <a href="https://snapcraft.io/immich-distribution" target="_blank" rel="noopener noreferrer">snap package</a>
++      </span>
++      The snap package should update automatically in a few days, you can inspect the progress at
++
++      <span class="font-medium underline">
++        <a href="https://github.com/nsg/immich-distribution/labels/new-version" target="_blank" rel="noopener noreferrer">the issue tracker</a>.
++      </span>
++
++      If this breaks compability with the mobile client please provide this information, otherwise relax and give us time. Look at the
++      <span class="font-medium underline">
++        <a href="https://github.com/immich-app/immich/releases/latest" target="_blank" rel="noopener noreferrer">release notes</a>
++      </span>
++      for news and information of what the new release contains.
++    </div>
  
--      <div class="mt-4 font-medium">Your friend, Alex</div>
--
-       <div class="font-sm mt-8">
-         <code>Server Version: {serverVersion}</code>
-         <br />
+     <div class="font-sm mt-8">
+       <code>Server Version: {serverVersion}</code>
