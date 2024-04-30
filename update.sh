@@ -46,7 +46,7 @@ fi
 git checkout $NEW_RELEASE_TAG
 
 CHECK_FILES="
-    server/src/infra/migrations
+    server/src/migrations
     server/Dockerfile
     server/start-server.sh
     server/start-microservices.sh
