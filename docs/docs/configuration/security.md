@@ -10,8 +10,6 @@ Immich is built as several discrete services communicating with each other over 
 
     If this system is shared with other untrusted users or processes consider deploying this inside a private network namespace, container or VM. It's possible to trigger unwanted API calls with a command like `curl http://127.0.0.1:3003/...`.
 
-There are a few ports listening to all interfaces, I hope to fix this soon. But overall I recommend to configure a firewall and block ports `3000-3003` while you wait.
-
 ## Snapd Sandbox
 
 If your Linux distribution fully supports all the security futures of snapd (like Ubuntu) the sandbox should keep processes running inside the `immich-distribution` package contained. Permissions are given per-application inside the package, but overall they are allowed to access the network, and listen on the network for incoming connections. No file system access outside the sandbox or any other special permissions are granted.

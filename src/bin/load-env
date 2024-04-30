@@ -30,6 +30,8 @@ export DB_DATABASE_NAME="immich"
 
 export REDIS_HOSTNAME="127.0.0.1"
 
+export HOST="127.0.0.1" # Used by server and microservices
+
 export IMMICH_SERVER_URL="http://127.0.0.1:3001" # Not used by Immich anymore, but still used by Immich Distribution
 export IMMICH_MACHINE_LEARNING_URL="http://127.0.0.1:3003"
 export IMMICH_WEB_ROOT="$SNAP/usr/src/app/www"
@@ -39,7 +41,7 @@ export IMMICH_MEDIA_LOCATION="$SNAP_COMMON/upload"
 export MACHINE_LEARNING_LOG_LEVEL="warning"
 export MACHINE_LEARNING_IP="127.0.0.1"
 export MACHINE_LEARNING_CACHE_FOLDER="$SNAP_COMMON/cache"
-export MACHINE_LEARNING_HOST="0.0.0.0"
+export MACHINE_LEARNING_HOST="127.0.0.1"
 export MACHINE_LEARNING_PORT=3003
 export MACHINE_LEARNING_WORKERS=1
 export MACHINE_LEARNING_WORKER_TIMEOUT=120
