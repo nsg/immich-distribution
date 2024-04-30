@@ -213,7 +213,7 @@ parts:
 
       npm ci
       npm run build
-      npm prune --omit=dev --omit=optional
+      npm prune --omit=dev #--omit=optional
 
       # Verify that sharp was built from source, and that the binary is still present (after ci & prune)
       if [[ ! -e node_modules/sharp/src/build/Release/sharp-linux-x64.node ]]; then
