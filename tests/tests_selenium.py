@@ -177,10 +177,7 @@ class TestImmichWeb(BaseCase):
         self.immich(login=True)
         self.immich(login=False, path="user-settings")
         self.wait_for_element("h2")
-        soup = self.get_beautiful_soup()
-        api_keys_div = soup.find(string="API Keys").parent.parent.parent
-        api_keys_button = api_keys_div.find("button")
-        self.click(css_selector_path(api_keys_button))
+        self.click("button:contains('API Keys')")
         self.click("button:contains('New API Key')")
         self.type("input[id='name']", "test\n")
         secret = self.get_text("textarea[id='secret']")
