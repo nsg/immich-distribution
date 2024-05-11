@@ -24,7 +24,7 @@ $SNAP/bin/lego $(lego_staging_string) \
     --email="$ACME_EMAIL" \
     --domains="$ACME_DOMAIN" \
     --http \
-    --http.port=":8081" \
+    --http.port=":8181" \
     run
 
 if [ -e "$ACME_CONFIG_PATH/certificates/$ACME_DOMAIN.crt" ]; then
