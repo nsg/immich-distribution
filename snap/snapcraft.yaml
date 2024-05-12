@@ -55,6 +55,11 @@ layout:
   /usr/lib/ImageMagick-7.1.1:
     symlink: $SNAP/usr/lib/ImageMagick-7.1.1
 
+hooks:
+  configure:
+    plugs:
+      - network
+
 apps:
   psql:
     command: bin/psql

@@ -48,6 +48,7 @@ export MACHINE_LEARNING_WORKERS=1
 export MACHINE_LEARNING_WORKER_TIMEOUT=120
 export TRANSFORMERS_CACHE="$MACHINE_LEARNING_CACHE_FOLDER"
 
+export ACME_PORT="$(snapctl get acme-port)"
 export ACME_DOMAIN="$(snapctl get acme-domain)"
 export ACME_EMAIL="$(snapctl get acme-email)"
 export ACME_STAGING="$(snapctl get acme-staging)"

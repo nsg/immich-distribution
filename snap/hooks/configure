@@ -4,6 +4,12 @@ random_string() {
     cat /dev/urandom | tr -dc '[:alpha:]' | fold -w ${1:-20} | head -n 1
 }
 
+free_port() {
+    for port in $(seq 34000 36000); do
+        (echo > /dev/tcp/0.0.0.0/$port) >/dev/null 2>&1 || { echo "$port"; break; }
+    done
+}
+
 # Clean up old reverse geocoding data. This information is stored in Postgres since Immich v1.89
 rm -rf $SNAP_COMMON/reverse-geocoding-dump
 
@@ -28,6 +34,10 @@ fi
 
 if [[ $(snapctl get haproxy-https-bind) == "" ]]; then
     snapctl set haproxy-https-bind="*:443"
+fi
+
+if [[ $(snapctl get acme-port) == "" ]]; then
+    snapctl set acme-port="$(free_port)"
 fi
 
 if [[ $(snapctl get manager-migrations-version) == "" ]]; then
