@@ -15,6 +15,6 @@ $SNAP/bin/lego $(lego_staging_string) \
     --email="$ACME_EMAIL" \
     --domains="$ACME_DOMAIN" \
     --http \
-    --http.port=":8181" \
+    --http.port=":${ACME_PORT}" \
     renew \
     --renew-hook="$SNAP/bin/renew-hook"
