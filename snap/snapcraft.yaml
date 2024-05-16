@@ -55,6 +55,11 @@ layout:
   /usr/lib/ImageMagick-7.1.1:
     symlink: $SNAP/usr/lib/ImageMagick-7.1.1
 
+hooks:
+  configure:
+    plugs:
+      - network
+
 apps:
   psql:
     command: bin/psql
@@ -327,11 +332,11 @@ parts:
 
   ffmpeg:
     plugin: dump
-    # These builds are linked from the official ffmpeg site, so I assume they are safe.
-    # It's a little annoying that there is not a stable URL, this link will be updated in the future and
-    # the checksum will change... when that happens, bump it or select the same release from "old-releases".
-    source: https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz
-    source-checksum: md5/8a34e2ab52b72777a8dcd3ff5defbcd8
+    # I'm using a static build from John Van Sickle, his builds are linked from the official ffmpeg site.
+    # There is no stable URL so I'm hosting a copy myself. The files are/where hosted at:
+    # https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz
+    source: http://assets.immich-distribution.nsg.cc/ffmpeg-6.1-amd64-static.tar.xz
+    source-checksum: sha256/1e1f535fbd6bbdcc652e592f780238c24f69006c1abc0698e82d1acbc25a282f
     override-build: |
       mkdir -p $CRAFT_PART_INSTALL/bin
       cp $CRAFT_PART_SRC/ffmpeg $CRAFT_PART_INSTALL/bin

@@ -37,6 +37,7 @@ export IMMICH_MACHINE_LEARNING_URL="http://127.0.0.1:3003"
 export IMMICH_WEB_ROOT="$SNAP/usr/src/app/www"
 export IMMICH_REVERSE_GEOCODING_ROOT="$SNAP/usr/src/app/resources"
 export IMMICH_MEDIA_LOCATION="$SNAP_COMMON/upload"
+export IMMICH_METRICS_PORT=8081
 
 export MACHINE_LEARNING_LOG_LEVEL="warning"
 export MACHINE_LEARNING_IP="127.0.0.1"
@@ -47,6 +48,7 @@ export MACHINE_LEARNING_WORKERS=1
 export MACHINE_LEARNING_WORKER_TIMEOUT=120
 export TRANSFORMERS_CACHE="$MACHINE_LEARNING_CACHE_FOLDER"
 
+export ACME_PORT="$(snapctl get acme-port)"
 export ACME_DOMAIN="$(snapctl get acme-domain)"
 export ACME_EMAIL="$(snapctl get acme-email)"
 export ACME_STAGING="$(snapctl get acme-staging)"
