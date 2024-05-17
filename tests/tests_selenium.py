@@ -59,8 +59,14 @@ def wait_for_empty_job_queue():
         time.sleep(1)
         running_or_paused_jobs = 0
         for _, job_data in get_all_jobs().items():
-            paused = job_data['queueStatus']['isPaused']
-            active = job_data['queueStatus']['isActive']
+            paused = True
+            active = True
+
+            # Validate the API response, we got a integer inside queueStatus instead of a dict
+            if isinstance(job_data, dict) and 'queueStatus' in job_data and isinstance(job_data['queueStatus'], dict):
+                paused = job_data['queueStatus']['isPaused']
+                active = job_data['queueStatus']['isActive']
+
             if paused or active:
                 running_or_paused_jobs += 1
 
