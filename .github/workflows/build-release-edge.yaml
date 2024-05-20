@@ -12,9 +12,30 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
-    name: Build and Test Immich & Release Snap Package
+  build-snap:
+    name: Build Snap Package
     runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Build snap package
+        uses: snapcore/action-build@v1
+        id: build
+
+      - name: Save snap artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-snap-package
+          if-no-files-found: error
+          path: |
+            ${{ steps.build.outputs.snap }}
+
+  run-tests:
+    name: Run System Tests
+    runs-on: ubuntu-latest
+    needs: build-snap
 
     services:
       selenium:
@@ -27,20 +48,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Build snap package
-        uses: snapcore/action-build@v1
-        id: build
-
-      - name: Save snap artifact
-        uses: actions/upload-artifact@v3
+      - name: Download snap artifact
+        uses: actions/download-artifact@v4
         with:
-          name: edge-snap
-          if-no-files-found: error
-          path: |
-            ${{ steps.build.outputs.snap }}
+          name: release-snap-package
 
       - name: TEST | Install package
-        run: sudo snap install --dangerous ${{ steps.build.outputs.snap }}
+        run: |
+          sudo snap install --dangerous *.snap
 
       - name: TEST | Install requirements
         run: pip install -r tests/requirements.txt
@@ -48,10 +63,37 @@ jobs:
       - name: TEST | Run Selenium Tests
         run: make ci -C tests
 
+      - name: Upload test report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: selenium-test-report
+          path: |
+            tests/latest_logs
+            tests/report/
+            tests/assets/live.js
+            tests/assets/pytest_style.css
+            tests/dashboard.html
+
+  release:
+    name: Release Snap Package
+    runs-on: ubuntu-latest
+    needs: [build-snap, run-tests]
+
+    steps:
+      - name: Download snap artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: release-snap-package
+
+      - name: Expand snap artifact name
+        id: snap-path
+        run: echo "SNAP_PATH=$(echo *.snap)" >> $GITHUB_OUTPUT
+
       - name: Upload snap package to edge channel
         uses: snapcore/action-publish@v1
         env:
           SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.STORE_LOGIN }}
         with:
-          snap: ${{ steps.build.outputs.snap }}
+          snap: ${{ steps.snap-path.outputs.SNAP_PATH }}
           release: edge
