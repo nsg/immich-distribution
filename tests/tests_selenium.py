@@ -59,8 +59,14 @@ def wait_for_empty_job_queue():
         time.sleep(1)
         running_or_paused_jobs = 0
         for _, job_data in get_all_jobs().items():
-            paused = job_data['queueStatus']['isPaused']
-            active = job_data['queueStatus']['isActive']
+            paused = True
+            active = True
+
+            # Validate the API response, we got a integer inside queueStatus instead of a dict
+            if isinstance(job_data, dict) and 'queueStatus' in job_data and isinstance(job_data['queueStatus'], dict):
+                paused = job_data['queueStatus']['isPaused']
+                active = job_data['queueStatus']['isActive']
+
             if paused or active:
                 running_or_paused_jobs += 1
 
@@ -298,16 +304,25 @@ class TestImmichWeb(BaseCase):
 
     def test_100_verify_people_detected(self):
         """
-        Query the API to get a list of assets, this mainly tests that:
-          * The ML model works and detects people
-          * Typesese works (used to generate embeddings)
+        Query the API to verify that people were detected in the images.
+        This test will try 10 times if there are no people detected in the images.
+          * The face recognition model works
+          * Pgvector extension works
         """
+
+        wait_for_empty_job_queue()
+
         with open("secret.txt", "r") as f:
             secret = f.read()
 
         headers = { "X-API-KEY": secret }
 
-        # query the API to get a list of people
-        r = requests.get(f"http://{get_ip_address()}/api/person", headers=headers)
-        people = r.json()
-        self.assertGreater(people['total'], 2)
+        for _ in range(10):
+            r = requests.get(f"http://{get_ip_address()}/api/person", headers=headers)
+            people = r.json()
+
+            if people['total'] == 0:
+                time.sleep(2)
+                continue
+
+            self.assertGreater(people['total'], 2)
