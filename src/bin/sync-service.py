@@ -99,6 +99,18 @@ class ImmichDatabase:
             """, (checksum, user_id))
             return cur.fetchone()
 
+    def get_asset_created_at_by_path(self, user_id: str, asset_path: str) -> psycopg2.extras.RealDictRow | None:
+        with self.conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+            cur.execute("""
+                SELECT assets."createdAt"
+                FROM assets
+                INNER JOIN assets_filesync_lookup
+                ON assets.checksum = assets_filesync_lookup.checksum
+                WHERE assets_filesync_lookup.asset_path = %s
+                AND assets_filesync_lookup.user_id = %s
+            """, (asset_path, user_id))
+            return cur.fetchone()
+
     def close(self):
         self.conn.commit()
         self.conn.close()
@@ -196,6 +208,14 @@ def delete_asset(db: ImmichDatabase, api: ImmichAPI, asset_path: str, base_path:
     else:
         log(f"Asset {relative_path} not found in database")
 
+def get_file_age(db: ImmichDatabase, user_id: str, asset_path: str, user_path: str) -> int:
+    relative_path = os.path.relpath(asset_path, user_path)
+    asset = db.get_asset_created_at_by_path(user_id, relative_path)
+    if asset:
+        created_at = datetime.now()
+        return (created_at - asset["createdat"]).days
+    return 0
+
 def import_watcher(event: threading.Event, db: ImmichDatabase, api: ImmichAPI, user_path: str) -> None:
     """
     Import watcher thread is responsible for scanning the user directory and
@@ -255,7 +275,9 @@ def file_watcher(event: threading.Event, db: ImmichDatabase, api: ImmichAPI, api
                 log(f"{c_path} modified, re-import asset to Immich")
                 import_asset(db, api, user_path, c_path)
             elif c_type == Change.deleted:
+                user_id = api.get_user_id()
                 log(f"{c_path} deleted, mark asset as removed")
+                log(f"File was {get_file_age(db, user_id, c_path, user_path)}")
                 delete_asset(db, api, c_path, user_path)
 
 def database_watcher(event: threading.Event, db: ImmichDatabase, api: ImmichAPI, user_path: str) -> None:
