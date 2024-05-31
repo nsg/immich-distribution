@@ -209,11 +209,14 @@ def delete_asset(db: ImmichDatabase, api: ImmichAPI, asset_path: str, base_path:
         log(f"Asset {relative_path} not found in database")
 
 def get_file_age(db: ImmichDatabase, user_id: str, asset_path: str, user_path: str) -> int:
+    """
+    Calculate the age of the file in days. Returns 0 if the asset is not found in the database.
+    """
+
     relative_path = os.path.relpath(asset_path, user_path)
     asset = db.get_asset_created_at_by_path(user_id, relative_path)
     if asset:
-        created_at = datetime.now()
-        return (created_at - asset["createdat"]).days
+        return (datetime.now() - asset["createdat"]).days
     return 0
 
 def import_watcher(event: threading.Event, db: ImmichDatabase, api: ImmichAPI, user_path: str) -> None:
