@@ -35,7 +35,3 @@ CREATE OR REPLACE TRIGGER trigger_assets_delete_audits
 BEFORE DELETE ON assets
 FOR EACH ROW
 EXECUTE PROCEDURE log_assets_delete_audits();
-
--- Clean up deprecated work queue table
--- Remove this later when all installations have updated
-DROP table IF EXISTS sync_work_queue;

@@ -20,6 +20,10 @@ class ImmichDatabase:
         self.conn.set_client_encoding('UTF8')
 
     def last_removed_asset(self, user_id: str) -> list[psycopg2.extras.RealDictRow]:
+        """
+        Retrieves the last removed asset for a given user.
+        """
+
         with self.conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
             cur.execute("""
                 SELECT
@@ -38,15 +42,25 @@ class ImmichDatabase:
             return cur.fetchall()
 
     def set_asset_removed(self, asset_id: str) -> None:
-        with self.conn.cursor() as cur:
-            cur.execute("""
-                UPDATE assets_delete_audits
-                SET file_removed = 'true'
-                WHERE asset_id = %s
-            """, (asset_id,))
-            self.conn.commit()
+            """
+            Sets the 'file_removed' flag to 'true' for the specified asset ID in the 'assets_delete_audits' table.
+            """
+
+            with self.conn.cursor() as cur:
+                cur.execute("""
+                    UPDATE assets_delete_audits
+                    SET file_removed = 'true'
+                    WHERE asset_id = %s
+                """, (asset_id,))
+                self.conn.commit()
 
     def save_hash(self, user_id: str, asset_path: str, checksum: bytes) -> None:
+        """
+        Save the hash of the file in the database. If the file is already in the
+        database the checksum is updated. The asset_path is the relative path
+        to the user directory.
+        """
+
         with self.conn.cursor() as cur:
             cur.execute("""
                 INSERT INTO
@@ -83,6 +97,18 @@ class ImmichDatabase:
                 WHERE assets_filesync_lookup.checksum = %s
                 AND assets_filesync_lookup.user_id = %s
             """, (checksum, user_id))
+            return cur.fetchone()
+
+    def get_asset_created_at_by_path(self, user_id: str, asset_path: str) -> psycopg2.extras.RealDictRow | None:
+        with self.conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+            cur.execute("""
+                SELECT assets."createdAt"
+                FROM assets
+                INNER JOIN assets_filesync_lookup
+                ON assets.checksum = assets_filesync_lookup.checksum
+                WHERE assets_filesync_lookup.asset_path = %s
+                AND assets_filesync_lookup.user_id = %s
+            """, (asset_path, user_id))
             return cur.fetchone()
 
     def close(self):
@@ -182,7 +208,26 @@ def delete_asset(db: ImmichDatabase, api: ImmichAPI, asset_path: str, base_path:
     else:
         log(f"Asset {relative_path} not found in database")
 
+def get_file_age(db: ImmichDatabase, user_id: str, asset_path: str, user_path: str) -> int:
+    """
+    Calculate the age of the file in days. Returns 0 if the asset is not found in the database.
+    """
+
+    relative_path = os.path.relpath(asset_path, user_path)
+    asset = db.get_asset_created_at_by_path(user_id, relative_path)
+    if asset:
+        return (datetime.now() - asset["createdat"]).days
+    return 0
+
 def import_watcher(event: threading.Event, db: ImmichDatabase, api: ImmichAPI, user_path: str) -> None:
+    """
+    Import watcher thread is responsible for scanning the user directory and
+    updating the hash lookup table. It also imports assets that are missing.
+
+    This thread is executed every day. It's intended for initial import,
+    catch missing files and hash database updates.
+    """
+
     log("Import watcher thread running...")
     while not event.is_set():
         for root, _, files in os.walk(user_path):
@@ -233,7 +278,9 @@ def file_watcher(event: threading.Event, db: ImmichDatabase, api: ImmichAPI, api
                 log(f"{c_path} modified, re-import asset to Immich")
                 import_asset(db, api, user_path, c_path)
             elif c_type == Change.deleted:
+                user_id = api.get_user_id()
                 log(f"{c_path} deleted, mark asset as removed")
+                log(f"File was {get_file_age(db, user_id, c_path, user_path)}")
                 delete_asset(db, api, c_path, user_path)
 
 def database_watcher(event: threading.Event, db: ImmichDatabase, api: ImmichAPI, user_path: str) -> None:
