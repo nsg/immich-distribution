@@ -4,7 +4,7 @@ import requests
 import threading
 import time
 import signal
-from datetime import datetime
+from datetime import datetime, timezone
 
 from watchfiles import watch, Change
 
@@ -216,7 +216,7 @@ def get_file_age(db: ImmichDatabase, user_id: str, asset_path: str, user_path: s
     relative_path = os.path.relpath(asset_path, user_path)
     asset = db.get_asset_created_at_by_path(user_id, relative_path)
     if asset:
-        return (datetime.now() - asset["createdat"]).days
+        return (datetime.now(timezone.utc) - asset["createdAt"]).days
     return 0
 
 def import_watcher(event: threading.Event, db: ImmichDatabase, api: ImmichAPI, user_path: str) -> None:
@@ -265,6 +265,7 @@ def import_watcher(event: threading.Event, db: ImmichDatabase, api: ImmichAPI, u
 
 def file_watcher(event: threading.Event, db: ImmichDatabase, api: ImmichAPI, api_key: str, user_path: str) -> None:
     log("File watcher thread running...")
+    delete_threshold =  int(os.environ["SYNC_DELETE_THRESHOLD"])
     for changes in watch(user_path, recursive=True, stop_event=event):
         for c_type, c_path in changes:
 
@@ -279,9 +280,13 @@ def file_watcher(event: threading.Event, db: ImmichDatabase, api: ImmichAPI, api
                 import_asset(db, api, user_path, c_path)
             elif c_type == Change.deleted:
                 user_id = api.get_user_id()
-                log(f"{c_path} deleted, mark asset as removed")
-                log(f"File was {get_file_age(db, user_id, c_path, user_path)}")
-                delete_asset(db, api, c_path, user_path)
+                file_age_days = get_file_age(db, user_id, c_path, user_path)
+
+                if file_age_days < delete_threshold:
+                    log(f"{c_path} deleted, mark asset as removed")
+                    delete_asset(db, api, c_path, user_path)
+                else:
+                    log(f"{c_path} deleted, but it's older than {delete_threshold} days, keep asset in Immich")
 
 def database_watcher(event: threading.Event, db: ImmichDatabase, api: ImmichAPI, user_path: str) -> None:
     log("Database watcher thread running...")
