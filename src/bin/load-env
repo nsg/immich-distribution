@@ -65,6 +65,8 @@ fi
 export HAPROXY_HTTP_BIND="$(snapctl get haproxy-http-bind)"
 export HAPROXY_HTTPS_BIND="$(snapctl get haproxy-https-bind)"
 
+export SYNC_DELETE_THRESHOLD="$(snapctl get sync-delete-threshold)"
+
 drop_privileges() {
     $SNAP/usr/bin/setpriv \
         --clear-groups \
