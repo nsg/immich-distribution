@@ -23,7 +23,6 @@ export LC_CTYPE="C"
 
 # I think NODE_ENV is not used by Immich anymore, keep it for now
 export NODE_ENV="production"
-export IMMICH_ENV="production"
 
 export DB_HOSTNAME="127.0.0.1"
 export DB_USERNAME="postgres"
@@ -32,14 +31,20 @@ export DB_DATABASE_NAME="immich"
 
 export REDIS_HOSTNAME="127.0.0.1"
 
-export HOST="127.0.0.1" # Used by server and microservices
-
+export IMMICH_ENV="production"
 export IMMICH_SERVER_URL="http://127.0.0.1:3001" # Not used by Immich anymore, but still used by Immich Distribution
+export IMMICH_HOST="127.0.0.1"
 export IMMICH_MACHINE_LEARNING_URL="http://127.0.0.1:3003"
 export IMMICH_WEB_ROOT="$SNAP/usr/src/app/www"
 export IMMICH_REVERSE_GEOCODING_ROOT="$SNAP/usr/src/app/resources"
 export IMMICH_MEDIA_LOCATION="$SNAP_COMMON/upload"
-export IMMICH_METRICS_PORT=8081
+export IMMICH_API_METRICS_PORT=8081
+export IMMICH_MICROSERVICES_METRICS_PORT=8082
+export IMMICH_METRICS="$(snapctl get metrics-enabled)"
+export IMMICH_API_METRICS="$(snapctl get metrics-api-enabled)"
+export IMMICH_HOST_METRICS="$(snapctl get metrics-host-enabled)"
+export IMMICH_IO_METRICS="$(snapctl get metrics-io-enabled)"
+export IMMICH_JOB_METRICS="$(snapctl get metrics-job-enabled)"
 
 export MACHINE_LEARNING_LOG_LEVEL="warning"
 export MACHINE_LEARNING_IP="127.0.0.1"
