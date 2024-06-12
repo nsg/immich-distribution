@@ -10,5 +10,11 @@ fi
 
 banner
 
+export CPU_CORES="$(grep -c ^processor /proc/cpuinfo)"
+echo "Detected CPU Cores: $CPU_CORES"
+if [ "$CPU_CORES" -gt 4 ]; then
+  export UV_THREADPOOL_SIZE=$CPU_CORES
+fi
+
 cd $SNAP/usr/src/app
-node dist/main immich
+node dist/main
