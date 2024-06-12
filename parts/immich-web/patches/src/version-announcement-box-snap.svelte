@@ -3,6 +3,7 @@
   import type { ServerVersionResponseDto } from '@immich/sdk';
   import Button from '../elements/buttons/button.svelte';
   import FullScreenModal from './full-screen-modal.svelte';
+  import { t } from 'svelte-i18n';
 
   let showModal = false;
 
@@ -33,7 +34,7 @@
 </script>
 
 {#if showModal}
-  <FullScreenModal id="new-version-modal" title="🎉 NEW VERSION AVAILABLE" onClose={() => (showModal = false)}>
+  <FullScreenModal title="🎉 NEW VERSION AVAILABLE" onClose={() => (showModal = false)}>
     <div>
 
       You are running an community build of IMMICH, packaged in a
@@ -60,7 +61,7 @@
     </div>
 
     <svelte:fragment slot="sticky-bottom">
-      <Button fullwidth on:click={onAcknowledge}>Acknowledge</Button>
+      <Button fullwidth on:click={onAcknowledge}>{$t('acknowledge')}</Button>
     </svelte:fragment>
   </FullScreenModal>
 {/if}
