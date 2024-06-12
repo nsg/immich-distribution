@@ -21,7 +21,9 @@ export PGDATA="$SNAP_COMMON/pgsql/data"
 export LC_ALL="C"
 export LC_CTYPE="C"
 
+# I think NODE_ENV is not used by Immich anymore, keep it for now
 export NODE_ENV="production"
+export IMMICH_ENV="production"
 
 export DB_HOSTNAME="127.0.0.1"
 export DB_USERNAME="postgres"
