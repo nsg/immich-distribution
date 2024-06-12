@@ -91,18 +91,6 @@ apps:
       - network-bind
       - network
 
-  immich-microservices:
-    command: bin/immich-microservices
-    daemon: simple
-    restart-delay: 10s
-    after:
-      - redis-server
-      - postgres
-      - immich-server
-    plugs:
-      - network-bind
-      - network
-
   debug:
     command: bin/debug
     plugs:
@@ -138,7 +126,6 @@ apps:
     restart-delay: 60s
     after:
       - immich-server
-      - immich-microservices
 
   backup:
     command: bin/backup
