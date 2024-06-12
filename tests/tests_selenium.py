@@ -30,7 +30,7 @@ def get_headers():
     }
 
 def get_assets(filter=[]):
-    r = requests.get(f"http://{get_ip_address()}/api/asset", headers=get_headers())
+    r = requests.get(f"http://{get_ip_address()}/api/assets", headers=get_headers())
     
     if len(filter) == 0:
         return r.json()
@@ -101,7 +101,7 @@ def import_asset(path):
     files = {"assetData": open(path, 'rb')}
 
     response = requests.post(
-        f"http://{get_ip_address()}/api/asset/upload", headers=get_headers(), data=data, files=files
+        f"http://{get_ip_address()}/api/assets/upload", headers=get_headers(), data=data, files=files
     )
 
     if response.status_code != 201:
@@ -318,7 +318,7 @@ class TestImmichWeb(BaseCase):
         headers = { "X-API-KEY": secret }
 
         for _ in range(10):
-            r = requests.get(f"http://{get_ip_address()}/api/person", headers=headers)
+            r = requests.get(f"http://{get_ip_address()}/api/people", headers=headers)
             people = r.json()
 
             if people['total'] == 0:
