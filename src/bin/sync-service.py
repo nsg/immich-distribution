@@ -150,7 +150,7 @@ class ImmichAPI:
         }
 
         response = requests.post(
-            f"{self.host}/assets/upload",
+            f"{self.host}/assets",
             headers=headers,
             data=data,
             files={"assetData": file_buffer}
