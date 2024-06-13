@@ -48,8 +48,7 @@ git checkout $NEW_RELEASE_TAG
 CHECK_FILES="
     server/src/migrations
     server/Dockerfile
-    server/start-server.sh
-    server/start-microservices.sh
+    server/start.sh
     web/README.md
     web/Dockerfile
     web/src/lib/components/shared-components/version-announcement-box.svelte

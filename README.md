@@ -30,7 +30,6 @@ See the documentation site at https://immich-distribution.nsg.cc/ for more infor
 | Software | Note |
 | -------- | -------- |
 | Immich Server | This is the server component of Immich that provides Immich API |
-| Immich Microservices | This service provides background processing of assets for Immich Server |
 | Immich Machine Learning | Object detection and image classifier, provides and API for Immich |
 | Immich Web | The Immich web pages |
 | Immich Distribution Sync | Synchronize (read & write) a external folder (with a few caveats) with Immich |

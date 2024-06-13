@@ -1,8 +1,8 @@
---- web/src/lib/components/shared-components/version-announcement-box.svelte	2024-04-28 22:29:03.615361123 +0200
-+++ web/src/lib/components/shared-components/version-announcement-box-snap.svelte	2024-04-28 22:36:08.752493074 +0200
-@@ -35,17 +35,23 @@
+--- web/src/lib/components/shared-components/version-announcement-box.svelte	2024-06-12 22:09:53.997501201 +0200
++++ web/src/lib/components/shared-components/version-announcement-box-snap.svelte	2024-06-12 22:10:47.406506178 +0200
+@@ -36,17 +36,23 @@
  {#if showModal}
-   <FullScreenModal id="new-version-modal" title="🎉 NEW VERSION AVAILABLE" onClose={() => (showModal = false)}>
+   <FullScreenModal title="🎉 NEW VERSION AVAILABLE" onClose={() => (showModal = false)}>
      <div>
 -      Hi friend, there is a new version of the application please take your time to visit the
 -      <span class="font-medium underline"

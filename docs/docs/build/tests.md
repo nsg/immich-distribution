@@ -18,10 +18,10 @@ wait:
 The HAProxy tests are configured like this:
 
 ```
-backend be_microservices
+backend be_server
     {==option httpchk==}
-    {==http-check send meth GET uri /ping==}
-    server microservices 127.0.0.1:3003 maxconn 32 {==check==} inter 10s fall 2 rise 6
+    {==http-check send meth GET uri /server-info/ping==}
+    server immich-server 127.0.0.1:3001 maxconn 64 {==check==} inter 5s fall 2 rise 6
 ```
 
 To summarize, HAProxy do a few basic backend checks to make sure that the services runs correctly. I use this information to detect if everyting is started and behaves correctly. This is exposed with the `test_haproxy.sh` script.

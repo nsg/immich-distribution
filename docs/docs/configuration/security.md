@@ -24,7 +24,6 @@ So overall if you configure your firewall limiting what Immich can access, it wo
     | postgres | [network-bind](https://snapcraft.io/docs/network-bind-interface) | Listen for incoming connections |
     | redis-server | [network-bind](https://snapcraft.io/docs/network-bind-interface) | Listen for incoming connections |
     | immich-server | [network](https://snapcraft.io/docs/network-interface), [network-bind](https://snapcraft.io/docs/network-bind-interface) | General network access, Listen for incoming connections |
-    | immich-microservices | [network](https://snapcraft.io/docs/network-interface), [network-bind](https://snapcraft.io/docs/network-bind-interface) | General network access, Listen for incoming connections |
     | immich-web | [network](https://snapcraft.io/docs/network-interface), [network-bind](https://snapcraft.io/docs/network-bind-interface) | General network access, Listen for incoming connections |
     | immich-machine-learning | [network](https://snapcraft.io/docs/network-interface), [network-bind](https://snapcraft.io/docs/network-bind-interface) | General network access, Listen for incoming connections |
     | cli | [network](https://snapcraft.io/docs/network-interface) | General network access |

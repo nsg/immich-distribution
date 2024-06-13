@@ -30,17 +30,28 @@ def get_headers():
     }
 
 def get_assets(filter=[]):
-    r = requests.get(f"http://{get_ip_address()}/api/asset", headers=get_headers())
-    
-    if len(filter) == 0:
-        return r.json()
-    
-    resp = {}
-    for asset in r.json():
-        if asset['originalFileName'] in filter:
-            resp[asset['originalFileName']] = asset
-    
-    return resp
+    ret = {}
+
+    for f in filter:
+        r = requests.post(
+            f"http://{get_ip_address()}/api/search/metadata",
+            headers=get_headers(),
+            json={"originalFileName": f}
+        )
+
+        asset = r.json()['assets']['items']
+        if len(asset) != 1:
+            raise Exception(f"Expected 1 asset, got {len(asset)}")
+
+        r = requests.get(f"http://{get_ip_address()}/api/assets/{asset[0]['id']}", headers=get_headers())
+        ret[f] = r.json()
+
+    return ret
+
+def get_number_of_assets():
+    r = requests.get(f"http://{get_ip_address()}/api/server-info/statistics", headers=get_headers())
+    response = r.json()
+    return response['photos'] + response['videos']
 
 def get_all_jobs():
     r = requests.get(f"http://{get_ip_address()}/api/jobs", headers=get_headers())
@@ -101,7 +112,7 @@ def import_asset(path):
     files = {"assetData": open(path, 'rb')}
 
     response = requests.post(
-        f"http://{get_ip_address()}/api/asset/upload", headers=get_headers(), data=data, files=files
+        f"http://{get_ip_address()}/api/assets", headers=get_headers(), data=data, files=files
     )
 
     if response.status_code != 201:
@@ -159,7 +170,7 @@ class TestImmichWeb(BaseCase):
         self.click("button:contains('Theme')")
 
         # Press on "Storage Template" to manage storage templates
-        self.click("button:contains('Storage Template')")
+        self.click("button:contains('Storage template')")
 
         # Do not enable the storage template feature, just click "Done"
         self.click("button:contains('Done')")
@@ -249,8 +260,7 @@ class TestImmichWeb(BaseCase):
         """
         Use the API to verify that the assets were uploaded correctly.
         """
-        assets = get_assets()
-        self.assertEqual(len(assets), 15)
+        self.assertEqual(get_number_of_assets(), 15)
 
     def test_100_verify_exif_location_extraction(self):
         """
@@ -263,21 +273,11 @@ class TestImmichWeb(BaseCase):
         ship = assets['ship.mp4']
         grass = assets['grass.MP.jpg']
 
+        print(ship)
+
         self.assertEqual(ship['type'], "VIDEO")
         self.assertEqual(ship['exifInfo']['country'], "Sweden")
         self.assertEqual(grass['exifInfo']['city'], "Mora")
-
-    # def test_100_verify_video_transcode(self):
-    #     """
-    #     Verify that the video was transcoded from VP9
-    #     """
-
-    #     assets = get_assets(["ship-vp9"])
-    #     ship = assets['ship-vp9']
-    #     self.assertEqual(ship['type'], "VIDEO")
-    #     r = requests.get(f"http://{get_ip_address()}/api/asset/file/{ship['id']}?isThumb=false&isWeb=true", headers=get_headers())
-    #     self.assertEqual(r.status_code, 200)
-    #     self.assertEqual(r.headers['content-type'], "video/webm")
 
     def test_100_verify_image_exitdata(self):
         """
@@ -318,7 +318,7 @@ class TestImmichWeb(BaseCase):
         headers = { "X-API-KEY": secret }
 
         for _ in range(10):
-            r = requests.get(f"http://{get_ip_address()}/api/person", headers=headers)
+            r = requests.get(f"http://{get_ip_address()}/api/people", headers=headers)
             people = r.json()
 
             if people['total'] == 0:

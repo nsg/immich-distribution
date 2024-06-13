@@ -125,12 +125,12 @@ class ImmichAPI:
         }
 
     def get_user_id(self) -> str:
-        r = requests.get(f"{self.host}/user/me", headers=self.headers)
+        r = requests.get(f"{self.host}/users/me", headers=self.headers)
         return r.json()["id"]
     
     def delete_asset(self, asset_id: str) -> None:
         data = { "ids": [ asset_id ] }
-        r = requests.delete(f"{self.host}/asset", headers=self.headers, json=data)
+        r = requests.delete(f"{self.host}/assets", headers=self.headers, json=data)
         if r.status_code not in [204]:
             raise Exception(f"Failed to delete asset {asset_id}, status code {r.status_code}. Response: {r.text}")
 
@@ -150,7 +150,7 @@ class ImmichAPI:
         }
 
         response = requests.post(
-            f"{self.host}/asset/upload",
+            f"{self.host}/assets",
             headers=headers,
             data=data,
             files={"assetData": file_buffer}
