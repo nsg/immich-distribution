@@ -240,6 +240,11 @@ def import_watcher(event: threading.Event, db: ImmichDatabase, api: ImmichAPI, u
                 user_id = api.get_user_id()
                 checksum = hash_file(file_path)
 
+                # Ignore missing files. This can happen if the file was deleted during execution.
+                if not os.path.exists(file_path):
+                    log(f"File {file_path} has disappeared, skipping")
+                    continue
+
                 #
                 # Update hash lookup table
                 #
