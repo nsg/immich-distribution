@@ -34,6 +34,12 @@ testprod:
 tests:
 	make -C tests test
 
+.PHONY: cleantests
+cleantests:
+	sudo snap remove --purge immich-distribution
+	make install
+	make -C tests test
+
 .PHONY: selenium
 selenium:
 	make -C tests/ selenium

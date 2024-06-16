@@ -327,6 +327,13 @@ def main():
 
     log(f"Starting sync for user {user_id} at {user_path}")
 
+    if not os.path.exists(user_path):
+        os.makedirs(user_path)
+
+    while len(os.listdir(user_path)) == 0:
+        log(f"Waiting for files in {user_path}")
+        time.sleep(10)
+
     stop_event = threading.Event()
 
     import_thread = threading.Thread(
