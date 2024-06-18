@@ -63,6 +63,9 @@ jobs:
       - name: TEST | Run Selenium Tests
         run: make ci -C tests
 
+      - name: TEST | Run Sync Service Tests
+        run: make ci-sync -C tests
+
       - name: Upload test report
         uses: actions/upload-artifact@v4
         if: always()

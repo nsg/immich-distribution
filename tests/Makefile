@@ -6,8 +6,34 @@
 test: .env/bin/seleniumbase test-assets wait check-selenium
 	.env/bin/pytest tests_selenium.py --server=127.0.0.1 --port=4444 --headed --dashboard --html=report/index.html ${EXTRA_ARGS}
 
+test-sync:
+	SERVICE_STATE=default .env/bin/pytest tests_sync_service.py
+	sudo snap set immich-distribution sync-enabled=true
+	sleep 10
+	SERVICE_STATE=enabled .env/bin/pytest tests_sync_service.py
+	sudo snap set immich-distribution sync="$(shell cat secret.txt)"
+	sleep 10
+	sudo chmod -R 777 /var/snap/immich-distribution/common/sync
+	SERVICE_STATE=running .env/bin/pytest tests_sync_service.py
+	sudo snap set immich-distribution sync-delete-threshold=0
+	sleep 10
+	SERVICE_STATE=threshold .env/bin/pytest tests_sync_service.py
+
 ci: test-assets wait
 	pytest tests_selenium.py --server=127.0.0.1 --port=4444 --dashboard --html=report/index.html
+
+ci-sync:
+	SERVICE_STATE=default pytest tests_sync_service.py
+	sudo snap set immich-distribution sync-enabled=true
+	sleep 10
+	SERVICE_STATE=enabled pytest tests_sync_service.py
+	sudo snap set immich-distribution sync="$(shell cat secret.txt)"
+	sleep 10
+	sudo chmod -R 777 /var/snap/immich-distribution/common/sync
+	SERVICE_STATE=running pytest tests_sync_service.py
+	sudo snap set immich-distribution sync-delete-threshold=0
+	sleep 10
+	SERVICE_STATE=threshold pytest tests_sync_service.py
 
 test_%: .env/bin/seleniumbase test-assets
 	.env/bin/pytest tests_selenium.py --server=127.0.0.1 --port=4444 --headed -k $* --html=report/index.html
