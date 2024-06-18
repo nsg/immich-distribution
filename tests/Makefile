@@ -5,6 +5,8 @@
 
 test: .env/bin/seleniumbase test-assets wait check-selenium
 	.env/bin/pytest tests_selenium.py --server=127.0.0.1 --port=4444 --headed --dashboard --html=report/index.html ${EXTRA_ARGS}
+
+test-sync:
 	SERVICE_STATE=default .env/bin/pytest tests_sync_service.py
 	sudo snap set immich-distribution sync-enabled=true
 	sleep 10
@@ -19,6 +21,8 @@ test: .env/bin/seleniumbase test-assets wait check-selenium
 
 ci: test-assets wait
 	pytest tests_selenium.py --server=127.0.0.1 --port=4444 --dashboard --html=report/index.html
+
+ci-sync:
 	SERVICE_STATE=default pytest tests_sync_service.py
 	sudo snap set immich-distribution sync-enabled=true
 	sleep 10
