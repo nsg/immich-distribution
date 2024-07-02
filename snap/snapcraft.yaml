@@ -239,9 +239,6 @@ parts:
     source: https://github.com/immich-app/immich.git
     source-tag: v1.107.0
     override-build: |
-      # Patch version announcement box with a version that refers to the snap instead of Docker
-      patch -p0 -i ${CRAFT_PART_SRC}/../../parts-web/src/patches/001-version-announcement-box.patch
-
       # Build typescript-sdk, this is included by cli and web
       cd open-api/typescript-sdk
       npm ci
@@ -255,14 +252,8 @@ parts:
       # Install the resulting web application
       mkdir -p ${CRAFT_PART_INSTALL}/usr/src/app
       cp -r build ${CRAFT_PART_INSTALL}/usr/src/app/www
-    after:
-      - parts-web
     build-snaps:
       - node/20/stable
-
-  parts-web:
-    plugin: nil
-    source: parts/immich-web
 
   machine-learning:
     plugin: make
