@@ -170,7 +170,7 @@ class TestImmichWeb(BaseCase):
         self.click("button:contains('Theme')")
 
         # Press on "Storage Template" to manage storage templates
-        self.click("button:contains('Storage template')")
+        self.click("button:contains('Storage Template')")
 
         # Do not enable the storage template feature, just click "Done"
         self.click("button:contains('Done')")
