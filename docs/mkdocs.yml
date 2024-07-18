@@ -19,7 +19,6 @@ nav:
     - configuration/sync.md
   - Contribute:
     - Upgrade: build/upgrade.md
-    - Patches: build/patches.md
     - Tests: build/tests.md
     - Statistics: build/statistics.md
 
@@ -27,8 +26,8 @@ theme:
   name: material
   palette:
     primary: custom
-  logo: assets/immich-dist-greyscale.png
-  favicon: assets/immich-dist-greyscale.png
+  logo: assets/immich-dist.png
+  favicon: assets/immich-dist.png
   icon:
     repo: fontawesome/brands/github
     edit: material/source-repository
@@ -47,11 +46,17 @@ plugins:
   - search
   - blog:
       blog_dir: news
+hooks:
+  - snapstore_versions.py
 extra:
-  social:
-    - icon: fontawesome/brands/github
-      link: https://github.com/nsg/immich-distribution
-      name: Project page at GitHub
+  generator: false  # Manually written in the copyright notice
+copyright: >
+  Immich Distribution is an independent community project that packages the software in a snap package.
+  This project is not affiliated with the upstream <strong><a href="https://immich.app">Immich project</a></strong>,
+  its developers, or <strong><a href="https://futo.org">FUTO</a></strong>.
+  For more information, please refer to the <strong><a href="/">about page</a></strong>.
+  Website made with <strong><a href="https://squidfunk.github.io/mkdocs-material/">Material for MkDocs</a></strong>.
+  Also check out the projects <strong><a href="https://github.com/nsg/immich-distribution">GitHub repository</a></strong>.
 markdown_extensions:
   - admonition
   - pymdownx.details

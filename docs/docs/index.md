@@ -8,13 +8,11 @@ hide:
 
 ![Immich Distribution Logo](/assets/immich-dist.png){ align=right .img-scale }
 
-These pages contains documentation related to the [snap](https://snapcraft.io/docs) package [immich-distribution](https://snapcraft.io/immich-distribution). It's based on [Immich](https://immich.app/), a self hosted [Google Photos](https://en.wikipedia.org/wiki/Google_Photos) replacement in early development. The package is inspired of the official Immich images. It will be **similar, but not identical** with the official Docker-based installation. Extra tools and customizations are included.
+These pages contains documentation related to the [snap](https://snapcraft.io/docs) package [immich-distribution](https://snapcraft.io/immich-distribution). It's based on [Immich](https://immich.app/), a self hosted [Google Photos](https://en.wikipedia.org/wiki/Google_Photos) replacement in early development. The package is inspired of the official Immich images. It will be **similar, but not identical** with the official Docker-based installation. Extra tools and customizations are included. This project is **not related to [FUTO](https://futo.org/)** in any way.
 
 ## Expectations
 
 Do not expect me to release updates the same day as the upstream Immich release. Immich is a really fast moving project and it's not uncommon that it takes me a few days to find the time to prepare a release. When Immich releases an update, I will build and push an update and try it out for a few days before I release it to the stable channel. You can track update progress over at [GitHub](https://github.com/nsg/immich-distribution/issues?q=is%3Aissue+is%3Aopen+label%3Anew-version).
-
-![Flowers in a box, in a room. Generated with Midjourney](/assets/room.png)
 
 ## Support
 

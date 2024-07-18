@@ -1,14 +1,18 @@
 # Installation
 
+The package can be installed from the snap store like any other snap package, below is the CLI command to install Immich. You can of course use Software / App Center to install is as well.
+
 ``` bash title="Install Immich Distribution"
 sudo snap install immich-distribution
 ```
 
-The package can be installed from the snap store like any other snap package. The package is **huge** (over 700MB) so it can take some time to download. For more information see the [Snap Store](https://snapcraft.io/immich-distribution).
+The package is over 700MB so it can take some time to download. For more information see the [Snap Store](https://snapcraft.io/immich-distribution). Also checkout the prerequisites below.
 
-<iframe src="https://snapcraft.io/immich-distribution/embedded?channels=true" frameborder="0" width="100%" height="390px" style="border: 1px solid #CCC; border-radius: 2px;"></iframe>
+## Available versions
 
-??? Warning "Important information if you like to use candidate, beta or edge"
+{{snapstore_versions}}
+
+!!! Warning "Important information if you like to use candidate, beta or edge"
 
     The `edge` channel is not intended for end users, it contains experimental untested builds directly from the repository. The `beta` channel contains software that "works on my machine" and is published for general testing, expect things to break. I personally use `candidate` as a staging ground to try out a release for a few days before I push it to stable.
 
@@ -31,11 +35,13 @@ A computer running Linux with [support for snapd](https://snapcraft.io/docs/inst
 
 ### Hardware
 
-A computer with a relatively modern Intel or AMD based CPU, for example the AVX instructionset is needed. You need **at minimum** 4GB available RAM, 6 or 8 is preferred. You probably also need a lot of free disk space, pictures are stored at `/var/snap`.
+A computer with a relatively modern Intel or AMD based CPU. You need **at minimum** 4GB available RAM, 6 or 8 is preferred. You probably also need a lot of free disk space, pictures are stored at `/var/snap`.
 
 ??? Note "What about ARM?"
 
     There is nothing technically blocking me from adapting this package for more architectures like ARM. At the moment I do not have any ARM based systems running to test and develop ARM support, so I have focused my resources on what I use personally.
+
+    If you like to comment, chat or vote for ARM support please do a :thumbsup: or write an comment [at this issue](https://github.com/nsg/immich-distribution/issues/192).
 
 ### Used ports
 
@@ -60,9 +66,9 @@ See [HAProxy](configuration/haproxy.md) if you like to change the http or https 
 
 ![](/assets/immich-loading.png){ align=right .img-scale }
 
-If you installed immich-distribution to a server with the IP `192.168.1.10` open a browser and navigate to `http://192.168.1.10`. The stack can take up to a minute to fully start, especially the machine learning components are slow to start.
+If you installed immich-distribution to a server with the IP `192.168.1.10` open a browser and navigate to `http://192.168.1.10`. The services can take up to a minute to fully start, especially the machine learning components are slow.
 
-See the official [Post Install Steps](https://immich.app/docs/install/post-install) will guide you to setup your account, and configure your mobile application.
+The official [Post Install Steps](https://immich.app/docs/install/post-install) will guide you to setup your account, and how to configure your mobile application.
 
 If this installation is exposed to the public internet I stronly suggest that you set up [https](/configuration/https) and read the [security](/configuration/security) section.
 
@@ -92,12 +98,14 @@ Updates are by **default** automatic, this is a core concept of the package form
 
 ??? Note "When is the next update released?"
 
-    Updates can be quick and easy, or a lot of work depending on the changes upstream. I will open a tracking issue tagged with [new-version](https://github.com/nsg/immich-distribution/issues?q=is%3Aissue+is%3Aopen+label%3Anew-version) when I detect an update, feel free to ask questions there. If you have experience with building snap packages, see [upgrade](/build/upgrade) how to contribute to the project.
+    Updates can be quick and easy, or a lot of work depending on the changes upstream. A tracking issue tagged with [new-version](https://github.com/nsg/immich-distribution/issues?q=is%3Aissue+is%3Aopen+label%3Anew-version) should appear when an update is detected, feel free to ask questions there. If you have experience with building snap packages, see [upgrade](/build/upgrade) how to contribute to the project.
 
-    To speed up the transition time from "beta -> candidate -> stable", help me test the build and inform me about detected problems, try to troubleshoot them, and of course, also report success!
+    To speed up the transition time from "candidate to stable", help me test the build and inform me of problems, try to troubleshoot them, and of course, also report success! Finally, just a thumbs up or any message will keep me motivated to carry on!
 
-    Finally, just a thumbs up or any message will keep me motivated to carry on!
+### Mobile app
+
+If you use the mobile application you have probably installed it from [Google Play Store](https://play.google.com/store/apps/details?id=app.alextran.immich), [Apple App Store](https://apps.apple.com/us/app/immich/id1613945652) or [F-Droid](https://f-droid.org/packages/app.alextran.immich). These stores usually update the apps automatically in the background. It's rare, but if there is a breaking change in the API the mobile app may temporary break if there is a version mismatch between the mobile app and the server.
 
 ## Configuration
 
-By default you should have a working installation of Immich, but you may like to configure it a bit. See the [configuration](/configuration/) pages for that.
+You should have a working installation of Immich out of the box, but you may like to configure it a bit. See the [configuration](/configuration/) pages for that.

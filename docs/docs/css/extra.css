@@ -11,3 +11,20 @@
 .img-scale {
     width: clamp(5rem, 25vw, 12rem);
 }
+
+.md-header__title {
+    margin-left: 0 !important;
+}
+
+.snapstore-versions {
+    width: 100%;
+}
+
+.snapstore-versions th {
+    border-bottom: 1px solid #444;
+    text-align: left;
+}
+
+.snapstore-versions td {
+    padding-top: 0.4em;
+}
