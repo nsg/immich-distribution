@@ -49,7 +49,10 @@ docs:
 	cd docs && poetry run mkdocs serve
 
 .PHONY: reset
-reset: clean
+reset:
+	@echo "This will purge and clean the local installation in 5 seconds ..."
+	sleep 5
+	make clean
 	sudo snap remove --purge immich-distribution
 	sudo rm -rf prime
 
