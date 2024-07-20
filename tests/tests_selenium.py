@@ -16,9 +16,6 @@ def get_ip_address():
     s.connect(("8.8.8.8", 80))
     return s.getsockname()[0]
 
-def is_dirty_state():
-    return os.getenv("DIRTY_STATE")
-
 def get_secret():
     with open("secret.txt", "r") as f:
         return f.read()
@@ -123,18 +120,38 @@ def import_asset(path):
 
 class TestImmichWeb(BaseCase):
 
-    def immich(self, path="", login=True):
-        self.open(f"http://{get_ip_address()}/{path}")
+    def immich(self, path=None, login=True):
+        self.open(f"http://{get_ip_address()}")
+        self.shot()
         if login:
             self.login()
             self.sleep(2)
             if self.is_element_present("button:contains('Acknowledge')"):
+                self.shot()
                 self.click("button:contains('Acknowledge')")
+
+        if path:
+            self.open(f"http://{get_ip_address()}/{path}")
 
     def login(self):
         self.type("input[id='email']", "foo@example.com")
         self.type("input[id='password']", "secret")
+        self.shot()
         self.click("button:contains('Login')")
+
+    def shot(self):
+        if not os.path.exists("screenshots"):
+            os.makedirs("screenshots")
+
+        self.sleep(2)
+        shot_counter = len(glob.glob("screenshots/*.png"))
+        self.save_screenshot(f"screenshots/{shot_counter}.png")
+
+    def record_message_shot(self, message):
+        self.open("about:blank")
+        self.execute_script("document.body.style = 'font-family: sans-serif; padding: 40px 20px; font-size: 2em;'")
+        self.execute_script(f'document.body.innerHTML="{message.replace("\"", "\\\"")}";')
+        self.shot()
 
     def test_001_register(self):
         """
@@ -152,9 +169,11 @@ class TestImmichWeb(BaseCase):
         self.type("input[id='password']", "secret")
         self.type("input[id='confirmPassword']", "secret")
         self.type("input[id='name']", "Ture Test")
+        self.shot()
         self.click("button:contains('Sign up')")
 
         self.assert_title("Login - Immich")
+        self.shot()
 
     def test_002_first_login(self):
         """
@@ -168,23 +187,28 @@ class TestImmichWeb(BaseCase):
 
         # Press on "Theme" to select a theme
         self.click("button:contains('Theme')")
+        self.shot()
 
         # Press on "Storage Template" to manage storage templates
         self.click("button:contains('Storage Template')")
+        self.shot()
 
         # Do not enable the storage template feature, just click "Done"
         self.click("button:contains('Done')")
+        self.shot()
 
         # Verify that we are on the photos page
         self.assert_title("Photos - Immich")
+        self.shot()
 
     def test_003_empty_timeline(self):
         """
         Make sure the timeline is empty and we get a message to upload photos.
         """
-        if not is_dirty_state():
-            self.immich()
-            self.assert_element("p:contains('CLICK TO UPLOAD YOUR FIRST PHOTO')")
+
+        self.immich()
+        self.shot()
+        self.assert_element("p:contains('CLICK TO UPLOAD YOUR FIRST PHOTO')")
 
     def test_004_generate_api_keys(self):
         """
@@ -192,14 +216,19 @@ class TestImmichWeb(BaseCase):
         The API keys will be used by other tests to query the API and upload assets.
         """
         self.immich(login=True)
+        self.shot()
         self.immich(login=False, path="user-settings")
+        self.shot()
         self.wait_for_element("h2")
         self.click("button:contains('API Keys')")
+        self.shot()
         self.click("button:contains('New API Key')")
+        self.shot()
         self.type("input[id='name']", "test\n")
         secret = self.get_text("textarea[id='secret']")
         with open("secret.txt", "w") as f:
             f.write(secret)
+        self.shot()
 
     def test_005_upload_assets_via_api(self):
         """
@@ -237,23 +266,35 @@ class TestImmichWeb(BaseCase):
         ]
 
         for test_image in test_images:
+            self.record_message_shot(f"API: Uploading {test_image}")
             r = import_asset(test_image)
             self.assertNotEqual(r.get('id'), None)
 
+    def test_006_wait_for_job_queue(self):
+        """
+        Wait for the job queue to be empty, this tests verifies that the image
+        processing jobs are running and that the queue is empty when they are done.
+        """
+
         # ML models are downloaded in the background when we upload assets
         # Wait for them to complete, and the queue to be empty before continuing
+        self.record_message_shot("API: Wait for the job queue to be empty")
         wait_for_empty_job_queue()
 
         # # Re-run the recognition job. I'm not sure if this is an Immich bug or
         # # just a quirk of the test environment. Anyway let's just run it again.
+        self.record_message_shot("API: Trigger the face detection job")
         trigger_job("faceDetection")
         time.sleep(2)
+
+        self.record_message_shot("API: Wait for the job queue to be empty (again)")
         wait_for_empty_job_queue()
 
     def test_100_verify_uploaded_assets_number_of_files(self):
         """
         Use the API to verify that the assets were uploaded correctly.
         """
+        self.record_message_shot("API: Query the API and verify that the number of assets is correct")
         self.assertEqual(get_number_of_assets(), 25)
 
     def test_100_verify_exif_location_extraction(self):
@@ -262,12 +303,11 @@ class TestImmichWeb(BaseCase):
         correctly as a named location.
         """
 
+        self.record_message_shot("API: Verify that the location is extracted correctly from the EXIF data")
         assets = get_assets(["ship.mp4", "grass.MP.jpg"])
 
         ship = assets['ship.mp4']
         grass = assets['grass.MP.jpg']
-
-        print(ship)
 
         self.assertEqual(ship['type'], "VIDEO")
         self.assertEqual(ship['exifInfo']['country'], "Sweden")
@@ -278,6 +318,7 @@ class TestImmichWeb(BaseCase):
         Extract the EXIF data from the images and verify that it is correct.
         """
 
+        self.record_message_shot("API: Verify that the EXIF data is extracted correctly")
         assets = get_assets(["ohm.gif", "grass.MP.jpg", "IMG_2682.heic"])
         ohm = assets['ohm.gif']
         grass = assets['grass.MP.jpg']
@@ -304,6 +345,7 @@ class TestImmichWeb(BaseCase):
           * Pgvector extension works
         """
 
+        self.record_message_shot("API: Verify that people are detected in the images")
         wait_for_empty_job_queue()
 
         with open("secret.txt", "r") as f:
@@ -320,3 +362,10 @@ class TestImmichWeb(BaseCase):
                 continue
 
             self.assertGreater(people['total'], 1)
+
+    def test_999_success(self):
+        """
+        The test suite has finished successfully.
+        """
+
+        self.record_message_shot("API: Test suite finished successfully")

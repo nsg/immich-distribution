@@ -86,3 +86,11 @@ jobs:
             tests/assets/live.js
             tests/assets/pytest_style.css
             tests/dashboard.html
+
+      - name: Upload test screenshots
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: selenium-test-screenshots
+          path: |
+            tests/screenshots/

@@ -4,7 +4,12 @@
 #
 
 test: .env/bin/seleniumbase test-assets wait check-selenium
+	rm screenshots/* || true
 	.env/bin/pytest tests_selenium.py --server=127.0.0.1 --port=4444 --headed --dashboard --html=report/index.html ${EXTRA_ARGS}
+	make movie
+
+cleantest:
+	make -C .. remove install tests
 
 test-sync:
 	SERVICE_STATE=default .env/bin/pytest tests_sync_service.py
@@ -36,6 +41,7 @@ ci-sync:
 	SERVICE_STATE=threshold pytest tests_sync_service.py
 
 test_%: .env/bin/seleniumbase test-assets
+	rm screenshots/* || true
 	.env/bin/pytest tests_selenium.py --server=127.0.0.1 --port=4444 --headed -k $* --html=report/index.html
 
 test-assets:
@@ -57,6 +63,12 @@ selenium:
 		-p 7900:7900 \
 		--shm-size="2g" \
 		docker.io/selenium/standalone-chrome:latest
+
+movie:
+	.env/bin/python movie.py
+
+ci-movie:
+	python movie.py
 
 .env:
 	virtualenv .env
