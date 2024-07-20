@@ -201,22 +201,6 @@ class TestImmichWeb(BaseCase):
         with open("secret.txt", "w") as f:
             f.write(secret)
 
-    def test_005_configure_immich(self):
-        """
-        Configure Immich via the API
-        """
-
-        old_config = requests.get(f"http://{get_ip_address()}/api/system-config", headers=get_headers())
-        self.assertEqual(old_config.status_code, 200)
-
-        data=old_config.json()
-        data["machineLearning"]["facialRecognition"]["minFaces"] = 1
-
-        response = requests.put(
-            f"http://{get_ip_address()}/api/system-config", headers=get_headers(), json=data
-        )
-        self.assertEqual(response.status_code, 200)
-
     def test_005_upload_assets_via_api(self):
         """
         Upload test assets to the server using the API. I maintain a list of testfiles in assets/
@@ -229,6 +213,16 @@ class TestImmichWeb(BaseCase):
             "assets/ai-people1.png",
             "assets/ai-people2.png",
             "assets/ai-people3.png",
+            "assets/ml-tesla1.png",
+            "assets/ml-tesla2.png",
+            "assets/ml-tesla3.png",
+            "assets/ml-tesla4.png",
+            "assets/ml-tesla5.png",
+            "assets/ml-tesla6.png",
+            "assets/ml-edison1.png",
+            "assets/ml-edison2.png",
+            "assets/ml-edison3.png",
+            "assets/ml-edison4.png",
             "assets/field.jpg",
             "assets/grass.MP.jpg",
             "assets/memory.jpg",
@@ -260,7 +254,7 @@ class TestImmichWeb(BaseCase):
         """
         Use the API to verify that the assets were uploaded correctly.
         """
-        self.assertEqual(get_number_of_assets(), 15)
+        self.assertEqual(get_number_of_assets(), 25)
 
     def test_100_verify_exif_location_extraction(self):
         """
@@ -325,4 +319,4 @@ class TestImmichWeb(BaseCase):
                 time.sleep(2)
                 continue
 
-            self.assertGreater(people['total'], 2)
+            self.assertGreater(people['total'], 1)
