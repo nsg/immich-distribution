@@ -150,7 +150,7 @@ class TestImmichWeb(BaseCase):
     def record_message_shot(self, message):
         self.open("about:blank")
         self.execute_script("document.body.style = 'font-family: sans-serif; padding: 40px 20px; font-size: 2em;'")
-        self.execute_script(f'document.body.innerHTML="{message.replace("\"", "\\\"")}";')
+        self.execute_script(f'document.body.innerHTML="{message}";')
         self.shot()
 
     def test_001_register(self):
