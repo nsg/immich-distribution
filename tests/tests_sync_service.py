@@ -192,7 +192,7 @@ def test_021_test_delete_assets_from_immich():
 
     asset_id = get_asset_id("tanners_ridge.jpg")
     delete_asset(asset_id)
-    time.sleep(2)
+    time.sleep(30)
     requests.post(f"http://{get_ip_address()}/api/trash/empty", headers=get_headers())
     time.sleep(30)
     assert os.path.exists(sync_file_path) == False
