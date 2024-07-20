@@ -7,6 +7,7 @@ import socket
 import shutil
 import time
 
+EXPECTED_INITIAL_IMAGE_COUNT = 25
 
 def processes_in_cgroup(unit_name: str) -> Tuple[bool, str]:
     result = subprocess.run([
@@ -75,7 +76,7 @@ def test_001_check_expected_state_default():
 
     assert rc == 0
     assert "sync-service.py" not in output
-    assert get_number_of_assets() == 15
+    assert get_number_of_assets() == EXPECTED_INITIAL_IMAGE_COUNT
 
 
 @pytest.mark.skipif(os.environ["SERVICE_STATE"] != "enabled", reason="Skipping test")
@@ -116,7 +117,7 @@ def test_001_running_sync_service():
 
     assert rc == 0
     assert "sync-service.py" in output
-    assert get_number_of_assets() == 15
+    assert get_number_of_assets() == EXPECTED_INITIAL_IMAGE_COUNT
 
     result = subprocess.run([
         "journalctl", "--no-pager", "-n", "10", "-e",
@@ -139,7 +140,7 @@ def test_010_add_file():
     shutil.copy("test-assets/albums/nature/polemonium_reptans.jpg", sync_file_path)
 
     time.sleep(10)
-    assert get_number_of_assets() == 16
+    assert get_number_of_assets() == EXPECTED_INITIAL_IMAGE_COUNT + 1
 
 
 @pytest.mark.skipif(os.environ["SERVICE_STATE"] != "running", reason="Skipping test")
@@ -154,7 +155,7 @@ def test_020_remove_file():
     os.remove(sync_file_path)
 
     time.sleep(10)
-    assert get_number_of_assets() == 15
+    assert get_number_of_assets() == EXPECTED_INITIAL_IMAGE_COUNT
 
 
 @pytest.mark.skipif(os.environ["SERVICE_STATE"] != "threshold", reason="Skipping test")
@@ -169,11 +170,11 @@ def test_020_test_delete_threshold():
     shutil.copy("test-assets/albums/nature/cyclamen_persicum.jpg", sync_file_path)
 
     time.sleep(10)
-    assert get_number_of_assets() == 16
+    assert get_number_of_assets() == EXPECTED_INITIAL_IMAGE_COUNT + 1
 
     os.remove(sync_file_path)
     time.sleep(10)
-    assert get_number_of_assets() == 16
+    assert get_number_of_assets() == EXPECTED_INITIAL_IMAGE_COUNT + 1
 
 
 @pytest.mark.skipif(os.environ["SERVICE_STATE"] != "threshold", reason="Skipping test")
@@ -187,7 +188,7 @@ def test_021_test_delete_assets_from_immich():
     shutil.copy("test-assets/albums/nature/tanners_ridge.jpg", sync_file_path)
 
     time.sleep(10)
-    assert get_number_of_assets() == 17
+    assert get_number_of_assets() == EXPECTED_INITIAL_IMAGE_COUNT + 2
 
     asset_id = get_asset_id("tanners_ridge.jpg")
     delete_asset(asset_id)
