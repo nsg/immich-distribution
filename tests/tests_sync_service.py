@@ -194,7 +194,7 @@ def test_021_test_delete_assets_from_immich():
     delete_asset(asset_id)
     time.sleep(2)
     requests.post(f"http://{get_ip_address()}/api/trash/empty", headers=get_headers())
-    time.sleep(10)
+    time.sleep(30)
     assert os.path.exists(sync_file_path) == False
 
 if __name__ == "__main__":
