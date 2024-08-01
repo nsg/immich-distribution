@@ -297,7 +297,15 @@ def database_watcher(event: threading.Event, db: ImmichDatabase, api: ImmichAPI,
     log("Database watcher thread running...")
     user_id = api.get_user_id()
     while not event.is_set():
-        for record in db.last_removed_asset(user_id):
+
+        try:
+            last_rem_asset = db.last_removed_asset(user_id)
+        except psycopg2.DatabaseError as e:
+            log(f"Database error, retry in 10 seconds: {e}")
+            time.sleep(10)
+            continue
+
+        for record in last_rem_asset:
             asset_id = record['asset_id']
             asset_path = record['asset_path']
             full_path = f"{user_path}/{asset_path}"
