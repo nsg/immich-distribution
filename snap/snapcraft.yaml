@@ -16,29 +16,24 @@ issues: https://github.com/nsg/immich-distribution/issues
 summary: This is an Immich Distribution packaged by the community.
 description: |
   This is an Immich Distribution packaged inside a snap package.
-  The package is inspired of the official Immich images.
-  It will be similar, but not identical with the official
+  The package is inspired by the official Immich images.
+  It will be similar but not identical to the official
   Docker-based installation.
 
-  Immich Distribution will ship the same software, but with limited
-  customization. The main focus is ease of use, a simple
-  `snap install immich-distribution` on a publicly available server 
-  should yield a fully working Immich installation. Extra tools are
-  included, they should be non-intrusive and you can ignore them if
-  you prefer.
-
-  **Extra tools**
-
-  * Simple Backup / Restore
-  * Folder Sync - Synchronize (read & write) a folder (with a few caveats) with Immich
+  Immich Distribution ships the same software but with limited customization.
+  The main focus is ease of use; a simple `snap install immich-distribution` on a publicly available server should yield a fully working Immich installation.
+  Non-intrusive extra tools are included, which can be ignored if not needed.
 
   **Resources**
 
   * https://immich-distribution.nsg.cc
   * https://github.com/nsg/immich-distribution
 
-  This is **NOT** an official Immich package.
-  For support, open an issue on the link above.
+  Immich Distribution is an independent community project that packages the software in a snap package.
+  This project is not affiliated with the upstream Immich project, its developers, or FUTO.
+  For more information, please refer to the links above.
+
+  For support, please open an issue on our GitHub page.
 
 system-usernames:
   snap_daemon: shared
