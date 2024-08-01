@@ -224,6 +224,7 @@ parts:
       - libpango1.0-dev
       - libopenjp2-7-dev
       - libimagequant-dev
+      - liblcms2-dev
     build-snaps:
       - node/20/stable
     stage-snaps:

@@ -3,53 +3,46 @@
 # The tests are written in Python and use the SeleniumBase framework.
 #
 
-test: .env/bin/seleniumbase test-assets wait check-selenium
-	rm screenshots/* || true
-	.env/bin/pytest tests_selenium.py --server=127.0.0.1 --port=4444 --headed --dashboard --html=report/index.html ${EXTRA_ARGS}
+ifndef CI
+    PYTEST = .env/bin/pytest
+    PYTEST_EXTRA_ARGS = --headed
+    PYTEST_LOCALTEST_DEPENDENCIES = .env/bin/seleniumbase check-selenium
+	PYTHON = .env/bin/python
+else
+    PYTEST = pytest
+    PYTEST_EXTRA_ARGS =
+    PYTEST_LOCALTEST_DEPENDENCIES =
+	PYTHON = python
+endif
+
+test: ${PYTEST_LOCALTEST_DEPENDENCIES} test-assets wait
+	rm -f screenshots/* || true
+	${PYTEST} tests_selenium.py --server=127.0.0.1 --port=4444 ${PYTEST_EXTRA_ARGS} --dashboard --html=report/index.html
 	make movie
 
-cleantest:
-	make -C .. remove install tests
-
 test-sync:
-	SERVICE_STATE=default .env/bin/pytest tests_sync_service.py
+	SERVICE_STATE=default ${PYTEST} tests_sync_service.py
 	sudo snap set immich-distribution sync-enabled=true
 	sleep 10
-	SERVICE_STATE=enabled .env/bin/pytest tests_sync_service.py
+	SERVICE_STATE=enabled ${PYTEST} tests_sync_service.py
 	sudo snap set immich-distribution sync="$(shell cat secret.txt)"
 	sleep 10
 	sudo chmod -R 777 /var/snap/immich-distribution/common/sync
-	SERVICE_STATE=running .env/bin/pytest tests_sync_service.py
+	SERVICE_STATE=running ${PYTEST} tests_sync_service.py
 	sudo snap set immich-distribution sync-delete-threshold=0
 	sleep 10
-	SERVICE_STATE=threshold .env/bin/pytest tests_sync_service.py
-
-ci: test-assets wait
-	pytest tests_selenium.py --server=127.0.0.1 --port=4444 --dashboard --html=report/index.html
-
-ci-sync:
-	SERVICE_STATE=default pytest tests_sync_service.py
-	sudo snap set immich-distribution sync-enabled=true
-	sleep 10
-	SERVICE_STATE=enabled pytest tests_sync_service.py
-	sudo snap set immich-distribution sync="$(shell cat secret.txt)"
-	sleep 10
-	sudo chmod -R 777 /var/snap/immich-distribution/common/sync
-	SERVICE_STATE=running pytest tests_sync_service.py
-	sudo snap set immich-distribution sync-delete-threshold=0
-	sleep 10
-	SERVICE_STATE=threshold pytest tests_sync_service.py
+	SERVICE_STATE=threshold ${PYTEST} tests_sync_service.py
 
 test_%: .env/bin/seleniumbase test-assets
 	rm screenshots/* || true
-	.env/bin/pytest tests_selenium.py --server=127.0.0.1 --port=4444 --headed -k $* --html=report/index.html
+	${PYTEST} tests_selenium.py --server=127.0.0.1 --port=4444 --headed -k $* --html=report/index.html
 
 test-assets:
 	git clone https://github.com/immich-app/test-assets.git
 	cd test-assets && git checkout 61131e84ec91d316265aebe375b3155308baaa89
 
-update-snap-symlinks-for-user:
-	immich-distribution.backup -h 2>&1 | grep -q root
+cleantest:
+	make -C .. remove install tests
 
 wait:
 	./test_haproxy.sh
@@ -65,10 +58,7 @@ selenium:
 		docker.io/selenium/standalone-chrome:latest
 
 movie:
-	.env/bin/python movie.py
-
-ci-movie:
-	python movie.py
+	${PYTHON} movie.py
 
 .env:
 	virtualenv .env
