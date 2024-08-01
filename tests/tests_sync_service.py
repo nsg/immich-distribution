@@ -193,6 +193,8 @@ def test_021_test_delete_assets_from_immich():
     sync_file_path = os.path.join(snap_common, "sync", get_user_id(), "tanners_ridge.jpg")
     shutil.copy("test-assets/albums/nature/tanners_ridge.jpg", sync_file_path)
 
+    assert os.path.exists(sync_file_path), "File was not copied to the sync directory"
+
     for _ in range(120):
         time.sleep(1)
         if get_number_of_assets() == EXPECTED_INITIAL_IMAGE_COUNT + 2:
