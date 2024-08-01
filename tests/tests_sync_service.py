@@ -38,9 +38,12 @@ def get_ip_address():
 
 
 def get_number_of_assets():
-    r = requests.get(f"http://{get_ip_address()}/api/server-info/statistics", headers=get_headers())
-    response = r.json()
-    return response['photos'] + response['videos']
+    num_assets = 0
+    r = requests.get(f"http://{get_ip_address()}/api/timeline/buckets?size=MONTH", headers=get_headers())
+    for bucket in r.json():
+        num_assets += bucket['count']
+
+    return num_assets
 
 
 def get_user_id() -> str:
