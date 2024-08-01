@@ -1,8 +1,5 @@
 IMMICH_VERSION := v1.109.2
 
-# Use our own Python, over the older included one
-export PATH := ${CRAFT_PART_BUILD}/../../python/install/usr/local/bin:$(PATH)
-
 POETRY_ENV = ${HOME}/poetry
 POETRY = ${POETRY_ENV}/bin/poetry
 

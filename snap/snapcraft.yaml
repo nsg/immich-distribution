@@ -148,28 +148,12 @@ apps:
       - network
       - network-bind
 
-#
-# Dependency graph of build dependencies of the different parts.
-# This is not a runtime dependency graph. Different parts may
-# depend on each other at runtime.
-#
-#         server                     web
-#            |                        |
-#         libvips_________         parts-web
-#        /       \        \
-#    cgif    imagemagick   \
-#              /   | \  \   \
-#           libraw |  \  libheif
-#                  |   \  /  |
-#                  |   x265  |
-#                   \       /
-#                    \     /
-#                    libde265
-#
-#   machine-learning     sync
-#                 \     /
-#                  python
-#
+package-repositories:
+  - type: apt
+    url: http://apt.nsg.cc
+    key-id: F57612E2E6C4A0CAA9695C839C471A5B8FA0B5E3
+    suites: [jammy]
+    components: [main]
 
 parts:
   server:
@@ -220,15 +204,40 @@ parts:
       cp -r resources ${CRAFT_PART_INSTALL}/usr/src/app
       cp package.json package-lock.json ${CRAFT_PART_INSTALL}/usr/src/app
 
-    after:
-      - libvips
     build-packages:
       - git
       - pkg-config
+
+      # Sharp needs to be rebuilt and linked against the system libvips, which requires installing various development packages.
+      # This list is based on the list of packages required to build libvips from source, some packages may be unnecessary but
+      # these packages are not included in the final snap package anyway so it doesn't matter.
+      - libfftw3-dev
+      - libopenexr-dev
+      - libgsf-1-dev
+      - libglib2.0-dev
+      - liborc-dev
+      - libopenslide-dev
+      - libmatio-dev
+      - libwebp-dev
+      - libjpeg-turbo8-dev
+      - libexpat1-dev
+      - libexif-dev
+      - libtiff5-dev
+      - libcfitsio-dev
+      - libpoppler-glib-dev
+      - librsvg2-dev
+      - libpango1.0-dev
+      - libopenjp2-7-dev
+      - libimagequant-dev
     build-snaps:
       - node/20/stable
     stage-snaps:
       - node/20/stable
+    stage-packages:
+      - nsg-ffmpeg
+      - nsg-redis
+      - nsg-postgres
+      - nsg-libvips
 
   parts-server-scripts:
     plugin: dump
@@ -261,8 +270,10 @@ parts:
     build-packages:
       - git
       - execstack
-    after:
-      - python
+      - nsg-python
+    stage-packages:
+      - nsg-python
+      - nsg-mimalloc
 
   debug:
     plugin: dump
@@ -277,12 +288,16 @@ parts:
       - curl
       - jq
       - xz-utils
+      - nsg-haproxy
+      - nsg-lego
 
   sync:
     plugin: make
     source: parts/sync
-    after:
-      - python
+    build-packages:
+      - nsg-python
+    stage-packages:
+      - nsg-python
 
   geodata:
     # Download geodata from geonames.org, based Immich Server base image
@@ -309,101 +324,6 @@ parts:
     plugin: dump
     source: parts/manager
 
-  ffmpeg:
-    plugin: dump
-    # I'm using a static build from John Van Sickle, his builds are linked from the official ffmpeg site.
-    # There is no stable URL so I'm hosting a copy myself. The files are/where hosted at:
-    # https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz
-    source: http://assets.immich-distribution.nsg.cc/ffmpeg-6.1-amd64-static.tar.xz
-    source-checksum: sha256/1e1f535fbd6bbdcc652e592f780238c24f69006c1abc0698e82d1acbc25a282f
-    override-build: |
-      mkdir -p $CRAFT_PART_INSTALL/bin
-      cp $CRAFT_PART_SRC/ffmpeg $CRAFT_PART_INSTALL/bin
-      cp $CRAFT_PART_SRC/ffprobe $CRAFT_PART_INSTALL/bin
-
-  haproxy:
-    source: http://git.haproxy.org/git/haproxy-2.6.git
-    source-tag: v2.6.15
-    plugin: make
-    make-parameters:
-      - TARGET=linux-glibc
-      - USE_OPENSSL=1
-      - USE_ZLIB=1
-      - USE_PCRE=1
-    build-packages:
-      - build-essential
-      - libssl-dev
-      - libpcre3-dev
-      - libz-dev
-    organize:
-      usr/local/sbin/haproxy: bin/haproxy
-    stage:
-      - -usr
-
-  lego:
-    source: https://github.com/go-acme/lego.git
-    source-tag: v4.10.2
-    plugin: go
-    build-environment:
-      - GO111MODULE: "on"
-    override-build: |
-      make build
-      mkdir -p $CRAFT_PART_INSTALL/bin
-      cp dist/lego $CRAFT_PART_INSTALL/bin
-    build-snaps: [go/latest/stable]
-
-  mimalloc:
-    source: https://github.com/microsoft/mimalloc.git
-    source-tag: v2.1.2
-    plugin: cmake
-
-  python:
-    source: https://www.python.org/ftp/python/3.11.7/Python-3.11.7.tgz
-    source-checksum: md5/ef61f81ec82c490484219c7f0ec96783
-    plugin: make
-    override-build: |
-      ./configure --enable-optimizations --with-ensurepip=install
-      craftctl default
-    build-packages:
-      - libssl-dev
-      - zlib1g-dev
-      - libbz2-dev
-      - liblzma-dev
-      - libreadline-dev
-      - libsqlite3-dev
-      - xz-utils
-      - libffi-dev
-      - libncurses5-dev
-      - libgdbm-dev
-      - libnss3-dev
-    stage-packages:
-      - libtcl8.6
-      - libtk8.6
-      - libxft2
-      - libgdbm6
-    stage:
-      - -etc/init.d
-      - -etc/X11
-      - -usr/bin
-      - -usr/include
-      - -usr/lib/X11
-      - -usr/share/doc
-      - -usr/share/doc-base
-      - -usr/share/lintian
-      - -usr/share/man
-      - -usr/share/X11
-
-  redis:
-    source: https://github.com/redis/redis.git
-    source-tag: 7.0.9
-    plugin: make
-    build-environment:
-      - PREFIX: $CRAFT_PART_INSTALL
-    build-packages:
-      - pkg-config
-    prime:
-      - bin/redis-server
-
   pgvecto-rs:
     source: https://github.com/tensorchord/pgvecto.rs/releases/download/v0.2.0/vectors-pg15_0.2.0_amd64.deb
     plugin: dump
@@ -412,248 +332,3 @@ parts:
       usr/lib/postgresql/15/lib: usr/local/pgsql/lib
     stage:
       - -usr/share/doc
-
-  postgres:
-    source: https://ftp.postgresql.org/pub/source/v15.2/postgresql-15.2.tar.bz2
-    plugin: make
-    build-packages:
-      - libreadline-dev
-      - zlib1g-dev
-      - uuid-dev
-    override-build: |
-      ./configure --enable-thread-safety --with-uuid=e2fs --with-gnu-ld
-      snapcraftctl build
-      cd contrib
-      make
-      make install DESTDIR=$CRAFT_PART_INSTALL
-    stage:
-      # headers
-      - -usr/local/pgsql/include
-      # examples
-      - -usr/local/share/doc
-
-  libvips:
-    plugin: meson
-    meson-parameters:
-      - --buildtype=release
-      - --prefix=/usr
-      - --libdir=lib
-      - --default-library=shared
-
-      # TIFF support is disabled because libvips believes incorrectly that several RAW formats are tiff files.
-      # Vips sends unsupported file formats to ImageMagick, who handles them correctly.
-      - -Dtiff=disabled
-
-    source: https://github.com/libvips/libvips.git
-    source-commit: 0144d503a4e90ee56830dda9ebc39b2f25ae8b1f
-    build-packages:
-      - meson
-      - ninja-build
-
-      # Based on https://github.com/libvips/libvips/wiki/Build-for-Ubuntu
-      - libfftw3-dev
-      - libopenexr-dev
-      - libgsf-1-dev
-      - libglib2.0-dev
-      - liborc-dev
-      - libopenslide-dev
-      - libmatio-dev
-      - libwebp-dev
-      - libjpeg-turbo8-dev
-      - libexpat1-dev
-      - libexif-dev
-      - libtiff5-dev
-      - libcfitsio-dev
-      - libpoppler-glib-dev
-      - librsvg2-dev
-      - libpango1.0-dev
-      - libopenjp2-7-dev
-      - libimagequant-dev
-    stage-packages:
-      - libfftw3-3
-      - libopenexr25
-      - libgsf-1-114
-      - libglib2.0-0
-      - liborc-0.4-0
-      - libopenslide0
-      - libmatio11
-      - libwebp7
-      - libjpeg-turbo8
-      - libexpat1
-      - libexif12
-      - libtiff5
-      - libcfitsio9
-      - libpoppler-glib8
-      - librsvg2-2
-      - libpango1.0-0
-      - libopenjp2-7
-      - libimagequant0
-      - libwebpmux3
-      - libwebpdemux2
-    after:
-       - cgif
-       - libheif
-       - imagemagick
-
-  cgif:
-    plugin: meson
-    source: https://github.com/dloebl/cgif.git
-    source-tag: "V0.3.2"
-    meson-parameters:
-      - --prefix=/usr
-    build-packages: [meson, ninja-build]
-
-  libheif:
-    plugin: cmake
-    source: https://github.com/strukturag/libheif.git
-    source-tag: "v1.17.5"
-    cmake-parameters:
-      - -DCMAKE_INSTALL_PREFIX=/usr
-      - --preset=release
-    build-packages:
-      - cmake
-      - pkg-config
-      - zlib1g-dev
-      - libsharp-dev
-      - libjpeg-turbo8-dev
-      - libpng-dev
-      - libaom-dev
-    stage-packages:
-      - zlib1g
-      - libsharp0
-      - libjpeg-turbo8
-      - libpng16-16
-      - libaom3
-    organize: 
-      usr/local: usr
-    after:
-      - libde265
-      - x265
-
-  libde265:
-    plugin: cmake
-    source: https://github.com/strukturag/libde265.git
-    source-tag: "v1.0.14"
-    build-packages: [cmake]
-    cmake-parameters:
-      - -DCMAKE_INSTALL_PREFIX=/usr
-
-  x265:
-    plugin: cmake
-    source: https://bitbucket.org/multicoreware/x265_git.git
-    source-tag: "3.5"
-    source-subdir: source
-    build-packages: [cmake, nasm]
-    cmake-parameters:
-      - -DCMAKE_INSTALL_PREFIX=/usr
-
-  imagemagick:
-    plugin: make
-    source: https://github.com/ImageMagick/ImageMagick.git
-    source-commit: 963f5fa2a3c87b362e2b6b29a31bff447b75925b
-    override-build: |
-      ./configure --with-modules --enable-static=yes --with-x=no --with-raw=yes --prefix=/usr
-      snapcraftctl build
-    build-packages:
-      - libltdl-dev
-      - libbz2-dev
-      - libdjvulibre-dev
-      - libexif-dev
-      - libfftw3-dev
-      - libfontconfig1-dev
-      - libfreetype6-dev
-      - libjpeg-dev
-      - liblcms2-dev
-      - liblqr-1-0-dev
-      - liblzma-dev
-      - libopenexr-dev
-      - libpango1.0-dev
-      - libperl-dev
-      - libpng-dev
-      - librsvg2-bin
-      - librsvg2-dev
-      - libtiff-dev
-      - libwebp-dev
-      - libwmf-dev
-      - libx11-dev
-      - libxext-dev
-      - libxml2-dev
-      - libxt-dev
-      - zlib1g-dev
-      - libzstd-dev
-    stage-packages:
-      - libcairo2
-      - libdatrie1
-      - libdjvulibre21
-      - libfontconfig1
-      - libfreetype6
-      - libfribidi0
-      - libgomp1
-      - libgraphite2-3
-      - libharfbuzz0b
-      - libicu70
-      - libilmbase25
-      - libjbig0
-      - libjpeg-turbo8
-      - liblcms2-2
-      - liblqr-1-0
-      - libltdl7
-      - libnuma1
-      - libopenexr25
-      - libopenjp2-7
-      - libpango-1.0-0
-      - libpangocairo-1.0-0
-      - libpangoft2-1.0-0
-      - libpixman-1-0
-      - libpng16-16
-      - libthai0
-      - libtiff5
-      - libwebp7
-      - libwebpdemux2
-      - libwebpmux3
-      - libwmf0.2-7
-      - libx11-6
-      - libxau6
-      - libxcb-render0
-      - libxcb-shm0
-      - libxcb1
-      - libxdmcp6
-      - libxext6
-      - libxml2
-      - libxrender1
-    stage:
-      - -usr/share/apport
-      - -usr/share/djvu
-      - -usr/share/docs
-      - -usr/share/doc
-      - -usr/share/lintian
-      - -usr/share/man
-      - -usr/share/X11
-    after:
-      - libraw
-      - x265
-      - libheif
-      - libde265
-
-  libraw:
-    plugin: autotools
-    source: https://github.com/libraw/libraw.git
-    source-commit: cccb97647fcee56801fa68231fa8a38aa8b52ef7
-    autotools-configure-parameters:
-      - --disable-examples
-      - --prefix=/usr
-      - --enable-jpeg
-      - --enable-zlib
-    override-build: |
-      autoreconf --install
-      craftctl default
-    build-packages:
-      - zlib1g-dev
-      - libjpeg8-dev
-      - pkg-config
-    stage-packages:
-      - libgomp1
-      - libjpeg-turbo8
-      - liblcms2-2
-    stage:
-      - -usr/share
