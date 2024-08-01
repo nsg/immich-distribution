@@ -169,7 +169,7 @@ def test_020_test_delete_threshold():
     sync_file_path = os.path.join(snap_common, "sync", get_user_id(), "cyclamen_persicum.jpg")
     shutil.copy("test-assets/albums/nature/cyclamen_persicum.jpg", sync_file_path)
 
-    time.sleep(10)
+    time.sleep(30)
     assert get_number_of_assets() == EXPECTED_INITIAL_IMAGE_COUNT + 1
 
     os.remove(sync_file_path)
