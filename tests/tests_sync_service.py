@@ -186,6 +186,9 @@ def test_021_test_delete_assets_from_immich():
     Add a file and delete it from Immich, verify that the file is removed.
     """
 
+    # Verify baseline number of assets
+    assert get_number_of_assets() == EXPECTED_INITIAL_IMAGE_COUNT + 1
+
     snap_common = "/var/snap/immich-distribution/common"
     sync_file_path = os.path.join(snap_common, "sync", get_user_id(), "tanners_ridge.jpg")
     shutil.copy("test-assets/albums/nature/tanners_ridge.jpg", sync_file_path)
