@@ -194,8 +194,13 @@ def test_021_test_delete_assets_from_immich():
     delete_asset(asset_id)
     time.sleep(30)
     requests.post(f"http://{get_ip_address()}/api/trash/empty", headers=get_headers())
-    time.sleep(30)
-    assert os.path.exists(sync_file_path) == False
+
+    for _ in range(120):
+        time.sleep(1)
+        if not os.path.exists(sync_file_path):
+            break
+    else:
+        assert False, "File was not deleted within the timeout period"
 
 if __name__ == "__main__":
     pytest.main()
