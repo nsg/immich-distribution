@@ -200,7 +200,12 @@ def test_021_test_delete_assets_from_immich():
         if get_number_of_assets() == EXPECTED_INITIAL_IMAGE_COUNT + 2:
             break
     else:
-        assert False, "Number of assets did not reach the expected count within the timeout period"
+        result = subprocess.run(
+            ["journalctl", "--no-pager", "-n", "100", "-e", "-u", "snap.immich-distribution.sync-service.service"],
+            capture_output=True
+        )
+        journal_messages = result.stdout.decode("utf-8")
+        assert False, f"File was not added to Immich, journal output:\n\n{journal_messages}"
 
     asset_id = get_asset_id("tanners_ridge.jpg")
     delete_asset(asset_id)
