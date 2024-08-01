@@ -21,6 +21,7 @@ nav:
     - Upgrade: build/upgrade.md
     - Tests: build/tests.md
     - Statistics: build/statistics.md
+    - Package Dependencies: build/dependencies.md
 
 theme:
   name: material
