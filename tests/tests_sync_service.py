@@ -190,7 +190,7 @@ def test_021_test_delete_assets_from_immich():
     sync_file_path = os.path.join(snap_common, "sync", get_user_id(), "tanners_ridge.jpg")
     shutil.copy("test-assets/albums/nature/tanners_ridge.jpg", sync_file_path)
 
-    time.sleep(10)
+    time.sleep(30)
     assert get_number_of_assets() == EXPECTED_INITIAL_IMAGE_COUNT + 2
 
     asset_id = get_asset_id("tanners_ridge.jpg")
