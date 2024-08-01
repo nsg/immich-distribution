@@ -1,12 +1,9 @@
-PYTHON_PATH = ${CRAFT_PART_BUILD}/../../python/install/usr/local/bin
 PYTHON_ENV = ${CRAFT_PART_INSTALL}/opt/pipsyncenv
-PIP = ${PYTHON_PATH}/python3 ${PYTHON_PATH}/pip3
-
-export PATH := ${PYTHON_PATH}:$(PATH)
 
 build:
+	echo ${PATH}
 	python3 --version
-	${PIP} --version
+	pip3 --version
 
 install:
-	${PIP} install watchfiles requests psycopg2-binary pyyaml --target ${PYTHON_ENV}
+	pip3 install watchfiles requests psycopg2-binary pyyaml --target ${PYTHON_ENV}

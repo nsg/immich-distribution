@@ -1,7 +1,9 @@
 #!/bin/bash
 
+HAPROXY_STATS_URL='http://localhost/haproxy/;csv'
+
 get_stats() {
-    curl -s 'http://localhost/haproxy/;csv'
+    curl -s "$HAPROXY_STATS_URL"
 }
 
 backends_down() {
@@ -29,6 +31,11 @@ log() {
     echo "###"
     echo
 }
+
+while ! curl -s -o /dev/null "$HAPROXY_STATS_URL"; do
+    echo "Waiting for haproxy stats..."
+    sleep 1
+done
 
 N=0
 MAX=240

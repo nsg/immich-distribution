@@ -25,9 +25,17 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+
+      - name: Cache Snap build
+        id: cache-snap
+        uses: actions/cache@v4
+        with:
+          path: "*.snap"
+          key: cache-snap-${{ hashFiles('parts/**', 'snap/**', 'src/**') }}
 
       - name: Build snap package
+        if: steps.cache-snap.outputs.cache-hit != 'true'
         uses: snapcore/action-build@v1
         id: build
 
@@ -36,8 +44,7 @@ jobs:
         with:
           name: development-snap-package
           if-no-files-found: error
-          path: |
-            ${{ steps.build.outputs.snap }}
+          path: "*.snap"
 
   run-tests:
     name: Run System Tests
@@ -70,10 +77,10 @@ jobs:
         run: pip install -r tests/requirements.txt
 
       - name: TEST | Run Selenium Tests
-        run: make ci -C tests
+        run: make test -C tests
 
       - name: TEST | Run Sync Service Tests
-        run: make ci-sync -C tests
+        run: make test-sync -C tests
 
       - name: Upload test report
         uses: actions/upload-artifact@v4
@@ -86,3 +93,11 @@ jobs:
             tests/assets/live.js
             tests/assets/pytest_style.css
             tests/dashboard.html
+
+      - name: Upload test screenshots
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: selenium-test-screenshots
+          path: |
+            tests/screenshots/

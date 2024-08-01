@@ -7,6 +7,7 @@ import socket
 import shutil
 import time
 
+EXPECTED_INITIAL_IMAGE_COUNT = 25
 
 def processes_in_cgroup(unit_name: str) -> Tuple[bool, str]:
     result = subprocess.run([
@@ -37,9 +38,12 @@ def get_ip_address():
 
 
 def get_number_of_assets():
-    r = requests.get(f"http://{get_ip_address()}/api/server-info/statistics", headers=get_headers())
-    response = r.json()
-    return response['photos'] + response['videos']
+    num_assets = 0
+    r = requests.get(f"http://{get_ip_address()}/api/timeline/buckets?size=MONTH", headers=get_headers())
+    for bucket in r.json():
+        num_assets += bucket['count']
+
+    return num_assets
 
 
 def get_user_id() -> str:
@@ -64,6 +68,14 @@ def delete_asset(asset_id: str) -> None:
         raise Exception(f"Failed to delete asset {asset_id}, status code {r.status_code}. Response: {r.text}")
 
 
+def sync_service_journal_messages() -> str:
+    result = subprocess.run(
+        ["journalctl", "--no-pager", "-n", "100", "-e", "-u", "snap.immich-distribution.sync-service.service"],
+        capture_output=True
+    )
+    return result.stdout.decode("utf-8")
+
+
 @pytest.mark.skipif(os.environ["SERVICE_STATE"] != "default", reason="Skipping test")
 def test_001_check_expected_state_default():
     """
@@ -75,7 +87,7 @@ def test_001_check_expected_state_default():
 
     assert rc == 0
     assert "sync-service.py" not in output
-    assert get_number_of_assets() == 15
+    assert get_number_of_assets() == EXPECTED_INITIAL_IMAGE_COUNT
 
 
 @pytest.mark.skipif(os.environ["SERVICE_STATE"] != "enabled", reason="Skipping test")
@@ -116,7 +128,7 @@ def test_001_running_sync_service():
 
     assert rc == 0
     assert "sync-service.py" in output
-    assert get_number_of_assets() == 15
+    assert get_number_of_assets() == EXPECTED_INITIAL_IMAGE_COUNT
 
     result = subprocess.run([
         "journalctl", "--no-pager", "-n", "10", "-e",
@@ -139,7 +151,7 @@ def test_010_add_file():
     shutil.copy("test-assets/albums/nature/polemonium_reptans.jpg", sync_file_path)
 
     time.sleep(10)
-    assert get_number_of_assets() == 16
+    assert get_number_of_assets() == EXPECTED_INITIAL_IMAGE_COUNT + 1, sync_service_journal_messages()
 
 
 @pytest.mark.skipif(os.environ["SERVICE_STATE"] != "running", reason="Skipping test")
@@ -154,7 +166,7 @@ def test_020_remove_file():
     os.remove(sync_file_path)
 
     time.sleep(10)
-    assert get_number_of_assets() == 15
+    assert get_number_of_assets() == EXPECTED_INITIAL_IMAGE_COUNT, sync_service_journal_messages()
 
 
 @pytest.mark.skipif(os.environ["SERVICE_STATE"] != "threshold", reason="Skipping test")
@@ -168,12 +180,12 @@ def test_020_test_delete_threshold():
     sync_file_path = os.path.join(snap_common, "sync", get_user_id(), "cyclamen_persicum.jpg")
     shutil.copy("test-assets/albums/nature/cyclamen_persicum.jpg", sync_file_path)
 
-    time.sleep(10)
-    assert get_number_of_assets() == 16
+    time.sleep(30)
+    assert get_number_of_assets() == EXPECTED_INITIAL_IMAGE_COUNT + 1
 
     os.remove(sync_file_path)
     time.sleep(10)
-    assert get_number_of_assets() == 16
+    assert get_number_of_assets() == EXPECTED_INITIAL_IMAGE_COUNT + 1
 
 
 @pytest.mark.skipif(os.environ["SERVICE_STATE"] != "threshold", reason="Skipping test")
@@ -182,19 +194,33 @@ def test_021_test_delete_assets_from_immich():
     Add a file and delete it from Immich, verify that the file is removed.
     """
 
+    # Verify baseline number of assets
+    assert get_number_of_assets() == EXPECTED_INITIAL_IMAGE_COUNT + 1
+
     snap_common = "/var/snap/immich-distribution/common"
     sync_file_path = os.path.join(snap_common, "sync", get_user_id(), "tanners_ridge.jpg")
     shutil.copy("test-assets/albums/nature/tanners_ridge.jpg", sync_file_path)
 
-    time.sleep(10)
-    assert get_number_of_assets() == 17
+    assert os.path.exists(sync_file_path), "File was not copied to the sync directory"
+
+    for _ in range(120):
+        time.sleep(1)
+        if get_number_of_assets() == EXPECTED_INITIAL_IMAGE_COUNT + 2:
+            break
+    else:
+        assert False, f"File was not added to Immich, journal output:\n\n{sync_service_journal_messages()}"
 
     asset_id = get_asset_id("tanners_ridge.jpg")
     delete_asset(asset_id)
-    time.sleep(2)
+    time.sleep(30)
     requests.post(f"http://{get_ip_address()}/api/trash/empty", headers=get_headers())
-    time.sleep(10)
-    assert os.path.exists(sync_file_path) == False
+
+    for _ in range(120):
+        time.sleep(1)
+        if not os.path.exists(sync_file_path):
+            break
+    else:
+        assert False, f"File was not deleted within the timeout period: {sync_service_journal_messages()}"
 
 if __name__ == "__main__":
     pytest.main()

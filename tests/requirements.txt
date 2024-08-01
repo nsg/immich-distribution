@@ -1,2 +1,3 @@
 seleniumbase
 pyyaml
+opencv-python

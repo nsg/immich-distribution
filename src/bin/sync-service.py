@@ -16,13 +16,24 @@ def log(msg: str):
 
 class ImmichDatabase:
     def __init__(self, host: str, database: str, user: str, password: str, port: int):
-        self.conn = psycopg2.connect(host=host, database=database, user=user, password=password, port=port)
+        self.host = host
+        self.database = database
+        self.user = user
+        self.password = password
+        self.port = port
+        self.conn = None
+
+    def connect(self):
+        self.conn = psycopg2.connect(host=self.host, database=self.database, user=self.user, password=self.password, port=self.port)
         self.conn.set_client_encoding('UTF8')
 
     def last_removed_asset(self, user_id: str) -> list[psycopg2.extras.RealDictRow]:
         """
         Retrieves the last removed asset for a given user.
         """
+
+        if not self.conn or self.conn.closed != 0:
+            self.connect()
 
         with self.conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
             cur.execute("""
@@ -42,17 +53,20 @@ class ImmichDatabase:
             return cur.fetchall()
 
     def set_asset_removed(self, asset_id: str) -> None:
-            """
-            Sets the 'file_removed' flag to 'true' for the specified asset ID in the 'assets_delete_audits' table.
-            """
+        """
+        Sets the 'file_removed' flag to 'true' for the specified asset ID in the 'assets_delete_audits' table.
+        """
 
-            with self.conn.cursor() as cur:
-                cur.execute("""
-                    UPDATE assets_delete_audits
-                    SET file_removed = 'true'
-                    WHERE asset_id = %s
-                """, (asset_id,))
-                self.conn.commit()
+        if not self.conn or self.conn.closed != 0:
+            self.connect()
+
+        with self.conn.cursor() as cur:
+            cur.execute("""
+                UPDATE assets_delete_audits
+                SET file_removed = 'true'
+                WHERE asset_id = %s
+            """, (asset_id,))
+            self.conn.commit()
 
     def save_hash(self, user_id: str, asset_path: str, checksum: bytes) -> None:
         """
@@ -60,6 +74,9 @@ class ImmichDatabase:
         database the checksum is updated. The asset_path is the relative path
         to the user directory.
         """
+
+        if not self.conn or self.conn.closed != 0:
+            self.connect()
 
         with self.conn.cursor() as cur:
             cur.execute("""
@@ -76,6 +93,9 @@ class ImmichDatabase:
             self.conn.commit()
 
     def get_asset_id_by_path(self, user_id: str, asset_path: str) -> psycopg2.extras.RealDictRow | None:
+        if not self.conn or self.conn.closed != 0:
+            self.connect()
+
         with self.conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
             cur.execute("""
                 SELECT assets.id
@@ -88,6 +108,9 @@ class ImmichDatabase:
             return cur.fetchone()
 
     def get_asset_id_by_checksum(self, user_id: str, checksum: bytes) -> psycopg2.extras.RealDictRow | None:
+        if not self.conn or self.conn.closed != 0:
+            self.connect()
+
         with self.conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
             cur.execute("""
                 SELECT assets.id
@@ -100,6 +123,9 @@ class ImmichDatabase:
             return cur.fetchone()
 
     def get_asset_created_at_by_path(self, user_id: str, asset_path: str) -> psycopg2.extras.RealDictRow | None:
+        if not self.conn or self.conn.closed != 0:
+            self.connect()
+
         with self.conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
             cur.execute("""
                 SELECT assets."createdAt"
@@ -297,7 +323,15 @@ def database_watcher(event: threading.Event, db: ImmichDatabase, api: ImmichAPI,
     log("Database watcher thread running...")
     user_id = api.get_user_id()
     while not event.is_set():
-        for record in db.last_removed_asset(user_id):
+
+        try:
+            last_rem_asset = db.last_removed_asset(user_id)
+        except psycopg2.DatabaseError as e:
+            log(f"Database error, retry in 10 seconds: {e}")
+            time.sleep(10)
+            continue
+
+        for record in last_rem_asset:
             asset_id = record['asset_id']
             asset_path = record['asset_path']
             full_path = f"{user_path}/{asset_path}"
