@@ -68,6 +68,14 @@ def delete_asset(asset_id: str) -> None:
         raise Exception(f"Failed to delete asset {asset_id}, status code {r.status_code}. Response: {r.text}")
 
 
+def sync_service_journal_messages() -> str:
+    result = subprocess.run(
+        ["journalctl", "--no-pager", "-n", "100", "-e", "-u", "snap.immich-distribution.sync-service.service"],
+        capture_output=True
+    )
+    return result.stdout.decode("utf-8")
+
+
 @pytest.mark.skipif(os.environ["SERVICE_STATE"] != "default", reason="Skipping test")
 def test_001_check_expected_state_default():
     """
@@ -143,7 +151,7 @@ def test_010_add_file():
     shutil.copy("test-assets/albums/nature/polemonium_reptans.jpg", sync_file_path)
 
     time.sleep(10)
-    assert get_number_of_assets() == EXPECTED_INITIAL_IMAGE_COUNT + 1
+    assert get_number_of_assets() == EXPECTED_INITIAL_IMAGE_COUNT + 1, sync_service_journal_messages()
 
 
 @pytest.mark.skipif(os.environ["SERVICE_STATE"] != "running", reason="Skipping test")
@@ -158,7 +166,7 @@ def test_020_remove_file():
     os.remove(sync_file_path)
 
     time.sleep(10)
-    assert get_number_of_assets() == EXPECTED_INITIAL_IMAGE_COUNT
+    assert get_number_of_assets() == EXPECTED_INITIAL_IMAGE_COUNT, sync_service_journal_messages()
 
 
 @pytest.mark.skipif(os.environ["SERVICE_STATE"] != "threshold", reason="Skipping test")
@@ -200,12 +208,7 @@ def test_021_test_delete_assets_from_immich():
         if get_number_of_assets() == EXPECTED_INITIAL_IMAGE_COUNT + 2:
             break
     else:
-        result = subprocess.run(
-            ["journalctl", "--no-pager", "-n", "100", "-e", "-u", "snap.immich-distribution.sync-service.service"],
-            capture_output=True
-        )
-        journal_messages = result.stdout.decode("utf-8")
-        assert False, f"File was not added to Immich, journal output:\n\n{journal_messages}"
+        assert False, f"File was not added to Immich, journal output:\n\n{sync_service_journal_messages()}"
 
     asset_id = get_asset_id("tanners_ridge.jpg")
     delete_asset(asset_id)
@@ -217,7 +220,7 @@ def test_021_test_delete_assets_from_immich():
         if not os.path.exists(sync_file_path):
             break
     else:
-        assert False, "File was not deleted within the timeout period"
+        assert False, f"File was not deleted within the timeout period: {sync_service_journal_messages()}"
 
 if __name__ == "__main__":
     pytest.main()
