@@ -44,8 +44,7 @@ jobs:
         with:
           name: development-snap-package
           if-no-files-found: error
-          path: |
-            ${{ steps.build.outputs.snap }}
+          path: "*.snap"
 
   run-tests:
     name: Run System Tests
