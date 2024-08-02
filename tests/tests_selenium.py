@@ -162,7 +162,7 @@ class TestImmichWeb(BaseCase):
 
         # Welcome page, click button
         if "Welcome" in self.get_title():
-            self.click("button")
+            self.click("a:contains('Getting Started')")
 
         # Register a new user
         self.type("input[id='email']", "foo@example.com")

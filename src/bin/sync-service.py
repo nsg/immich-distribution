@@ -151,8 +151,14 @@ class ImmichAPI:
         }
 
     def get_user_id(self) -> str:
-        r = requests.get(f"{self.host}/users/me", headers=self.headers)
-        return r.json()["id"]
+        for _ in range(10):
+            r = requests.get(f"{self.host}/users/me", headers=self.headers)
+            if r.status_code in [200]:
+                return r.json()["id"]
+            time.sleep(2)
+        
+        raise Exception(f"Failed to get user ID, status code {r.status_code}. Response: {r.text}")
+
     
     def delete_asset(self, asset_id: str) -> None:
         data = { "ids": [ asset_id ] }
