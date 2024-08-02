@@ -152,6 +152,10 @@ class ImmichAPI:
 
     def get_user_id(self) -> str:
         r = requests.get(f"{self.host}/users/me", headers=self.headers)
+
+        if r.status_code not in [200]:
+            raise Exception(f"Failed to get user ID, status code {r.status_code}. Response: {r.text}")
+
         return r.json()["id"]
     
     def delete_asset(self, asset_id: str) -> None:
