@@ -1,6 +1,6 @@
 name: immich-distribution
 title: Immich Distribution
-version: "v1.109.2"
+version: "v1.110.0"
 base: core22
 grade: stable
 confinement: strict
@@ -154,7 +154,7 @@ parts:
   server:
     plugin: nil
     source: https://github.com/immich-app/immich.git
-    source-tag: v1.109.2
+    source-tag: v1.110.0
     override-build: |
       craftctl default
 
@@ -242,7 +242,7 @@ parts:
   web:
     plugin: nil
     source: https://github.com/immich-app/immich.git
-    source-tag: v1.109.2
+    source-tag: v1.110.0
     override-build: |
       # Build typescript-sdk, this is included by cli and web
       cd open-api/typescript-sdk
