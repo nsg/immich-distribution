@@ -81,7 +81,7 @@ jobs:
       - name: Backup database and assets
         run: |
           sudo immich-distribution.backup -a -d
-          cp -v /var/snap/immich-distribution/common/backups .
+          cp -rv /var/snap/immich-distribution/common/backups .
 
       - name: Upload backups
         uses: actions/upload-artifact@v4
