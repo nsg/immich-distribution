@@ -80,7 +80,7 @@ jobs:
 
       - name: Backup database and assets
         run: |
-          immich-distribution.backup -a -d
+          sudo immich-distribution.backup -a -d
           cp -v /var/snap/immich-distribution/common/backups .
 
       - name: Upload backups
@@ -121,10 +121,10 @@ jobs:
           name: backups
 
       - name: Restore database
-        run: immich-distribution.import -y -d backups/immich_database*.sql.xz
+        run: sudo immich-distribution.import -y -d backups/immich_database*.sql.xz
 
       - name: Restore assets
-        run: immich-distribution.import -y -a backups/immich_assets*.tar.xz
+        run: sudo immich-distribution.import -y -a backups/immich_assets*.tar.xz
 
       - name: TEST | Install requirements
         run: pip install -r tests/requirements.txt
