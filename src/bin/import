@@ -29,12 +29,26 @@ root_check
 
 [ -z $1 ] && usage
 
-while getopts d:a:h option; do
+YES=
+while getopts d:a:hy option; do
     case "$option" in
+        y)
+            YES=true
+            ;;
         d) 
+            if [ -z $YES ]; then
+                echo "This will DESTROY and OVERWRITE your current database. You need to confirm with -y"
+                exit 1
+            fi
+
             restore_database "$OPTARG"
             ;;
         a)
+            if [ -z $YES ]; then
+                echo "This will DESTROY and OVERWRITE your current assets. You need to confirm with -y"
+                exit 1
+            fi
+
             restore_assets "$OPTARG"
             ;;
         *|h)

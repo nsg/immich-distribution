@@ -143,6 +143,12 @@ apps:
       - network
       - network-bind
 
+  backup-service:
+    command: bin/backup -s
+    daemon: simple
+    restart-delay: 60s
+    timer: "01:00"
+
 package-repositories:
   - type: apt
     url: http://apt.nsg.cc

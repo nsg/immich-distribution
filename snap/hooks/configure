@@ -68,6 +68,10 @@ if [[ $(snapctl get metrics-job-enabled) == "" ]]; then
     snapctl set metrics-job-enabled="false"
 fi
 
+if [[ $(snapctl get backup-database-daily) == "" ]]; then
+    snapctl set backup-database-daily="false"
+fi
+
 # Restart services
 snapctl restart immich-distribution.postgres
 snapctl restart immich-distribution.haproxy
