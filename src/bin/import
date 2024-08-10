@@ -17,7 +17,7 @@ usage() {
 restore_database() {
     echo "Restoring database from backup: $1"
     cd "$SNAP_COMMON/backups"
-    xzcat "$1" | drop_privileges $SNAP/usr/local/pgsql/bin/psql -U postgres -d immich
+    xzcat "$1" | drop_privileges $SNAP/usr/local/pgsql/bin/psql -U postgres -d immich --single-transaction -v ON_ERROR_STOP=1
 }
 
 restore_assets() {
