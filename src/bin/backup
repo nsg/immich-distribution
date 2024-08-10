@@ -25,9 +25,9 @@ clean_up_daily_backups() {
 
 backup_database() {
     if [ "$1" == "daily" ]; then
-        local backup_db_file="$SNAP_COMMON/backups/immich_database_daily_$TIME.sql.xz"
+        local backup_db_file="$SNAP_COMMON/backups/immich_database_daily_${SNAP_VERSION}_${TIME}.sql.xz"
     else
-        local backup_db_file="$SNAP_COMMON/backups/immich_database_$TIME.sql.xz"
+        local backup_db_file="$SNAP_COMMON/backups/immich_database_${SNAP_VERSION}_${TIME}.sql.xz"
     fi
 
     echo "Creating database backup: $backup_db_file"
@@ -36,7 +36,7 @@ backup_database() {
 }
 
 backup_assets() {
-    local backup_as_file="$SNAP_COMMON/backups/immich_assets_$TIME.tar.xz"
+    local backup_as_file="$SNAP_COMMON/backups/immich_assets_${SNAP_VERSION}_${TIME}.tar.xz"
 
     echo "Creating assets backup: $backup_as_file"
     tar cJf "$backup_as_file" $SNAP_COMMON/upload
