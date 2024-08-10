@@ -15,10 +15,14 @@ else
 	PYTHON = python
 endif
 
-test: ${PYTEST_LOCALTEST_DEPENDENCIES} test-assets wait
-	rm -f screenshots/* || true
+test: test-prep
+	make test-assets
+
+test-prep: ${PYTEST_LOCALTEST_DEPENDENCIES} wait
+	${PYTEST} tests_prep.py --server=127.0.0.1 --port=4444 ${PYTEST_EXTRA_ARGS} --dashboard --html=report/index.html
+
+test-assets: ${PYTEST_LOCALTEST_DEPENDENCIES} test-assets wait
 	${PYTEST} tests_selenium.py --server=127.0.0.1 --port=4444 ${PYTEST_EXTRA_ARGS} --dashboard --html=report/index.html
-	make movie
 
 test-sync:
 	SERVICE_STATE=default ${PYTEST} tests_sync_service.py
