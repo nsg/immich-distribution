@@ -5,14 +5,13 @@
 export PGDATA="$SNAP_COMMON/pgsql/data"
 
 TIME="$(date +%FT%H%M%S)"
-BACKUP_DB_FILE="$SNAP_COMMON/backups/immich_database_$TIME.sql.xz"
-BACKUP_AS_FILE="$SNAP_COMMON/backups/immich_assets_$TIME.tar.xz"
 
 usage() {
     echo "$0 [-d] [-a]"
     echo
     echo -e "-d\tBackup database"
     echo -e "-a\tBackup assets (images, videos, ...)"
+    echo -e "-l\tList backups"
     echo
     echo "The recommended way to backup Immich is to do a" \
          "database backup, and then manually backup the" \
@@ -20,27 +19,76 @@ usage() {
     exit 1
 }
 
+clean_up_daily_backups() {
+    find $SNAP_COMMON/backups -name "immich_database_daily_*.sql.xz" -type f -mtime +8 -delete
+}
+
 backup_database() {
-    echo "Creating database backup: $BACKUP_DB_FILE"
-    drop_privileges $SNAP/usr/local/pgsql/bin/pg_dump -U postgres --clean immich | xz > $BACKUP_DB_FILE
+    if [ "$1" == "daily" ]; then
+        local backup_db_file="$SNAP_COMMON/backups/immich_database_daily_${SNAP_VERSION}_${TIME}.sql.xz"
+    else
+        local backup_db_file="$SNAP_COMMON/backups/immich_database_${SNAP_VERSION}_${TIME}.sql.xz"
+    fi
+
+    echo "Creating database backup: $backup_db_file"
+    cd "$SNAP_COMMON/backups"
+    drop_privileges $SNAP/usr/local/pgsql/bin/pg_dumpall -U postgres --clean --if-exists | xz > $backup_db_file
 }
 
 backup_assets() {
-    echo "Creating assets backup: $BACKUP_AS_FILE"
-    tar cJf "$BACKUP_AS_FILE" $SNAP_COMMON/upload
+    local backup_as_file="$SNAP_COMMON/backups/immich_assets_${SNAP_VERSION}_${TIME}.tar.xz"
+
+    echo "Creating assets backup: $backup_as_file"
+    tar cJf "$backup_as_file" $SNAP_COMMON/upload
+}
+
+list_backups() {
+    echo "Database backups:"
+    database_backup_files=$(ls -lh $SNAP_COMMON/backups/immich_database_*.sql.xz 2>/dev/null)
+    if [ -z "$database_backup_files" ]; then
+        echo "No database backups found"
+    else
+        echo "$database_backup_files"
+    fi
+
+    echo
+    echo "Assets backups:"
+    assets_backup_files=$(ls -lh $SNAP_COMMON/backups/immich_assets_*.tar.xz 2>/dev/null)
+    if [ -z "$assets_backup_files" ]; then
+        echo "No assets backups found"
+    else
+        echo "$assets_backup_files"
+    fi
+
+    echo
+    echo "To restore a backup, use the following commands:"
+    echo "immich-distribution.restore -d <database_backup>"
+    echo "immich-distribution.restore -a <assets_backup>"
 }
 
 root_check
 
 [ -z $1 ] && usage
 
-while getopts dah option; do
+while getopts dahls option; do
     case "$option" in
         d) 
             backup_database
             ;;
         a)
             backup_assets
+            ;;
+        l)
+            list_backups
+            ;;
+        s)
+            if [ "$BACKUP_DATABASE_DAILY" == "true" ]; then
+                echo "Running daily database backup"
+                backup_database daily
+                clean_up_daily_backups
+            else
+                echo "Daily database backup is disabled"
+            fi
             ;;
         *|h)
             usage

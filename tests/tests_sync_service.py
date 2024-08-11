@@ -7,7 +7,7 @@ import socket
 import shutil
 import time
 
-EXPECTED_INITIAL_IMAGE_COUNT = 25
+EXPECTED_INITIAL_IMAGE_COUNT = int(os.getenv("EXPECTED_INITIAL_IMAGE_COUNT", 25))
 
 def processes_in_cgroup(unit_name: str) -> Tuple[bool, str]:
     result = subprocess.run([

@@ -46,8 +46,8 @@ jobs:
           if-no-files-found: error
           path: "*.snap"
 
-  run-tests:
-    name: Run System Tests
+  prep-backup:
+    name: Prepare installation and backup state
     runs-on: ubuntu-latest
 
     needs: build-snap
@@ -61,7 +61,134 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+
+      - name: Download snap artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: development-snap-package
+
+      - name: TEST | Install package
+        run: sudo snap install --dangerous *.snap
+
+      - name: TEST | Install requirements
+        run: pip install -r tests/requirements.txt
+
+      - name: TEST | Run Prepare Tests
+        run: make test-prep -C tests
+
+      - name: Backup database and assets
+        run: |
+          sudo immich-distribution.backup -a -d
+          cp -rv /var/snap/immich-distribution/common/backups .
+
+      - name: Upload backups and secret.txt
+        uses: actions/upload-artifact@v4
+        with:
+          name: backups
+          path: |
+            backups
+            tests/secret.txt
+
+  prep:
+    name: Prepare & Asset Tests
+    runs-on: ubuntu-latest
+
+    needs: build-snap
+
+    services:
+      selenium:
+        image: selenium/standalone-chrome:latest
+        options: --shm-size=2gb
+        ports:
+          - 4444:4444
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download snap artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: development-snap-package
+
+      - name: TEST | Install package
+        run: sudo snap install --dangerous *.snap
+
+      - name: TEST | Install requirements
+        run: pip install -r tests/requirements.txt
+
+      - name: TEST | Run Prepare Tests
+        run: make test-prep -C tests
+
+      - name: TEST | Run Selenium Tests
+        run: make test-selenium -C tests
+
+  assets:
+    name: Test Assets
+    runs-on: ubuntu-latest
+
+    needs: prep-backup
+
+    services:
+      selenium:
+        image: selenium/standalone-chrome:latest
+        options: --shm-size=2gb
+        ports:
+          - 4444:4444
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download snap artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: development-snap-package
+
+      - name: TEST | Install package
+        run: sudo snap install --dangerous *.snap
+
+      - name: Download backups artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: backups
+
+      - name: Wait Immich Distribution to start
+        run: make wait -C tests
+
+      - name: Restore database
+        run: |
+          sudo cp -rv ./backups/immich_database_*.sql.xz /var/snap/immich-distribution/common/backups
+          sudo immich-distribution.restore -y -d /var/snap/immich-distribution/common/backups/immich_database_*.sql.xz
+
+      - name: Restore assets
+        run: |
+          sudo cp -rv ./backups/immich_assets_*.tar.xz /var/snap/immich-distribution/common/backups
+          sudo immich-distribution.restore -y -a /var/snap/immich-distribution/common/backups/immich_assets_*.tar.xz
+
+      - name: TEST | Install requirements
+        run: pip install -r tests/requirements.txt
+
+      - name: TEST | Run Selenium Tests
+        run: make test-selenium -C tests
+
+  sync:
+    name: Test Sync Service
+    runs-on: ubuntu-latest
+
+    needs: prep-backup
+
+    services:
+      selenium:
+        image: selenium/standalone-chrome:latest
+        options: --shm-size=2gb
+        ports:
+          - 4444:4444
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
       - name: Download snap artifact
         uses: actions/download-artifact@v4
@@ -70,34 +197,30 @@ jobs:
 
       - name: TEST | Install package
         run: |
-          find .
           sudo snap install --dangerous *.snap
+
+      - name: Download backups artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: backups
+
+      - name: Wait Immich Distribution to start
+        run: make wait -C tests
+
+      - name: Restore database
+        run: |
+          sudo cp -rv ./backups/immich_database_*.sql.xz /var/snap/immich-distribution/common/backups
+          sudo immich-distribution.restore -y -d /var/snap/immich-distribution/common/backups/immich_database_*.sql.xz
+
+      - name: Restore assets
+        run: |
+          sudo cp -rv ./backups/immich_assets_*.tar.xz /var/snap/immich-distribution/common/backups
+          sudo immich-distribution.restore -y -a /var/snap/immich-distribution/common/backups/immich_assets_*.tar.xz
 
       - name: TEST | Install requirements
         run: pip install -r tests/requirements.txt
 
-      - name: TEST | Run Selenium Tests
-        run: make test -C tests
+      - name: TEST | Run Sync Tests
+        run: EXPECTED_INITIAL_IMAGE_COUNT=0 make test-sync -C tests
 
-      - name: TEST | Run Sync Service Tests
-        run: make test-sync -C tests
 
-      - name: Upload test report
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: selenium-test-report
-          path: |
-            tests/latest_logs
-            tests/report/
-            tests/assets/live.js
-            tests/assets/pytest_style.css
-            tests/dashboard.html
-
-      - name: Upload test screenshots
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: selenium-test-screenshots
-          path: |
-            tests/screenshots/

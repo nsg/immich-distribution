@@ -125,8 +125,8 @@ apps:
   backup:
     command: bin/backup
 
-  import:
-    command: bin/import
+  restore:
+    command: bin/restore
 
   lets-encrypt:
     command: bin/acme-init
@@ -142,6 +142,12 @@ apps:
     plugs:
       - network
       - network-bind
+
+  backup-service:
+    command: bin/backup -s
+    daemon: simple
+    restart-delay: 60s
+    timer: "01:00"
 
 package-repositories:
   - type: apt
