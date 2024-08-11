@@ -46,7 +46,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Download snap artifact
         uses: actions/download-artifact@v4
@@ -54,17 +54,16 @@ jobs:
           name: release-snap-package
 
       - name: TEST | Install package
-        run: |
-          sudo snap install --dangerous *.snap
+        run: sudo snap install --dangerous *.snap
 
       - name: TEST | Install requirements
         run: pip install -r tests/requirements.txt
 
-      - name: TEST | Run Selenium Tests
-        run: make test -C tests
+      - name: TEST | Run Prepare Tests
+        run: make test-prep -C tests
 
-      - name: TEST | Run Sync Service Tests
-        run: make test-sync -C tests
+      - name: TEST | Run Selenium Tests
+        run: make test-selenium -C tests
 
       - name: Upload test report
         uses: actions/upload-artifact@v4
