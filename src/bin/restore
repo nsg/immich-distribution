@@ -44,6 +44,7 @@ restore_database() {
     echo "Restoring database from backup: $1"
     xzcat "$1" \
         | sed "s/SELECT pg_catalog.set_config('search_path', '', false);/SELECT pg_catalog.set_config('search_path', 'public, pg_catalog', true);/g" \
+        | sed "/^DROP ROLE/d" | sed "/^CREATE ROLE/d" | sed "/^ALTER ROLE/d" \
         | drop_privileges $SNAP/usr/local/pgsql/bin/psql -U postgres -v ON_ERROR_STOP=1
 
     echo "Starting Immich Services"
