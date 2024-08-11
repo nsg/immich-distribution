@@ -32,7 +32,7 @@ backup_database() {
 
     echo "Creating database backup: $backup_db_file"
     cd "$SNAP_COMMON/backups"
-    drop_privileges $SNAP/usr/local/pgsql/bin/pg_dump -U postgres --clean immich | xz > $backup_db_file
+    drop_privileges $SNAP/usr/local/pgsql/bin/pg_dumpall -U postgres --clean --if-exists | xz > $backup_db_file
 }
 
 backup_assets() {
@@ -62,8 +62,8 @@ list_backups() {
 
     echo
     echo "To restore a backup, use the following commands:"
-    echo "immich-distribution.import -d <database_backup>"
-    echo "immich-distribution.import -a <assets_backup>"
+    echo "immich-distribution.restore -d <database_backup>"
+    echo "immich-distribution.restore -a <assets_backup>"
 }
 
 root_check

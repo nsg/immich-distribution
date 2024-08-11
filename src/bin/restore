@@ -1,0 +1,90 @@
+#!/bin/bash
+
+. $SNAP/bin/load-env
+
+export PGDATA="$SNAP_COMMON/pgsql/data"
+
+usage() {
+    echo "$0 [-d database-backup] [-a assets-backup]"
+    echo
+    echo -e "-d  FILE    Restore a database backup"
+    echo -e "-a  FILE    Restore assets (images, videos, ...) from an asset backup"
+    echo
+    echo "Note that this will DESTROY and OVERWRITE your current install"
+    exit 1
+}
+
+restore_database() {
+    cd "$SNAP_COMMON/backups"
+
+    echo "Shut down Immich Services"
+    snapctl stop immich-distribution.immich-machine-learning
+    snapctl stop immich-distribution.immich-server
+    snapctl stop immich-distribution.sync-service
+
+    echo "Stop database services"
+    snapctl stop immich-distribution.redis-server
+    snapctl stop immich-distribution.postgres
+
+    echo "Reset/remove database state"
+    rm -rf $SNAP_COMMON/pgsql $SNAP_COMMON/redis
+
+    echo "Start database services"
+    snapctl start immich-distribution.redis-server
+    snapctl start immich-distribution.postgres
+
+    echo "Wait for database to be ready"
+    while ! $SNAP/usr/local/pgsql/bin/pg_isready; do
+        sleep 1
+    done
+
+    echo "Restoring database from backup: $1"
+    xzcat "$1" \
+        | sed "s/SELECT pg_catalog.set_config('search_path', '', false);/SELECT pg_catalog.set_config('search_path', 'public, pg_catalog', true);/g" \
+        | drop_privileges $SNAP/usr/local/pgsql/bin/psql -U postgres -d immich -v ON_ERROR_STOP=1
+
+    echo "Starting Immich Services"
+    snapctl start immich-distribution.immich-machine-learning
+    snapctl start immich-distribution.immich-server
+    snapctl start immich-distribution.sync-service
+
+    echo "Database restored"
+}
+
+restore_assets() {
+    echo "Restoring assets from backup: $1"
+    rm -rf $SNAP_COMMON/upload/*
+    tar -C "/" -xf "$1"
+}
+
+root_check
+
+[ -z $1 ] && usage
+
+YES=
+while getopts d:a:hy option; do
+    case "$option" in
+        y)
+            YES=true
+            ;;
+        d) 
+            if [ -z $YES ]; then
+                echo "This will DESTROY and OVERWRITE your current database. You need to confirm with -y"
+                exit 1
+            fi
+
+            restore_database "$OPTARG"
+            ;;
+        a)
+            if [ -z $YES ]; then
+                echo "This will DESTROY and OVERWRITE your current assets. You need to confirm with -y"
+                exit 1
+            fi
+
+            restore_assets "$OPTARG"
+            ;;
+        *|h)
+            usage
+            ;;
+    esac
+done

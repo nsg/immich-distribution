@@ -160,12 +160,12 @@ jobs:
       - name: Restore database
         run: |
           sudo cp -rv ./backups/immich_database_*.sql.xz /var/snap/immich-distribution/common/backups
-          sudo immich-distribution.import -y -d /var/snap/immich-distribution/common/backups/immich_database_*.sql.xz
+          sudo immich-distribution.restore -y -d /var/snap/immich-distribution/common/backups/immich_database_*.sql.xz
 
       - name: Restore assets
         run: |
           sudo cp -rv ./backups/immich_assets_*.tar.xz /var/snap/immich-distribution/common/backups
-          sudo immich-distribution.import -y -a /var/snap/immich-distribution/common/backups/immich_assets_*.tar.xz
+          sudo immich-distribution.restore -y -a /var/snap/immich-distribution/common/backups/immich_assets_*.tar.xz
 
       - name: TEST | Install requirements
         run: pip install -r tests/requirements.txt
@@ -210,12 +210,12 @@ jobs:
       - name: Restore database
         run: |
           sudo cp -rv ./backups/immich_database_*.sql.xz /var/snap/immich-distribution/common/backups
-          sudo immich-distribution.import -y -d /var/snap/immich-distribution/common/backups/immich_database_*.sql.xz
+          sudo immich-distribution.restore -y -d /var/snap/immich-distribution/common/backups/immich_database_*.sql.xz
 
       - name: Restore assets
         run: |
           sudo cp -rv ./backups/immich_assets_*.tar.xz /var/snap/immich-distribution/common/backups
-          sudo immich-distribution.import -y -a /var/snap/immich-distribution/common/backups/immich_assets_*.tar.xz
+          sudo immich-distribution.restore -y -a /var/snap/immich-distribution/common/backups/immich_assets_*.tar.xz
 
       - name: TEST | Install requirements
         run: pip install -r tests/requirements.txt

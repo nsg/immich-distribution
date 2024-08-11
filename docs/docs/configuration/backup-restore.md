@@ -30,13 +30,13 @@ sudo snap set immich-distribution backup-database-daily=true
 
 Backups will occur every night at `01:00`. Backups older than a week should be removed automatically.
 
-## Import / Restore
+## Restore
 
 ```
-immich-distribution.import [-d database-backup] [-a assets-backup]
+immich-distribution.restore [-d database-backup] [-a assets-backup]
 
--d	FILE   Import a database backup
--a	FILE   Import assets (images, videos, ...) from an asset backup
+-d	FILE   Restore a database backup
+-a	FILE   Restore assets (images, videos, ...) from an asset backup
 ```
 
 !!! danger
