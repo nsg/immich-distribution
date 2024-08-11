@@ -404,7 +404,7 @@ def main():
             log("Critical: Thread watch is not alive")
         if not database_thread.is_alive():
             log("Critical: Thread database is not alive")
-        time.sleep(10)
+        time.sleep(3600)
 
 if __name__ == '__main__':
     main()
