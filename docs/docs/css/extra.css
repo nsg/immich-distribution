@@ -28,3 +28,8 @@
 .snapstore-versions td {
     padding-top: 0.4em;
 }
+
+.center-image {
+    display: block;
+    margin: auto;
+}

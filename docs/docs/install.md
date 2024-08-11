@@ -8,6 +8,8 @@ sudo snap install immich-distribution
 
 The package is over 700MB so it can take some time to download. For more information see the [Snap Store](https://snapcraft.io/immich-distribution). Also checkout the prerequisites below.
 
+[![Link to the Snapcraft Store](/assets/button.png){ class="center-image" }](https://snapcraft.io/immich-distribution)
+
 ## Available versions
 
 {{snapstore_versions}}
@@ -21,6 +23,10 @@ The package is over 700MB so it can take some time to download. For more informa
     ![](/assets/channel-flow.png)
 
     Feel free to use the `candidate` channel if you can't wait, but overall for a trouble free experience, stay at the default `stable` channel. Sounds complicated? Use the default `stable` channel.
+
+## Demo
+
+[![Link to the Snapcraft Store](/assets/youtube-install-demo.jpg){ class="center-image" }](https://www.youtube.com/watch?v=LpOpgl2xAK0)
 
 ## Prerequisites
 
