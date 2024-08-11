@@ -27,7 +27,8 @@ restore_database() {
     snapctl stop immich-distribution.postgres
 
     echo "Reset/remove database state"
-    rm -rf $SNAP_COMMON/pgsql $SNAP_COMMON/redis
+    drop_privileges rm -rf $SNAP_COMMON/pgsql/data
+    rm -rf $SNAP_COMMON/redis
 
     echo "Start database services"
     snapctl start immich-distribution.redis-server
@@ -41,7 +42,7 @@ restore_database() {
     echo "Restoring database from backup: $1"
     xzcat "$1" \
         | sed "s/SELECT pg_catalog.set_config('search_path', '', false);/SELECT pg_catalog.set_config('search_path', 'public, pg_catalog', true);/g" \
-        | drop_privileges $SNAP/usr/local/pgsql/bin/psql -U postgres -d immich -v ON_ERROR_STOP=1
+        | drop_privileges $SNAP/usr/local/pgsql/bin/psql -U postgres -v ON_ERROR_STOP=1
 
     echo "Starting Immich Services"
     snapctl start immich-distribution.immich-machine-learning
