@@ -27,7 +27,9 @@ restore_database() {
     snapctl stop immich-distribution.postgres
 
     echo "Reset/remove database state"
-    drop_privileges rm -rf $SNAP_COMMON/pgsql/data
+    # Note, I keep the folder psql/data/ because to prevent the initdb from running
+    # in the postgres script. The dump will restore the postgres user and database
+    drop_privileges rm -rf $SNAP_COMMON/pgsql/data/*
     rm -rf $SNAP_COMMON/redis
 
     echo "Start database services"
