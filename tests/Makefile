@@ -37,8 +37,10 @@ test-sync: test-assets wait
 	sleep 10
 	SERVICE_STATE=threshold ${PYTEST} tests_sync_service.py
 
-test_%: .env/bin/seleniumbase test-assets
-	rm screenshots/* || true
+test_prep_%: .env/bin/seleniumbase test-assets
+	${PYTEST} tests_prep.py --server=127.0.0.1 --port=4444 --headed -k $* --html=report/index.html
+
+test_selenium_%: .env/bin/seleniumbase test-assets
 	${PYTEST} tests_selenium.py --server=127.0.0.1 --port=4444 --headed -k $* --html=report/index.html
 
 test-assets:

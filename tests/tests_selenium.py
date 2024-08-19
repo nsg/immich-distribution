@@ -141,7 +141,7 @@ class TestImmichWeb(BaseCase):
         self.execute_script("document.body.style = 'font-family: sans-serif; padding: 40px 20px; font-size: 2em;'")
         self.execute_script(f'document.body.innerHTML="{message}";')
 
-    def test_001_empty_timeline(self):
+    def test_selenium_001_empty_timeline(self):
         """
         Make sure the timeline is empty and we get a message to upload photos.
         """
@@ -149,7 +149,7 @@ class TestImmichWeb(BaseCase):
         self.immich()
         self.assert_element("p:contains('CLICK TO UPLOAD YOUR FIRST PHOTO')")
 
-    def test_005_upload_assets_via_api(self):
+    def test_selenium_005_upload_assets_via_api(self):
         """
         Upload test assets to the server using the API. I maintain a list of testfiles in assets/
         The Makefile that runs this script should have cloned a specific version of the test-assets
@@ -189,7 +189,7 @@ class TestImmichWeb(BaseCase):
             r = import_asset(test_image)
             self.assertNotEqual(r.get('id'), None)
 
-    def test_006_wait_for_job_queue(self):
+    def test_selenium_006_wait_for_job_queue(self):
         """
         Wait for the job queue to be empty, this tests verifies that the image
         processing jobs are running and that the queue is empty when they are done.
@@ -209,14 +209,14 @@ class TestImmichWeb(BaseCase):
         self.write_message("API: Wait for the job queue to be empty (again)")
         wait_for_empty_job_queue()
 
-    def test_100_verify_uploaded_assets_number_of_files(self):
+    def test_selenium_100_verify_uploaded_assets_number_of_files(self):
         """
         Use the API to verify that the assets were uploaded correctly.
         """
         self.write_message("API: Query the API and verify that the number of assets is correct")
         self.assertEqual(get_number_of_assets(), 25)
 
-    def test_100_verify_exif_location_extraction(self):
+    def test_selenium_100_verify_exif_location_extraction(self):
         """
         Extract the location from the EXIF data and verify that it is parses
         correctly as a named location.
@@ -232,7 +232,7 @@ class TestImmichWeb(BaseCase):
         self.assertEqual(ship['exifInfo']['country'], "Sweden")
         self.assertEqual(grass['exifInfo']['city'], "Mora")
 
-    def test_100_verify_image_exitdata(self):
+    def test_selenium_100_verify_image_exitdata(self):
         """
         Extract the EXIF data from the images and verify that it is correct.
         """
@@ -256,7 +256,7 @@ class TestImmichWeb(BaseCase):
         self.assertEqual(heic['exifInfo']['dateTimeOriginal'], "2019-03-21T16:04:22.348Z")
         self.assertEqual(heic['exifInfo']['country'], "United States of America")
 
-    def test_100_verify_people_detected(self):
+    def test_selenium_100_verify_people_detected(self):
         """
         Query the API to verify that people were detected in the images.
         This test will try 10 times if there are no people detected in the images.

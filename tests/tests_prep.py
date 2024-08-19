@@ -38,7 +38,7 @@ class TestImmichPrep(BaseCase):
         self.execute_script("document.body.style = 'font-family: sans-serif; padding: 40px 20px; font-size: 2em;'")
         self.execute_script(f'document.body.innerHTML="{message}";')
 
-    def test_001_register(self):
+    def test_prep_001_register(self):
         """
         Register a new user
         """
@@ -58,7 +58,7 @@ class TestImmichPrep(BaseCase):
 
         self.assert_title("Login - Immich")
 
-    def test_002_first_login(self):
+    def test_prep_002_first_login(self):
         """
         Login, follow the welcome flow and make sure we end up on the photos page.
         """
@@ -80,7 +80,7 @@ class TestImmichPrep(BaseCase):
         # Verify that we are on the photos page
         self.assert_title("Photos - Immich")
 
-    def test_003_empty_timeline(self):
+    def test_prep_003_empty_timeline(self):
         """
         Make sure the timeline is empty and we get a message to upload photos.
         """
@@ -88,7 +88,7 @@ class TestImmichPrep(BaseCase):
         self.immich()
         self.assert_element("p:contains('CLICK TO UPLOAD YOUR FIRST PHOTO')")
 
-    def test_004_generate_api_keys(self):
+    def test_prep_004_generate_api_keys(self):
         """
         Generate API keys and save them to a file called secret.txt.
         The API keys will be used by other tests to query the API and upload assets.
