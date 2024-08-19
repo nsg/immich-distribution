@@ -65,19 +65,11 @@ class TestImmichPrep(BaseCase):
 
         self.immich()
 
-        # Check that we are on the onboarding page
         self.assert_title("Onboarding - Immich")
-
-        # Press on "Theme" to select a theme
         self.click("button:contains('Theme')")
-
-        # Press on "Storage Template" to manage storage templates
+        self.click("button:contains('Privacy')")
         self.click("button:contains('Storage Template')")
-
-        # Do not enable the storage template feature, just click "Done"
         self.click("button:contains('Done')")
-
-        # Verify that we are on the photos page
         self.assert_title("Photos - Immich")
 
     def test_prep_003_empty_timeline(self):
