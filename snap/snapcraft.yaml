@@ -164,6 +164,9 @@ parts:
     override-build: |
       craftctl default
 
+      # Apply patch to fix https://github.com/immich-app/immich/issues/12634
+      curl https://github.com/immich-app/immich/commit/917d04c39b1602c5aeae9530ac98ff70ab7ba6bc.patch | patch -p1
+
       cd server
 
       SHARP_VERSION=0.33.0

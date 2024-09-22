@@ -229,11 +229,7 @@ class TestImmichWeb(BaseCase):
         grass = assets['grass.MP.jpg']
 
         self.assertEqual(ship['type'], "VIDEO")
-
-        # This test is failing because the location is not extracted correctly due to a bug in Immich.
-        # https://github.com/immich-app/immich/issues/12634
-        # self.assertEqual(ship['exifInfo']['country'], "Sweden")
-
+        self.assertEqual(ship['exifInfo']['country'], "Sweden")
         self.assertEqual(grass['exifInfo']['city'], "Mora")
 
     def test_selenium_100_verify_image_exitdata(self):
