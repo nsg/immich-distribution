@@ -1,6 +1,6 @@
 name: immich-distribution
 title: Immich Distribution
-version: "v1.114.0"
+version: "v1.115.0"
 base: core22
 grade: stable
 confinement: strict
@@ -160,9 +160,12 @@ parts:
   server:
     plugin: nil
     source: https://github.com/immich-app/immich.git
-    source-tag: v1.114.0
+    source-tag: v1.115.0
     override-build: |
       craftctl default
+
+      # Apply patch to fix https://github.com/immich-app/immich/issues/12634
+      curl https://github.com/immich-app/immich/commit/917d04c39b1602c5aeae9530ac98ff70ab7ba6bc.patch | patch -p1
 
       cd server
 
@@ -248,7 +251,7 @@ parts:
   web:
     plugin: nil
     source: https://github.com/immich-app/immich.git
-    source-tag: v1.114.0
+    source-tag: v1.115.0
     override-build: |
       # Build typescript-sdk, this is included by cli and web
       cd open-api/typescript-sdk
