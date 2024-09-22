@@ -92,6 +92,11 @@ apps:
       - network-bind
       - network
 
+  immich-admin:
+    command: bin/immich-admin
+    plugs:
+      - network
+
   immich-machine-learning:
     command: bin/immich-machine-learning
     daemon: simple
