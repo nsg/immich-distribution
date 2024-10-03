@@ -45,6 +45,11 @@ export IMMICH_HOST_METRICS="$(snapctl get metrics-host-enabled)"
 export IMMICH_IO_METRICS="$(snapctl get metrics-io-enabled)"
 export IMMICH_JOB_METRICS="$(snapctl get metrics-job-enabled)"
 
+export IMMICH_THIRD_PARTY_SOURCE_URL="https://github.com/nsg/immich-distribution"
+export IMMICH_THIRD_PARTY_BUG_FEATURE_URL="https://github.com/nsg/immich-distribution/issues"
+export IMMICH_THIRD_PARTY_DOCUMENTATION_URL="https://immich-distribution.nsg.cc"
+export IMMICH_THIRD_PARTY_SUPPORT_URL="https://github.com/nsg/immich-distribution/issues"
+
 export MACHINE_LEARNING_LOG_LEVEL="warning"
 export MACHINE_LEARNING_IP="127.0.0.1"
 export MACHINE_LEARNING_CACHE_FOLDER="$SNAP_COMMON/cache"
