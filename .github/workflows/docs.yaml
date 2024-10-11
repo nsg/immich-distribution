@@ -30,7 +30,7 @@ jobs:
 
       - name: Install Poetry
         run: |
-          apt-get install -y python3-poetry
+          sudo apt-get install -y python3-poetry
 
       - name: Install dependencies for mkdocs-material
         run: |
