@@ -23,7 +23,7 @@ test-prep: ${PYTEST} ${PYTEST_LOCALTEST_DEPENDENCIES} wait
 test-selenium: ${PYTEST} ${PYTEST_LOCALTEST_DEPENDENCIES} test-assets wait
 	${PYTEST} tests_selenium.py --server=127.0.0.1 --port=4444 ${PYTEST_EXTRA_ARGS} --dashboard --html=report/index.html
 
-test-sync: test-assets wait
+test-sync: ${PYTEST} test-assets wait
 	SERVICE_STATE=default ${PYTEST} tests_sync_service.py
 	sudo snap set immich-distribution sync-enabled=true
 	sleep 10
