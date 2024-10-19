@@ -71,9 +71,6 @@ jobs:
       - name: TEST | Install package
         run: sudo snap install --dangerous *.snap
 
-      - name: TEST | Install requirements
-        run: pip install -r tests/requirements.txt
-
       - name: TEST | Run Prepare Tests
         run: make test-prep -C tests
 
@@ -114,9 +111,6 @@ jobs:
 
       - name: TEST | Install package
         run: sudo snap install --dangerous *.snap
-
-      - name: TEST | Install requirements
-        run: pip install -r tests/requirements.txt
 
       - name: TEST | Run Prepare Tests
         run: make test-prep -C tests
@@ -166,9 +160,6 @@ jobs:
         run: |
           sudo cp -rv ./backups/immich_assets_*.tar.xz /var/snap/immich-distribution/common/backups
           sudo immich-distribution.restore -y -a /var/snap/immich-distribution/common/backups/immich_assets_*.tar.xz
-
-      - name: TEST | Install requirements
-        run: pip install -r tests/requirements.txt
 
       - name: TEST | Run Selenium Tests
         run: make test-selenium -C tests
