@@ -37,13 +37,10 @@ def get_ip_address():
     return s.getsockname()[0]
 
 
-def get_number_of_assets():
-    num_assets = 0
-    r = requests.get(f"http://{get_ip_address()}/api/timeline/buckets?size=MONTH", headers=get_headers())
-    for bucket in r.json():
-        num_assets += bucket['count']
-
-    return num_assets
+def get_number_of_assets() -> int:
+    r = requests.get(f"http://{get_ip_address()}/api/server/statistics", headers=get_headers())
+    response = r.json()
+    return response['photos'] + response['videos']
 
 
 def get_user_id() -> str:

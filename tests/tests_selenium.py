@@ -45,8 +45,8 @@ def get_assets(filter=[]):
 
     return ret
 
-def get_number_of_assets():
-    r = requests.get(f"http://{get_ip_address()}/api/server-info/statistics", headers=get_headers())
+def get_number_of_assets() -> int:
+    r = requests.get(f"http://{get_ip_address()}/api/server/statistics", headers=get_headers())
     response = r.json()
     return response['photos'] + response['videos']
 
