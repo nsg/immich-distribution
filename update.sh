@@ -56,6 +56,7 @@ CHECK_FILES="
     machine-learning/README.md
     machine-learning/Dockerfile
     machine-learning/start.sh
+    machine-learning/gunicorn_conf.py
     docker/example.env
     docker/docker-compose.yml
     docs/docs/install/environment-variables.md

@@ -56,9 +56,6 @@ jobs:
       - name: TEST | Install package
         run: sudo snap install --dangerous *.snap
 
-      - name: TEST | Install requirements
-        run: pip install -r tests/requirements.txt
-
       - name: TEST | Run Prepare Tests
         run: make test-prep -C tests
 
