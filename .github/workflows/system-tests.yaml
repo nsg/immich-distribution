@@ -208,9 +208,6 @@ jobs:
           sudo cp -rv ./backups/immich_assets_*.tar.xz /var/snap/immich-distribution/common/backups
           sudo immich-distribution.restore -y -a /var/snap/immich-distribution/common/backups/immich_assets_*.tar.xz
 
-      - name: TEST | Install requirements
-        run: pip install -r tests/requirements.txt
-
       - name: TEST | Run Sync Tests
         run: EXPECTED_INITIAL_IMAGE_COUNT=0 make test-sync -C tests
 
