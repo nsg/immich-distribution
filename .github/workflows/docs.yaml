@@ -30,7 +30,8 @@ jobs:
 
       - name: Install Poetry
         run: |
-          sudo apt-get install -y python3-poetry
+          python3 -m venv venv
+          venv/bin/pip install poetry
           
       - name: Install deps for pillow
         run: sudo apt-get install -y libtiff5-dev libjpeg8-dev libopenjp2-7-dev zlib1g-dev libfreetype6-dev liblcms2-dev libwebp-dev tcl8.6-dev tk8.6-dev python3-tk libharfbuzz-dev libfribidi-dev libxcb1-dev
@@ -38,12 +39,12 @@ jobs:
       - name: Install dependencies for mkdocs-material
         run: |
           cd docs
-          poetry install
+          ../venv/bin/poetry install
 
       - name: Build site
         run: |
           cd docs
-          poetry run mkdocs build
+          ../venv/bin/poetry run mkdocs build
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
