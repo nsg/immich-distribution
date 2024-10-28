@@ -40,11 +40,8 @@ export IMMICH_BUILD_DATA="$SNAP/var/lib/immich/build" # Contains www, geodata an
 export IMMICH_MEDIA_LOCATION="$SNAP_COMMON/upload"
 export IMMICH_API_METRICS_PORT=8081
 export IMMICH_MICROSERVICES_METRICS_PORT=8082
-export IMMICH_METRICS="$(snapctl get metrics-enabled)"
-export IMMICH_API_METRICS="$(snapctl get metrics-api-enabled)"
-export IMMICH_HOST_METRICS="$(snapctl get metrics-host-enabled)"
-export IMMICH_IO_METRICS="$(snapctl get metrics-io-enabled)"
-export IMMICH_JOB_METRICS="$(snapctl get metrics-job-enabled)"
+export IMMICH_TELEMETRY_INCLUDE="$(snapctl get metrics-telemetry-include)"
+export IMMICH_TELEMETRY_EXCLUDE="$(snapctl get metrics-telemetry-exclude)"
 
 export IMMICH_THIRD_PARTY_SOURCE_URL="https://github.com/nsg/immich-distribution"
 export IMMICH_THIRD_PARTY_BUG_FEATURE_URL="https://github.com/nsg/immich-distribution/issues"

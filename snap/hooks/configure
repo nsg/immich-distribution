@@ -48,25 +48,16 @@ if [[ $(snapctl get sync-delete-threshold) == "" ]]; then
     snapctl set sync-delete-threshold="300"
 fi
 
-if [[ $(snapctl get metrics-enabled) == "" ]]; then
-    snapctl set metrics-enabled="false"
+if [[ $(snapctl get metrics-enabled) == "true" ]]; then
+    snapctl set metrics-telemetry-include="all"
 fi
 
-if [[ $(snapctl get metrics-api-enabled) == "" ]]; then
-    snapctl set metrics-api-enabled="false"
-fi
-
-if [[ $(snapctl get metrics-host-enabled) == "" ]]; then
-    snapctl set metrics-host-enabled="false"
-fi
-
-if [[ $(snapctl get metrics-io-enabled) == "" ]]; then
-    snapctl set metrics-io-enabled="false"
-fi
-
-if [[ $(snapctl get metrics-job-enabled) == "" ]]; then
-    snapctl set metrics-job-enabled="false"
-fi
+# Clean up legacy metrics configuration
+snapctl unset metrics-enabled
+snapctl unset metrics-api-enabled
+snapctl unset metrics-host-enabled
+snapctl unset metrics-io-enabled
+snapctl unset metrics-job-enabled
 
 if [[ $(snapctl get backup-database-daily) == "" ]]; then
     snapctl set backup-database-daily="false"
