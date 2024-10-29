@@ -48,6 +48,7 @@ plugins:
   - search
   - blog:
       blog_dir: news
+      blog_toc: true
 hooks:
   - snapstore_versions.py
 extra:
