@@ -17,6 +17,7 @@ nav:
     - configuration/postgres.md
     - configuration/haproxy.md
     - configuration/sync.md
+    - configuration/metrics.md
   - Contribute:
     - Upgrade: build/upgrade.md
     - Tests: build/tests.md
