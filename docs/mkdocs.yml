@@ -2,7 +2,7 @@ site_name: Immich Distribution
 repo_url: https://github.com/nsg/immich-distribution
 edit_uri: edit/master/docs/docs/
 nav:
-  - About: index.md
+  - About: about.md
   - News: [news/index.md]
   - Installation: install.md
   - Configuration:

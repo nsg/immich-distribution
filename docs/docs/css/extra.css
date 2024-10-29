@@ -33,3 +33,13 @@
     display: block;
     margin: auto;
 }
+
+.info-box {
+    max-width: 36em;
+    margin: 1.8em auto;
+    border: 3px solid var(--md-primary-fg-color);
+    text-align: center;
+    padding: 1em;
+    box-shadow: 0 0 1em rgba(0, 0, 0, 0.2);
+    background-color: #fafafa;
+}
