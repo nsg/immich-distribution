@@ -241,10 +241,11 @@ parts:
     stage-snaps:
       - node/20/stable
     stage-packages:
-      - nsg-ffmpeg
       - nsg-redis
       - nsg-postgres
       - nsg-libvips
+    after:
+      - jellyfin-ffmpeg
 
   parts-server-scripts:
     plugin: dump
@@ -339,3 +340,36 @@ parts:
       usr/lib/postgresql/15/lib: usr/local/pgsql/lib
     stage:
       - -usr/share/doc
+
+  jellyfin-ffmpeg:
+    source: https://github.com/jellyfin/jellyfin-ffmpeg/releases/download/v7.0.2-7/jellyfin-ffmpeg7_7.0.2-7-jammy_amd64.deb
+    plugin: dump
+    source-checksum: sha256/f116e06281e5dc96a4b1d59a57aa39c1601deb01e9ed023d1741574886cc9432
+    organize:
+      usr/lib/jellyfin-ffmpeg/lib: usr/lib
+      usr/lib/jellyfin-ffmpeg/share: usr/share
+      usr/lib/jellyfin-ffmpeg/ffprobe: usr/bin/ffprobe
+      usr/lib/jellyfin-ffmpeg/ffmpeg: usr/bin/ffmpeg
+      usr/lib/jellyfin-ffmpeg/vainfo: usr/bin/vainfo
+    stage-packages:
+      - libbluray2
+      - libopenmpt0
+      - libpciaccess0
+      - libllvm15
+      - libx11-xcb1
+      - libxcb-dri2-0
+      - libxcb-dri3-0
+      - libxcb-present0
+      - libxcb-sync1
+      - libxcb-xfixes0
+      - libxcb-randr0
+      - libxshmfence1
+      - libopencl1
+      - libmp3lame0
+      - libopus0
+      - libtheora0
+      - libvorbis0a
+      - libvorbisenc2
+      - libvpx7
+      - libx264-163
+      - libzvbi0
