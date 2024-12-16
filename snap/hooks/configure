@@ -20,6 +20,10 @@ snapctl unset typesense-key
 mkdir -p $SNAP_COMMON/{pgsql,redis,reverse-geocoding-dump,upload,sync,backups,acme,cache}
 chown snap_daemon:snap_daemon $SNAP_COMMON/pgsql
 
+if [[ $(snapctl get ml-device) == "" ]]; then
+    snapctl set ml-device="cpu"
+fi
+
 if [[ $(snapctl get database-password) == "" ]]; then
     snapctl set database-password="$(random_string)"
 fi

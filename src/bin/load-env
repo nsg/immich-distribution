@@ -24,6 +24,8 @@ export LC_CTYPE="C"
 # I think NODE_ENV is not used by Immich anymore, keep it for now
 export NODE_ENV="production"
 
+export DEVICE="$(snapctl get ml-device)"
+
 export DB_HOSTNAME="127.0.0.1"
 export DB_USERNAME="postgres"
 export DB_PASSWORD="$(snapctl get database-password)"
