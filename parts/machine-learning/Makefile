@@ -1,4 +1,4 @@
-IMMICH_VERSION := v1.123.0
+IMMICH_VERSION := v1.124.0
 
 POETRY_ENV = ${HOME}/poetry
 POETRY = ${POETRY_ENV}/bin/poetry
