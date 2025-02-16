@@ -248,12 +248,12 @@ class TestImmichWeb(BaseCase):
 
         self.assertEqual(grass['type'], "IMAGE")
         self.assertEqual(grass['exifInfo']['model'], "Pixel 4")
-        self.assertEqual(grass['exifInfo']['dateTimeOriginal'], "2023-07-08T12:13:53.210+00:00")
+        self.assertEqual(grass['exifInfo']['dateTimeOriginal'], "2023-07-08T12:13:53.21+00:00")
         self.assertEqual(grass['exifInfo']['city'], "Mora")
 
         self.assertEqual(heic['type'], "IMAGE")
         self.assertEqual(heic['exifInfo']['model'], "iPhone 7")
-        self.assertEqual(heic['exifInfo']['dateTimeOriginal'], "2019-03-21T16:04:22.348Z")
+        self.assertEqual(heic['exifInfo']['dateTimeOriginal'], "2019-03-21T16:04:22.34+00:00")
         self.assertEqual(heic['exifInfo']['country'], "United States of America")
 
     def test_selenium_100_verify_people_detected(self):
