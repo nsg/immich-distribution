@@ -16,6 +16,7 @@ endif
 
 test: test-prep
 	make test-assets
+	make test-selenium
 
 test-prep: ${PYTEST} ${PYTEST_LOCALTEST_DEPENDENCIES} wait
 	${PYTEST} tests_prep.py --server=127.0.0.1 --port=4444 ${PYTEST_EXTRA_ARGS} --dashboard --html=report/index.html
@@ -58,7 +59,7 @@ check-selenium:
 selenium:
 	podman run \
 		-p 4444:4444 \
-		-p 7900:7900 \
+		-p 0.0.0.0:7900:7900 \
 		--shm-size="2g" \
 		docker.io/selenium/standalone-chrome:latest
 
