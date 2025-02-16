@@ -248,7 +248,7 @@ class TestImmichWeb(BaseCase):
 
         self.assertEqual(grass['type'], "IMAGE")
         self.assertEqual(grass['exifInfo']['model'], "Pixel 4")
-        self.assertEqual(grass['exifInfo']['dateTimeOriginal'], "2023-07-08T12:13:53.210Z")
+        self.assertEqual(grass['exifInfo']['dateTimeOriginal'], "2023-07-08T12:13:53.210+00:00")
         self.assertEqual(grass['exifInfo']['city'], "Mora")
 
         self.assertEqual(heic['type'], "IMAGE")
