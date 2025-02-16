@@ -7,7 +7,7 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.10"
-mkdocs-material = "^9.6.4"
+mkdocs-material = {extras = ["imaging"], version = "^9.6.4"}
 
 
 [build-system]
