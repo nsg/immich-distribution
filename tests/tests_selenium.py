@@ -253,7 +253,7 @@ class TestImmichWeb(BaseCase):
 
         self.assertEqual(heic['type'], "IMAGE")
         self.assertEqual(heic['exifInfo']['model'], "iPhone 7")
-        self.assertEqual(heic['exifInfo']['dateTimeOriginal'], "2019-03-21T16:04:22.34+00:00")
+        self.assertEqual(heic['exifInfo']['dateTimeOriginal'], "2019-03-21T16:04:22.348+00:00")
         self.assertEqual(heic['exifInfo']['country'], "United States of America")
 
     def test_selenium_100_verify_people_detected(self):
