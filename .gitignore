@@ -14,5 +14,7 @@ __pycache__
 /tests/dashboard.html
 /tests/test-assets
 /tests/screenshots
+/tests/last_report.html
+/tests/.env/
 /prime
 /.vscode

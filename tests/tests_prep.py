@@ -38,6 +38,12 @@ class TestImmichPrep(BaseCase):
         self.execute_script("document.body.style = 'font-family: sans-serif; padding: 40px 20px; font-size: 2em;'")
         self.execute_script(f'document.body.innerHTML="{message}";')
 
+    def get_input_by_label(self, label_text, text=None):
+        element = self.find_element(f"//label[contains(text(), '{label_text}')]/..//input")
+        if text:
+            element.send_keys(text)
+        return element
+
     def test_prep_001_register(self):
         """
         Register a new user
@@ -47,13 +53,13 @@ class TestImmichPrep(BaseCase):
 
         # Welcome page, click button
         if "Welcome" in self.get_title():
-            self.click("a:contains('Getting Started')")
+            self.click("span:contains('Getting Started')")
 
         # Register a new user
-        self.type("input[id='email']", "foo@example.com")
-        self.type("input[id='password']", "secret")
-        self.type("input[id='confirmPassword']", "secret")
-        self.type("input[id='name']", "Ture Test")
+        self.get_input_by_label("Admin Email", "foo@example.com")
+        self.get_input_by_label("Admin Password", "secret")
+        self.get_input_by_label("Confirm Admin Password", "secret")
+        self.get_input_by_label("Name", "Ture Test")
         self.click("button:contains('Sign up')")
 
         self.assert_title("Login - Immich")
