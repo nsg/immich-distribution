@@ -73,6 +73,14 @@ def sync_service_journal_messages() -> str:
     return result.stdout.decode("utf-8")
 
 
+def wait_for_condition(condition_func, timeout=60, message="Waiting"):
+    for _ in range(timeout):
+        if condition_func():
+            return True
+        time.sleep(1)
+    return False
+
+
 @pytest.mark.skipif(os.environ["SERVICE_STATE"] != "default", reason="Skipping test")
 def test_001_check_expected_state_default():
     """
@@ -147,9 +155,11 @@ def test_010_add_file():
     sync_file_path = os.path.join(snap_common, "sync", get_user_id(), "polemonium_reptans.jpg")
     shutil.copy("test-assets/albums/nature/polemonium_reptans.jpg", sync_file_path)
 
-    time.sleep(10)
-    assert get_number_of_assets() == EXPECTED_INITIAL_IMAGE_COUNT + 1, sync_service_journal_messages()
-
+    assert wait_for_condition(
+        lambda: get_number_of_assets() == EXPECTED_INITIAL_IMAGE_COUNT + 1,
+        timeout=60,
+        message="Waiting for asset to be added"
+    ), sync_service_journal_messages()
 
 @pytest.mark.skipif(os.environ["SERVICE_STATE"] != "running", reason="Skipping test")
 def test_020_remove_file():
@@ -162,8 +172,11 @@ def test_020_remove_file():
     sync_file_path = os.path.join(snap_common, "sync", get_user_id(), "polemonium_reptans.jpg")
     os.remove(sync_file_path)
 
-    time.sleep(10)
-    assert get_number_of_assets() == EXPECTED_INITIAL_IMAGE_COUNT, sync_service_journal_messages()
+    assert wait_for_condition(
+        lambda: get_number_of_assets() == EXPECTED_INITIAL_IMAGE_COUNT,
+        timeout=10,
+        message="Waiting for asset to be removed"
+    ), sync_service_journal_messages()
 
 
 @pytest.mark.skipif(os.environ["SERVICE_STATE"] != "threshold", reason="Skipping test")
@@ -177,8 +190,11 @@ def test_020_test_delete_threshold():
     sync_file_path = os.path.join(snap_common, "sync", get_user_id(), "cyclamen_persicum.jpg")
     shutil.copy("test-assets/albums/nature/cyclamen_persicum.jpg", sync_file_path)
 
-    time.sleep(30)
-    assert get_number_of_assets() == EXPECTED_INITIAL_IMAGE_COUNT + 1
+    assert wait_for_condition(
+        lambda: get_number_of_assets() == EXPECTED_INITIAL_IMAGE_COUNT + 1,
+        timeout=30,
+        message="Waiting for asset to be added"
+    ), sync_service_journal_messages()
 
     os.remove(sync_file_path)
     time.sleep(10)
@@ -200,24 +216,22 @@ def test_021_test_delete_assets_from_immich():
 
     assert os.path.exists(sync_file_path), "File was not copied to the sync directory"
 
-    for _ in range(120):
-        time.sleep(1)
-        if get_number_of_assets() == EXPECTED_INITIAL_IMAGE_COUNT + 2:
-            break
-    else:
-        assert False, f"File was not added to Immich, journal output:\n\n{sync_service_journal_messages()}"
+    assert wait_for_condition(
+        lambda: get_number_of_assets() == EXPECTED_INITIAL_IMAGE_COUNT + 2,
+        timeout=120,
+        message="Waiting for asset to be added"
+    ), sync_service_journal_messages()
 
     asset_id = get_asset_id("tanners_ridge.jpg")
     delete_asset(asset_id)
     time.sleep(30)
     requests.post(f"http://{get_ip_address()}/api/trash/empty", headers=get_headers())
 
-    for _ in range(120):
-        time.sleep(1)
-        if not os.path.exists(sync_file_path):
-            break
-    else:
-        assert False, f"File was not deleted within the timeout period: {sync_service_journal_messages()}"
+    assert wait_for_condition(
+        lambda: not os.path.exists(sync_file_path),
+        timeout=120,
+        message="Waiting for file to be removed"
+    ), sync_service_journal_messages()
 
 if __name__ == "__main__":
     pytest.main()
