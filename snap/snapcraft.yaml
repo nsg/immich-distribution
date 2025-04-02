@@ -273,15 +273,35 @@ parts:
       - node/20/stable
 
   machine-learning:
-    plugin: make
-    source: parts/machine-learning
-    build-packages:
-      - git
-      - execstack
-      - nsg-python
+    plugin: uv
+    source: https://github.com/immich-app/immich.git
+    source-tag: v1.130.0
+    source-subdir: machine-learning
+    uv-extras:
+      - cpu
+    override-build: |
+      craftctl default
+
+      cd machine-learning
+      mkdir -p ${CRAFT_PART_INSTALL}/etc
+      mkdir -p ${CRAFT_PART_INSTALL}/lib/python3.10/site-packages/ann
+      cp log_conf.json ${CRAFT_PART_INSTALL}/etc
+      cp -r ann/ann.py ${CRAFT_PART_INSTALL}/lib/python3.10/site-packages/ann/ann.py
+
     stage-packages:
-      - nsg-python
       - nsg-mimalloc
+    after: [uv-deps]
+
+  uv-deps:
+    plugin: nil
+    override-build: |
+      curl -sL https://github.com/astral-sh/uv/releases/download/0.6.11/uv-x86_64-unknown-linux-gnu.tar.gz -o uv.tar.gz
+      echo "c19b3be7ac26f8b211f7a5f07f01a77fd4d2b6205ff257790770a585f7f5bda4  uv.tar.gz" | sha256sum -c
+      tar -xf uv.tar.gz
+      mkdir -p $CRAFT_PART_INSTALL/usr/bin
+      mv uv-x86_64-unknown-linux-gnu/* $CRAFT_PART_INSTALL/usr/bin
+    build-packages:
+      - coreutils
 
   debug:
     plugin: dump
@@ -302,10 +322,6 @@ parts:
   sync:
     plugin: make
     source: parts/sync
-    build-packages:
-      - nsg-python
-    stage-packages:
-      - nsg-python
 
   geodata:
     # Download geodata from geonames.org, based Immich Server base image
