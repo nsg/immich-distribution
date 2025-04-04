@@ -331,6 +331,8 @@ parts:
     build-environment:
       - UV_PROJECT_ENVIRONMENT: "${CRAFT_PART_INSTALL}/sync"
     after: [uv-deps]
+    stage:
+      - sync
 
   geodata:
     # Download geodata from geonames.org, based Immich Server base image
