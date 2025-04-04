@@ -328,6 +328,8 @@ parts:
   sync:
     plugin: uv
     source: parts/sync
+    build-environment:
+      - UV_PROJECT_ENVIRONMENT: "${CRAFT_PART_INSTALL}/sync"
     after: [uv-deps]
 
   geodata:
