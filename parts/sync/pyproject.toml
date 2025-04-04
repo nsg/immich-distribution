@@ -9,7 +9,6 @@ dependencies = [
     "watchfiles",
     "requests",
     "psycopg2-binary",
-    "pyyaml",
 ]
 
 [build-system]
