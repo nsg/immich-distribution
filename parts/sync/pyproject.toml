@@ -1,0 +1,31 @@
+[project]
+name = "sync-service"
+version = "0.1.0"
+description = "Sync Service"
+requires-python = ">=3.10"
+readme = "README.md"
+
+dependencies = [
+    "watchfiles",
+    "requests",
+    "psycopg2-binary",
+    "pyyaml",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.uv]
+compile-bytecode = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["sync_service"]
+
+[tool.hatch.build.targets.sdist]
+packages = ["sync_service"]
+include = ["sync_service"]
+
+[project.scripts]
+sync-service = "sync_service.main:main"
+

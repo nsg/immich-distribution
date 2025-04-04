@@ -326,8 +326,9 @@ parts:
       - nsg-lego
 
   sync:
-    plugin: make
+    plugin: uv
     source: parts/sync
+    after: [uv-deps]
 
   geodata:
     # Download geodata from geonames.org, based Immich Server base image

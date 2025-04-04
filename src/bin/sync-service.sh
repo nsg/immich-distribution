@@ -3,7 +3,6 @@
 . $SNAP/bin/load-env
 
 export PGDATA="$SNAP_COMMON/pgsql/data"
-export PYTHONPATH="$SNAP/opt/pipsyncenv"
 
 while ! sync_enabled; do
     sleep 3600
@@ -23,7 +22,7 @@ cat $SNAP/etc/modify-db.sql | $SNAP/bin/psql -d immich
 
 for KEY in $(snapctl get sync); do
     {
-        IMMICH_API_KEY="$KEY" $SNAP/usr/local/bin/python3 $SNAP/bin/sync-service.py
+        IMMICH_API_KEY="$KEY" $SNAP/bin/sync-service
     } &
 done
 
