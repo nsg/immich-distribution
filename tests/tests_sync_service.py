@@ -91,7 +91,7 @@ def test_001_check_expected_state_default():
     rc, output = processes_in_cgroup("snap.immich-distribution.sync-service.service")
 
     assert rc == 0
-    assert "sync-service.py" not in output
+    assert "sync-service" not in output
     assert get_number_of_assets() == EXPECTED_INITIAL_IMAGE_COUNT
 
 
@@ -132,7 +132,7 @@ def test_001_running_sync_service():
     rc, output = processes_in_cgroup("snap.immich-distribution.sync-service.service")
 
     assert rc == 0
-    assert "sync-service.py" in output
+    assert "sync-service" in output
     assert get_number_of_assets() == EXPECTED_INITIAL_IMAGE_COUNT
 
     result = subprocess.run([
