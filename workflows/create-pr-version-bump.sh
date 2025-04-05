@@ -52,7 +52,6 @@ git checkout -b $BRANCH_NAME
 
 # Bump version
 sed -i "s/$OLD_VERSION/$NEW_VERSION/g" snap/snapcraft.yaml
-sed -i "s/$OLD_VERSION/$NEW_VERSION/g" parts/machine-learning/Makefile
 sed -i "s/$OLD_VERSION/$NEW_VERSION/g" VERSION
 
 git add .
