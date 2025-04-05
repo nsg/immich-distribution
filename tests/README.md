@@ -1,13 +1,43 @@
 # Immich Distribution Tests
 
-Upstream Immich is a fast moving project, I will do what I can to detect changes when I update Immich to a new version. I will inspect upstream changes and adapt them to this package, I will also test the new release from the candidate channel before I push it out to stable to protect stable users from surprises. Finally I run a few automated tested as part of GitHub Actions.
+Immich is a rapidly evolving application. I monitor upstream changes and adapt this package accordingly. New releases from the candidate channel are thoroughly tested before being moved to the stable channel, ensuring that stable users encounter no surprises. Automated tests are also run as part of GitHub Actions.
 
-## Selenium
+## Running Tests Locally
 
-I trigger automated Selenium tests in [tests_selenium.py](https://github.com/nsg/immich-distribution/blob/master/tests/tests_selenium.py). Selenium is a automated browser that uses Immich Web to create users, logs in and uses Immich like a real user. The idea is to find problems before a human do.
+I assume you have Podman installed; adapting this setup to another OCI runtime (like Docker) should be straightforward. To run the tests inside Incus, prefix the commands with `incus-` (e.g., `make incus-tests`).
 
-A pull request is built, installed and tested with Selenium to find regresions.
+### Start Selenium Server
 
-### Run it locally
+Run `make selenium`. You can access the Selenium browser at http://127.0.0.1:7900 using the password `secret`.
 
-If you have podman installed just type `make`, otherwise it would be easy to adapt to another OCI runtime (like Docker).
+### Run tests
+
+Simply run `make tests`; this command executes the preparation tests (`test-prep`) followed by the main tests (`test-selenium`).
+
+#### Tests: Preparation
+
+This test suite, defined in `tests_prep.py`, sets up the environment for subsequent tests by performing the following actions:
+
+- Registers a new user.
+- Executes the initial login and onboarding flows to ensure proper navigation.
+- Verifies that the timeline is empty, confirming no pre-existing photo uploads.
+- Generates API keys and saves them to a file (`secret.txt`) for use in later tests.
+
+#### Tests: Main Tests
+
+This test suite, defined in `tests_selenium.py`, validates the core functionality of the Immich Distribution application by:
+
+- Uploading various test assets via the API.
+- Waiting for image processing jobs to complete and ensuring that the job queue is empty.
+- Verifying that assets are uploaded and processed correctly using EXIF data extraction.
+- Confirming that people detection functions as expected.
+
+#### Tests: Sync Tests
+
+This test suite, defined in `test_sync.sh`, verifies the synchronization service's functionality by:
+
+- Ensuring that the sync service does not run unexpectedly on a new installation.
+- Testing the behavior of the sync service when enabling/disabling synchronization and providing API keys.
+- Verifying database modifications via service logs.
+- Manipulating files in the user’s sync directory to confirm that asset additions and removals are accurately reflected via the API.
+- Ensuring proper deletion and cleanup of assets.
