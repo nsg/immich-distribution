@@ -77,7 +77,9 @@ incus-setup:
 	incus config device add immich-distribution build disk source=${PWD} path=/build
 	incus start immich-distribution
 	sleep 30 # wait for the VM to boot
-	incus exec immich-distribution -- sudo apt install snapd podman make python3.10-venv curl git -y
+	incus exec immich-distribution -- sudo apt update
+	incus exec immich-distribution -- sudo apt install snapd podman make python3.10-venv curl git jq -y
+	sleep 10 # wait snapd to start
 	incus exec immich-distribution -- sudo snap install --classic snapcraft
 	incus exec immich-distribution -- sudo snap install lxd
 	incus exec immich-distribution -- sudo lxd init --auto

@@ -24,18 +24,8 @@ test-prep: ${PYTEST} ${PYTEST_LOCALTEST_DEPENDENCIES} wait
 test-selenium: ${PYTEST} ${PYTEST_LOCALTEST_DEPENDENCIES} test-assets wait
 	${PYTEST} tests_selenium.py --server=127.0.0.1 --port=4444 ${PYTEST_EXTRA_ARGS} --dashboard --html=report/index.html
 
-test-sync: ${PYTEST} test-assets wait
-	SERVICE_STATE=default ${PYTEST} tests_sync_service.py
-	sudo snap set immich-distribution sync-enabled=true
-	sleep 10
-	SERVICE_STATE=enabled ${PYTEST} tests_sync_service.py
-	sudo snap set immich-distribution sync="$(shell cat secret.txt)"
-	sleep 10
-	sudo chmod -R 777 /var/snap/immich-distribution/common/sync
-	SERVICE_STATE=running ${PYTEST} tests_sync_service.py
-	sudo snap set immich-distribution sync-delete-threshold=0
-	sleep 10
-	SERVICE_STATE=threshold ${PYTEST} tests_sync_service.py
+test-sync: test-assets wait
+	./test_sync.sh
 
 test_prep_%: .env/bin/seleniumbase test-assets
 	${PYTEST} tests_prep.py --server=127.0.0.1 --port=4444 --headed -k $* --html=report/index.html

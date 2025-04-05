@@ -40,7 +40,7 @@ done
 N=0
 MAX=240
 while is_backend_down; do
-    backends_down
+    backends_down | tr '\n' '\r'
 
     if [ "$N" -ge "$MAX" ]; then
         echo "ERROR: Backends are still DOWN after $MAX seconds"

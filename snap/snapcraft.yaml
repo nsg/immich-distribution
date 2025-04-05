@@ -1,6 +1,6 @@
 name: immich-distribution
 title: Immich Distribution
-version: "v1.129.0"
+version: "v1.130.0"
 base: core22
 grade: stable
 confinement: strict
@@ -165,13 +165,15 @@ parts:
   server:
     plugin: nil
     source: https://github.com/immich-app/immich.git
-    source-tag: v1.129.0
+    source-tag: v1.130.0
     override-build: |
       craftctl default
 
       cd server
 
       SHARP_VERSION=0.33.0
+      NODE_ADDON_API_VERSION=8.3.1
+      NODE_GYP_VERSION=11.1.0
 
       if [[ "$(node -p "require('./package.json').dependencies.sharp")" == "^$SHARP_VERSION" ]]; then
         echo "Sharp version is correct"
@@ -181,7 +183,10 @@ parts:
       fi
 
       # needed for sharp to build from source
-      npm install --save node-addon-api node-gyp
+      npm install --save node-addon-api@$NODE_ADDON_API_VERSION
+      npm install --save node-gyp@$NODE_GYP_VERSION
+
+      # Install sharp from source, this will use the global libvips
       npm install --save sharp@$SHARP_VERSION
 
       # Verify that sharp thinks it should use the global libvips
@@ -193,6 +198,7 @@ parts:
         fi
       )
 
+      # Now build the Immich server
       npm ci
       npm run build
       npm prune --omit=dev #--omit=optional
@@ -254,7 +260,7 @@ parts:
   web:
     plugin: nil
     source: https://github.com/immich-app/immich.git
-    source-tag: v1.129.0
+    source-tag: v1.130.0
     override-build: |
       # Build typescript-sdk, this is included by cli and web
       cd open-api/typescript-sdk
@@ -273,15 +279,35 @@ parts:
       - node/20/stable
 
   machine-learning:
-    plugin: make
-    source: parts/machine-learning
-    build-packages:
-      - git
-      - execstack
-      - nsg-python
+    plugin: uv
+    source: https://github.com/immich-app/immich.git
+    source-tag: v1.130.0
+    source-subdir: machine-learning
+    uv-extras:
+      - cpu
+    override-build: |
+      craftctl default
+
+      cd machine-learning
+      mkdir -p ${CRAFT_PART_INSTALL}/etc
+      mkdir -p ${CRAFT_PART_INSTALL}/lib/python3.10/site-packages/ann
+      cp log_conf.json ${CRAFT_PART_INSTALL}/etc
+      cp -r ann/ann.py ${CRAFT_PART_INSTALL}/lib/python3.10/site-packages/ann/ann.py
+
     stage-packages:
-      - nsg-python
       - nsg-mimalloc
+    after: [uv-deps]
+
+  uv-deps:
+    plugin: nil
+    override-build: |
+      curl -sL https://github.com/astral-sh/uv/releases/download/0.6.11/uv-x86_64-unknown-linux-gnu.tar.gz -o uv.tar.gz
+      echo "c19b3be7ac26f8b211f7a5f07f01a77fd4d2b6205ff257790770a585f7f5bda4  uv.tar.gz" | sha256sum -c
+      tar -xf uv.tar.gz
+      mkdir -p $CRAFT_PART_INSTALL/usr/bin
+      mv uv-x86_64-unknown-linux-gnu/* $CRAFT_PART_INSTALL/usr/bin
+    build-packages:
+      - coreutils
 
   debug:
     plugin: dump
@@ -300,12 +326,13 @@ parts:
       - nsg-lego
 
   sync:
-    plugin: make
+    plugin: uv
     source: parts/sync
-    build-packages:
-      - nsg-python
-    stage-packages:
-      - nsg-python
+    build-environment:
+      - UV_PROJECT_ENVIRONMENT: "${CRAFT_PART_INSTALL}/sync"
+    after: [uv-deps]
+    stage:
+      - sync
 
   geodata:
     # Download geodata from geonames.org, based Immich Server base image
