@@ -92,8 +92,9 @@ wait_for_asset_count() {
 
     echo -n "Waiting for assets to be $expected... "
     for ((i=0; i<timeout; i+=interval)); do
-        echo -ne "\rWaiting for assets to be $expected... [${i}/${timeout}]"
-        if [[ $(get_number_of_assets) -eq $expected ]]; then
+        local current=$(get_number_of_assets)
+        echo -ne "\rWaiting for assets to be $expected ($current) [${i}/${timeout}]"
+        if [[ $current -eq $expected ]]; then
             echo
             return 0
         fi
