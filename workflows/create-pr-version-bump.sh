@@ -70,6 +70,9 @@ Please review the changes and merge this PR if everything looks good.
 ## Monitored upstream files
 $(./update.sh $OLD_VERSION $NEW_VERSION)
 
+## AI analysis
+$(cd ai && uv run python main.py $OLD_VERSION $NEW_VERSION)
+
 ## Base image
 Check the base images for recent relevant changes:
 

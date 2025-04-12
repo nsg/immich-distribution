@@ -1,5 +1,6 @@
 import subprocess
 import os
+import sys
 
 from openai import OpenAI
 client = OpenAI()
@@ -77,14 +78,19 @@ def concat_files(folder_path):
 
 
 def main():
+    # Get old and new versions from command-line arguments
+    if len(sys.argv) != 3:
+        print("Usage: python main.py <old_version> <new_version>")
+        print("Example: python main.py v1.130.3 v1.131.3")
+        sys.exit(1)
+    
+    old_release = sys.argv[1]
+    new_release = sys.argv[2]
 
     # Clone the repository if the directory doesn't exist
     repo_remote = "https://github.com/immich-app/immich.git"
     repo_local = "immich"
     
-    new_release = "v1.131.3"
-    old_release = "v1.130.3"
-
     if not os.path.exists(repo_local):
         clone_git_repo(repo_remote, new_release, repo_local)
 
