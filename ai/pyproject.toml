@@ -1,0 +1,9 @@
+[project]
+name = "ai"
+version = "0.1.0"
+description = "Use AI to do stuff"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "openai>=1.72.0",
+]

@@ -48,6 +48,12 @@ if [[ $(version_to_int "$NEW_VERSION") -lt $(version_to_int "$OLD_VERSION") ]]; 
     exit 0
 fi
 
+(
+    cd ai
+    uv sync
+    uv run python main.py $OLD_VERSION $NEW_VERSION
+)
+
 git checkout -b $BRANCH_NAME
 
 # Bump version
@@ -69,6 +75,9 @@ Please review the changes and merge this PR if everything looks good.
 
 ## Monitored upstream files
 $(./update.sh $OLD_VERSION $NEW_VERSION)
+
+## AI analysis
+$(cat ai/final_report.md)
 
 ## Base image
 Check the base images for recent relevant changes:

@@ -49,9 +49,13 @@ jobs:
         with:
           ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
       - name: Create PR Version Bump
         env:
           GH_TOKEN: ${{ github.token }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
           git config --global user.name "Github Action Automation"
           git config --global user.email "nsg@users.noreply.github.com"
