@@ -290,9 +290,7 @@ parts:
 
       cd machine-learning
       mkdir -p ${CRAFT_PART_INSTALL}/etc
-      mkdir -p ${CRAFT_PART_INSTALL}/lib/python3.10/site-packages/ann
-      cp log_conf.json ${CRAFT_PART_INSTALL}/etc
-      cp -r ann/ann.py ${CRAFT_PART_INSTALL}/lib/python3.10/site-packages/ann/ann.py
+      cp immich_ml/log_conf.json ${CRAFT_PART_INSTALL}/etc
 
     stage-packages:
       - nsg-mimalloc
