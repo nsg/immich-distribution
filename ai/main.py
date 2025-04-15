@@ -142,6 +142,16 @@ def main():
         """
     )
 
+    generate_report("ml-start", repo_local, old_release, new_release, "machine-learning/immich_ml/__main__.py",
+        [
+            "src/bin/immich-machine-learning",
+        ],
+        """
+        - The "immich-machine-learning" script is the entry point for the machine learning service.
+        - Upstream Immich uses __main__.py to start the application.
+        
+        We are using our own script with a few changes adapted to our needs. Make sure that any changes
+        in the __main__.py file does not need to be applied to the "immich-machine-learning" script.
         """
     )
 
