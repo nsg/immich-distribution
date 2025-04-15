@@ -142,21 +142,26 @@ def main():
         """
     )
 
-    response = client.responses.create(
-        model="o3-mini",
-        input=f"""
-            Please make a nicely formatted report of the following reports.
-            I will add them as a comment to a pull request so please format it nicely with markdown.
-            The reports are:
-            
-            {concat_files("reports")}
         """
     )
+
 
     if os.path.exists("final_report.md"):
         print("Final report already exists. Skipping generation.")
     else:
         print("Generating final report...")
+
+        response = client.responses.create(
+            model="o3-mini",
+            input=f"""
+                Please make a nicely formatted report of the following reports.
+                I will add them as a comment to a pull request so please format it nicely with markdown.
+                The reports are:
+                
+                {concat_files("reports")}
+            """
+        )
+
         write_file_content("final_report.md", response.output_text)
 
 
