@@ -4,10 +4,11 @@
 
 export LD_PRELOAD="$SNAP/usr/local/lib/libmimalloc.so.2"
 
-gunicorn app.main:app \
-	-k app.config.CustomUvicornWorker \
+gunicorn immich_ml.main:app \
+	-k immich_ml.config.CustomUvicornWorker \
  	-w $MACHINE_LEARNING_WORKERS \
  	-b $MACHINE_LEARNING_HOST:$MACHINE_LEARNING_PORT \
 	-t $MACHINE_LEARNING_WORKER_TIMEOUT \
 	--log-config-json $SNAP/etc/log_conf.json \
-	--graceful-timeout 0
+	--keep-alive $MACHINE_LEARNING_KEEP_ALIVE_TIMEOUT \
+	--graceful-timeout $MACHINE_LEARNING_GRACEFUL_TIMEOUT

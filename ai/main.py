@@ -142,21 +142,37 @@ def main():
         """
     )
 
-    response = client.responses.create(
-        model="o3-mini",
-        input=f"""
-            Please make a nicely formatted report of the following reports.
-            I will add them as a comment to a pull request so please format it nicely with markdown.
-            The reports are:
-            
-            {concat_files("reports")}
+    generate_report("ml-start", repo_local, old_release, new_release, "machine-learning",
+        [
+            "src/bin/immich-machine-learning",
+            "src/bin/load-env",
+        ],
+        """
+        - The "immich-machine-learning" script is the entry point for the machine learning service.
+        - Upstream Immich uses __main__.py to start the application.
+
+        We are using our own script with a few changes adapted to our needs. Make sure that any changes
+        done in the upstream package do not need to be applied to the "immich-machine-learning" script.
         """
     )
+
 
     if os.path.exists("final_report.md"):
         print("Final report already exists. Skipping generation.")
     else:
         print("Generating final report...")
+
+        response = client.responses.create(
+            model="o3-mini",
+            input=f"""
+                Please make a nicely formatted report of the following reports.
+                I will add them as a comment to a pull request so please format it nicely with markdown.
+                The reports are:
+                
+                {concat_files("reports")}
+            """
+        )
+
         write_file_content("final_report.md", response.output_text)
 
 
