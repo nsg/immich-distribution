@@ -68,9 +68,9 @@ export ACME_CONFIG_PATH="$SNAP_COMMON/acme"
 export HTTPS_ENABLED="$(snapctl get https-enabled)"
 
 if [ "x$HTTPS_ENABLED" == "xtrue" ]; then
-    export HAPROXY_CONF_FILE="haproxy-tls.cfg"
+    export HAPROXY_HTTPS_FRONTEND_DATA=""
 else
-    export HAPROXY_CONF_FILE="haproxy.cfg"
+    export HAPROXY_HTTPS_FRONTEND_DATA="disabled"
 fi
 
 export HAPROXY_HTTP_BIND="$(snapctl get haproxy-http-bind)"
