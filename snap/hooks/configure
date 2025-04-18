@@ -24,6 +24,14 @@ if [[ $(snapctl get database-password) == "" ]]; then
     snapctl set database-password="$(random_string)"
 fi
 
+if [[ $(snapctl get https-enabled) == "" ]]; then
+    snapctl set https-enabled="false"
+fi
+
+if [[ $(snapctl get http-enabled) == "" ]]; then
+    snapctl set http-enabled="true"
+fi
+
 if [[ $(snapctl get haproxy-http-bind) == "" ]]; then
     snapctl set haproxy-http-bind="*:80"
 fi
