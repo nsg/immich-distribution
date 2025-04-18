@@ -44,6 +44,10 @@ if [[ $(snapctl get acme-port) == "" ]]; then
     snapctl set acme-port="$(free_port)"
 fi
 
+if [[ $(snapctl get acme-challenge) == "" ]]; then
+    snapctl set acme-challenge="http"
+fi
+
 if [[ $(snapctl get manager-migrations-version) == "" ]]; then
     snapctl set manager-migrations-version="0"
 fi
