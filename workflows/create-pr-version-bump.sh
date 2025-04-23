@@ -49,6 +49,7 @@ if [[ $(version_to_int "$NEW_VERSION") -lt $(version_to_int "$OLD_VERSION") ]]; 
 fi
 
 (
+    echo "AI: Analyzing the changes between $OLD_VERSION and $NEW_VERSION"
     cd ai
     uv sync
     uv run python main.py $OLD_VERSION $NEW_VERSION
