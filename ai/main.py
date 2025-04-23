@@ -48,19 +48,28 @@ def generate_report(report_name, repo_local, old_release, new_release, diff_path
     diff_changes_output = diff_changes(repo_local, old_release, new_release, diff_path)
 
     input_prompt = f"""
-        You are a software engineer. You maintain a package of a piece of software called Immich.
-        You are provided a diff of changes between the old version {old_release} and the new version {new_release}.
+        You are a software engineer that maintains a package called Immich Distribution.
+        Immich Distribution is a snap package that packages the software Immich.
+        The package is using Immich {old_release} currently and is going to upgrade to Immich {new_release}.
+        You are provided a diff of changes between the old version and the new version.
         Your job is to figure out if the changes are relevant to the files you maintain in the package.
-        Your response should be formatted in markdown to fit in a GitHub comment.
-        Give advice on what I need to change in the following files: {", ".join(relevant_files)}
-        You must provide code diffs of what needs to be changed in the files.
-        Diffs should be sounded by triple backticks.
-        Omit files with no changes needed.
-        You will not fix existing bugs in the code, only things related to the upgrade.
-        Generate unified diffs for the files that need to be changed.
-        It's really important that the diffs works and applies to the provided files.
+
+        Formatting of the response:
+        - Your response should be formatted in markdown to fit in a GitHub comment.
+        - You must provide code diffs of what needs to be changed.
+        - Keep the diffs as small as possible.
+        - You must provide a short explanation of why the change is needed.
+        - You must provide a short explanation of what the change is doing.
+        - Diffs should be sounded by triple backticks.
+        - Do not mention files where there are no changes needed.
+        - You will not fix existing bugs in the code, only things related to the upgrade.
+        - Generate unified diffs for the files that need to be changed.
+        - It's really important that the diffs are valid and applies to the provided files.
 
         {prompt}
+
+        Give advice on what I need to change in the following files:
+        {", ".join(relevant_files)}
         
         Files that has changed in the new release of Immich:
         {diff_changes_output}
@@ -69,15 +78,17 @@ def generate_report(report_name, repo_local, old_release, new_release, diff_path
         {relevant_files_content}
         """
 
-    print(f"Input prompt token count: {count_tokens(input_prompt)}")
-
-    response = client.responses.create(
-        model="o4-mini",
-        input=input_prompt
+    token_count = count_tokens(input_prompt)
+    print(f"Input prompt token count: {token_count}")
+    
+    chat_response = client.chat.completions.create(
+        model="gpt-4.1",
+        messages=[{"role": "user", "content": input_prompt}]
     )
+    response_text = chat_response.choices[0].message.content
 
     os.makedirs("reports", exist_ok=True)
-    write_file_content(report_file, response.output_text)
+    write_file_content(report_file, response_text)
 
 def concat_files(folder_path):
     content = []
@@ -85,9 +96,10 @@ def concat_files(folder_path):
         for filename in filenames:
             if filename.endswith(".md"):
                 file_path = os.path.join(root, filename)
-                name = filename[:-3]  # Remove .md extension
                 with open(file_path, 'r') as f:
-                    content.append(f"## {name}\n\n{f.read()}")
+                    content.append(f"\n=== FILE: {filename} ===")
+                    content.append(f.read())
+                    content.append("\n")
     return "\n\n".join(content)
 
 
@@ -179,10 +191,21 @@ def main():
         response = client.responses.create(
             model="o4-mini",
             input=f"""
-                Please make a nicely formatted report of the following reports.
-                I will add them as a comment to a pull request so please format it nicely with markdown.
-                The reports are:
+                You are a software engineer that maintains a package called Immich Distribution that packages the software Immich.
+                You are given a set of reports that contains the changes needed to upgrade the package from Immich {old_release} to {new_release}.
+                Your job is to generate a final report that contains all the changes needed to upgrade the package.
+
+                Formatting of the response:                
+                - Please make a nicely formatted report.
+                - You must provide code diffs of what needs to be changed.
+                - Keep the diffs as small as possible.
+                - Remove unnecessary lines from the diffs.
+                - Use unified diff format.
+                - You must provide a short explanation of why the change is needed.
                 
+                The response should be formatted in markdown to fit in a GitHub comment.
+
+                The reports are:
                 {concat_files("reports")}
             """
         )
