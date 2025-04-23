@@ -2,6 +2,7 @@ import subprocess
 import os
 import sys
 
+import tiktoken
 from openai import OpenAI
 client = OpenAI()
 
@@ -22,6 +23,11 @@ def write_file_content(file_path, content):
     with open(file_path, 'w') as file:
         file.write(content)
 
+def count_tokens(text):
+    # o4-mini is not supported yet, so we use o3-mini for now. This is close enough.
+    encoding = tiktoken.encoding_for_model("o3-mini")
+    return len(encoding.encode(text))
+
 def generate_report(report_name, repo_local, old_release, new_release, diff_path, relevant_files, prompt):
 
     report_file = f"reports/{report_name}.md"
@@ -37,9 +43,7 @@ def generate_report(report_name, repo_local, old_release, new_release, diff_path
 
     diff_changes_output = diff_changes(repo_local, old_release, new_release, diff_path)
 
-    response = client.responses.create(
-        model="o3-mini",
-        input=f"""
+    input_prompt = f"""
         You are a software engineer. You maintain a package of a piece of software called Immich.
         You are provided a diff of changes between the old version {old_release} and the new version {new_release}.
         Your job is to figure out if the changes are relevant to the files you maintain in the package.
@@ -60,6 +64,12 @@ def generate_report(report_name, repo_local, old_release, new_release, diff_path
         The package contains the following relevant files:
         {relevant_files_content}
         """
+
+    print(f"Input prompt token count: {count_tokens(input_prompt)}")
+
+    response = client.responses.create(
+        model="o4-mini",
+        input=input_prompt
     )
 
     os.makedirs("reports", exist_ok=True)
@@ -163,7 +173,7 @@ def main():
         print("Generating final report...")
 
         response = client.responses.create(
-            model="o3-mini",
+            model="o4-mini",
             input=f"""
                 Please make a nicely formatted report of the following reports.
                 I will add them as a comment to a pull request so please format it nicely with markdown.
