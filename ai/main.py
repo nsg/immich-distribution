@@ -12,6 +12,7 @@ def clone_git_repo(repo_url, branch, target_dir):
 
 def diff_changes(repo_dir, old_branch, new_branch, file_path):
     cmd = ["git", "-C", repo_dir, "diff", f"{old_branch}..{new_branch}", file_path]
+    print(f"Running command: {' '.join(cmd)}")
     result = subprocess.run(cmd, capture_output=True, text=True)
     return result.stdout
 
