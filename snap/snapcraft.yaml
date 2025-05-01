@@ -1,6 +1,6 @@
 name: immich-distribution
 title: Immich Distribution
-version: "v1.131.3"
+version: "v1.132.0"
 base: core22
 grade: stable
 confinement: strict
@@ -156,16 +156,15 @@ apps:
 
 package-repositories:
   - type: apt
-    url: http://apt.nsg.cc
-    key-id: F57612E2E6C4A0CAA9695C839C471A5B8FA0B5E3
-    suites: [jammy]
-    components: [main]
+    url: https://nsg.github.io/aptly/deb
+    key-id: 5C1D32DC907B26F2BDD7EE8E0D00DE0E5C61B36E
+    path: /
 
 parts:
   server:
     plugin: nil
     source: https://github.com/immich-app/immich.git
-    source-tag: v1.131.3
+    source-tag: v1.132.0
     override-build: |
       craftctl default
 
@@ -260,7 +259,7 @@ parts:
   web:
     plugin: nil
     source: https://github.com/immich-app/immich.git
-    source-tag: v1.131.3
+    source-tag: v1.132.0
     override-build: |
       # Build typescript-sdk, this is included by cli and web
       cd open-api/typescript-sdk
@@ -281,7 +280,7 @@ parts:
   machine-learning:
     plugin: uv
     source: https://github.com/immich-app/immich.git
-    source-tag: v1.131.3
+    source-tag: v1.132.0
     source-subdir: machine-learning
     uv-extras:
       - cpu
