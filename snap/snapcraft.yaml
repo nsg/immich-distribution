@@ -156,10 +156,9 @@ apps:
 
 package-repositories:
   - type: apt
-    url: http://apt.nsg.cc
-    key-id: F57612E2E6C4A0CAA9695C839C471A5B8FA0B5E3
-    suites: [jammy]
-    components: [main]
+    url: https://nsg.github.io/aptly/deb
+    key-id: 5C1D32DC907B26F2BDD7EE8E0D00DE0E5C61B36E
+    path: /
 
 parts:
   server:
