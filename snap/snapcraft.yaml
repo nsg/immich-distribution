@@ -185,8 +185,10 @@ parts:
       npm install --save node-addon-api@$NODE_ADDON_API_VERSION
       npm install --save node-gyp@$NODE_GYP_VERSION
 
-      # Install sharp from source, this will use the global libvips
-      npm install --save sharp@$SHARP_VERSION
+      # Now build the Immich server
+      npm ci
+      npm run build
+      npm prune --omit=dev #--omit=optional
 
       # Verify that sharp thinks it should use the global libvips
       (
@@ -196,11 +198,6 @@ parts:
           exit 1
         fi
       )
-
-      # Now build the Immich server
-      npm ci
-      npm run build
-      npm prune --omit=dev #--omit=optional
 
       # Verify that sharp was built from source, and that the binary is still present (after ci & prune)
       if [[ ! -e node_modules/sharp/src/build/Release/sharp-linux-x64.node ]]; then
