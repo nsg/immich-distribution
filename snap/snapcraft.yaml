@@ -172,7 +172,7 @@ parts:
 
       SHARP_VERSION=0.34.0
       NODE_ADDON_API_VERSION=8.3.1
-      NODE_GYP_VERSION=11.1.0
+      NODE_GYP_VERSION=11.2.0
 
       if [[ "$(node -p "require('./package.json').dependencies.sharp")" == "^$SHARP_VERSION" ]]; then
         echo "Sharp version is correct"
