@@ -1,6 +1,6 @@
 name: immich-distribution
 title: Immich Distribution
-version: "v1.132.0"
+version: "v1.132.3"
 base: core22
 grade: stable
 confinement: strict
@@ -164,15 +164,15 @@ parts:
   server:
     plugin: nil
     source: https://github.com/immich-app/immich.git
-    source-tag: v1.132.0
+    source-tag: v1.132.3
     override-build: |
       craftctl default
 
       cd server
 
-      SHARP_VERSION=0.33.5
+      SHARP_VERSION=0.34.0
       NODE_ADDON_API_VERSION=8.3.1
-      NODE_GYP_VERSION=11.1.0
+      NODE_GYP_VERSION=11.2.0
 
       if [[ "$(node -p "require('./package.json').dependencies.sharp")" == "^$SHARP_VERSION" ]]; then
         echo "Sharp version is correct"
@@ -185,8 +185,10 @@ parts:
       npm install --save node-addon-api@$NODE_ADDON_API_VERSION
       npm install --save node-gyp@$NODE_GYP_VERSION
 
-      # Install sharp from source, this will use the global libvips
-      npm install --save sharp@$SHARP_VERSION
+      # Now build the Immich server
+      npm ci
+      npm run build
+      npm prune --omit=dev #--omit=optional
 
       # Verify that sharp thinks it should use the global libvips
       (
@@ -196,11 +198,6 @@ parts:
           exit 1
         fi
       )
-
-      # Now build the Immich server
-      npm ci
-      npm run build
-      npm prune --omit=dev #--omit=optional
 
       # Verify that sharp was built from source, and that the binary is still present (after ci & prune)
       if [[ ! -e node_modules/sharp/src/build/Release/sharp-linux-x64.node ]]; then
@@ -259,7 +256,7 @@ parts:
   web:
     plugin: nil
     source: https://github.com/immich-app/immich.git
-    source-tag: v1.132.0
+    source-tag: v1.132.3
     override-build: |
       # Build typescript-sdk, this is included by cli and web
       cd open-api/typescript-sdk
@@ -280,7 +277,7 @@ parts:
   machine-learning:
     plugin: uv
     source: https://github.com/immich-app/immich.git
-    source-tag: v1.132.0
+    source-tag: v1.132.3
     source-subdir: machine-learning
     uv-extras:
       - cpu

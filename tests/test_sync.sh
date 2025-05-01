@@ -170,6 +170,7 @@ log "Add file polemonium_reptans.jpg"
 add_file "polemonium_reptans.jpg"
 
 log "Verify that the file is added to Immich via the API."
+sleep 10
 if ! wait_for_asset_count $((INITIAL_NUMBER_OF_ASSETS + 1)); then
     die "Expected the number of assets to increase to $((INITIAL_NUMBER_OF_ASSETS + 1)) within 1 minute, but it did not."
 fi
@@ -178,6 +179,7 @@ log "Remove the file polemonium_reptans.jpg"
 remove_file "polemonium_reptans.jpg"
 
 log "Verify that the file is removed from Immich via the API."
+sleep 10
 if ! wait_for_asset_count $INITIAL_NUMBER_OF_ASSETS; then
     die "Expected the number of assets to decrease to $INITIAL_NUMBER_OF_ASSETS within 1 minute, but it did not."
 fi
@@ -191,6 +193,7 @@ log "Add file cyclamen_persicum.jpg"
 add_file "cyclamen_persicum.jpg"
 
 log "Verify that the file is added to Immich via the API."
+sleep 10
 if ! wait_for_asset_count $((INITIAL_NUMBER_OF_ASSETS + 1)); then
     die "Expected the number of assets to increase to $((INITIAL_NUMBER_OF_ASSETS + 1)) within 1 minute, but it did not."
 fi
@@ -199,6 +202,7 @@ log "Remove the file cyclamen_persicum.jpg"
 remove_file "cyclamen_persicum.jpg"
 
 log "Verify that the file is still in Immich via the API."
+sleep 10
 if ! wait_for_asset_count $((INITIAL_NUMBER_OF_ASSETS + 1)); then
     die "Expected the number of assets to stay the same"
 fi
@@ -207,6 +211,7 @@ log "Add file tanners_ridge.jpg"
 add_file "tanners_ridge.jpg"
 
 log "Verify that the file is added to Immich via the API."
+sleep 10
 if ! wait_for_asset_count $((INITIAL_NUMBER_OF_ASSETS + 2)); then
     die "Expected the number of assets to increase"
 fi

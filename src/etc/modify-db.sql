@@ -1,4 +1,4 @@
--- A audit lof of deleted assets
+-- An audit log of deleted assets
 CREATE TABLE IF NOT EXISTS assets_delete_audits (
     id INT GENERATED ALWAYS AS IDENTITY,
     asset_id UUID NOT NULL,
@@ -30,7 +30,7 @@ BEGIN
 END;
 $$;
 
--- Trigger that calls the function above on deletetion of assets
+-- Trigger that calls the function above on deletion of assets
 CREATE OR REPLACE TRIGGER trigger_assets_delete_audits
 BEFORE DELETE ON assets
 FOR EACH ROW
