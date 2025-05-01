@@ -4,7 +4,7 @@
 
 export LD_PRELOAD="$SNAP/usr/local/lib/libmimalloc.so.2"
 
-gunicorn immich_ml.main:app \
+exec gunicorn immich_ml.main:app \
 	-k immich_ml.config.CustomUvicornWorker \
  	-w $MACHINE_LEARNING_WORKERS \
  	-b $MACHINE_LEARNING_HOST:$MACHINE_LEARNING_PORT \
