@@ -43,8 +43,8 @@ layout:
     symlink: $SNAP_COMMON/upload
   /usr/lib/x86_64-linux-gnu/libheif:
     symlink: $SNAP/usr/lib/x86_64-linux-gnu/libheif
-  /usr/lib/vips-modules-8.15:
-    symlink: $SNAP/usr/lib/vips-modules-8.15
+  /usr/lib/vips-modules-8.16:
+    symlink: $SNAP/usr/lib/vips-modules-8.16
   /usr/etc/ImageMagick-7:
     symlink: $SNAP/usr/etc/ImageMagick-7
   /usr/lib/ImageMagick-7.1.1:
@@ -393,4 +393,5 @@ parts:
       - libvorbisenc2
       - libvpx7
       - libx264-163
+      - libx265-199
       - libzvbi0
