@@ -2,6 +2,6 @@
 
 . $SNAP/bin/load-env
 
-# Enable vectors.so extension in postgresql.conf
-# NOTE: This the #, this will only match once per installation
-sed -i "s/^#shared_preload_libraries.*/shared_preload_libraries = 'vectors.so' # Added pgvecto-rs/" $PGDATA/postgresql.conf
+# NOTE: This the leading #, this will only match once per installation
+sed -i "s/^#shared_preload_libraries.*/shared_preload_libraries = 'vectors.so' # enable pgvector extension for immich vector search/" $PGDATA/postgresql.conf
+sed -i "s/^#search_path.*/search_path = '\"\$\$user\", public, vectors' # include vectors schema in search_path for immich queries/" $PGDATA/postgresql.conf
