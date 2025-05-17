@@ -1,12 +1,12 @@
 # Backup and Restore
 
-There is a backup and import command bundled as part of the snap. This is simple shell scripts wrapping `psql` and `tar`. They are included for your convenience.
+A backup and restore command is bundled as part of the Snap package. These are simple shell scripts that wrap `psql` (for database operations) and `tar` (for file archiving). They are included for convenience.
 
 !!! Note "Backup recommendations"
 
-    On a real install with a lot of pictures the tar-file will be unusable large. It's recommended to only backup the database with these tools and manually backup the files directly with your backup software of choice.
+    On an installation with many pictures, the asset archive (`.tar` file) can become impractically large. It is generally recommended to use these tools to back up only the database and to back up the asset files directly using your preferred backup software.
 
-    The `-a` option is here mainly for smaller installations and they can be useful to quickly restore test instances.
+    The `-a` (assets) option is primarily intended for smaller installations or for quickly restoring test instances.
 
 ## Manual Backup
 
@@ -18,17 +18,17 @@ immich-distribution.backup [-d] [-a] [-l]
 -l  List backups
 ```
 
-The recommended way to backup Immich is to do a database backup with `-d`, and then manually backup the assets directly from `/var/snap/immich-distribution/common/upload/{==library==}`, `/var/snap/immich-distribution/common/upload/{==upload==}` and `/var/snap/immich-distribution/common/upload/{==profile==}`.
+The recommended backup strategy is to perform a database backup using the `-d` option, and then manually back up the asset directories. These are typically located at `/var/snap/immich-distribution/common/upload/{==library==}`, `/var/snap/immich-distribution/common/upload/{==upload==}` (for external library uploads if applicable), and `/var/snap/immich-distribution/common/upload/{==profile==}`.
 
 ## Automatic backup
 
-There are an included backup service that you can enable with the command below. It will run a daily database backup and keep them for a week.
+An included backup service can be enabled with the command below. This service will perform a daily database backup and retain these backups for one week.
 
 ```
 sudo snap set immich-distribution backup-database-daily=true
 ```
 
-Backups will occur every night at `01:00`. Backups older than a week should be removed automatically.
+Backups are scheduled to occur daily at `01:00` server time. Backups older than one week are automatically removed.
 
 ## Restore
 
@@ -40,4 +40,4 @@ immich-distribution.restore [-d database-backup] [-a assets-backup]
 ```
 
 !!! danger
-    Note that this will **DESTROY** and **OVERWRITE** your current install!
+    Note that restoring will **DESTROY** and **OVERWRITE** your current Immich installation data!

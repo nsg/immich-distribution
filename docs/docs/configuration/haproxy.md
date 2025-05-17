@@ -1,6 +1,6 @@
 # HAProxy
 
-You can inspect the HAProxy stats status page at `/haproxy`. It can be useful to troubleshoot or just to get a feeling about the installations status. You can [inspect the configuration here](https://github.com/nsg/immich-distribution/blob/master/src/etc/haproxy.cfg).
+You can inspect the HAProxy statistics and status page by navigating to `/haproxy` on your Immich instance (e.g., `http://your.domain.name/haproxy`). This page can be useful for troubleshooting or getting an overview of the installation's operational status. The HAProxy configuration file used by Immich Distribution can be [inspected here](https://github.com/nsg/immich-distribution/blob/master/src/etc/haproxy.cfg).
 
 ## Enable https frontend
 
@@ -8,11 +8,11 @@ You can inspect the HAProxy stats status page at `/haproxy`. It can be useful to
 sudo snap set immich-distribution https-enabled="true"
 ```
 
-The above command will enable the TLS frontend, this will be enabled if you configure [https](/configuration/https) with Let's encrypt.
+The command above enables the TLS frontend in HAProxy. This is automatically enabled if you configure [HTTPS with Let's Encrypt](/configuration/https).
 
 ## Change port numbers
 
-HAProxy listens on `*:80` (all interfaces, tcp port 80) by default, and `*:443` if https is enabled. If you like to change these ports update the following configuration keys.
+By default, HAProxy listens on `*:80` (all network interfaces, TCP port 80) for HTTP traffic, and `*:443` for HTTPS traffic if enabled. If you need to change these default ports (e.g., if they are already in use by another service), you can update the following configuration keys:
 
 ```bash title="Use port 8880 for HTTP traffic"
 sudo snap set immich-distribution haproxy-http-bind="*:8880"
@@ -24,6 +24,5 @@ sudo snap set immich-distribution haproxy-https-bind="*:4443"
 
 ## Loading screen
 
-The loading screen below uses haproxy stats to display it's information. The loading screen is displayed if the Immich Web frontend is down.
-
+The loading screen shown when Immich services are starting or down uses HAProxy statistics to display its information.
 ![](/assets/immich-loading.png)

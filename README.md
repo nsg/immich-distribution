@@ -1,8 +1,9 @@
 # Immich Distribution
 
-Immich Distribution is an independent community project that packages the software in a snap package. This project is not affiliated with the upstream [Immich project](https://immich.app/), its developers, or [FUTO](https://futo.org). For more information, please refer to the [documentation site](https://immich-distribution.nsg.cc).
+Immich Distribution is an independent community project that packages the software in a snap package. This project is not affiliated with the upstream [Immich project](https://immich.app/), its developers, or [FUTO](https://futo.org). For more information, refer to the [documentation site](https://immich-distribution.nsg.cc).
 
-If you like to have Immich installed directly from the Immich project use the official [Docker images](https://immich.app/docs/install/docker-compose). Do not report bugs to upstream _unless_ you are sure that the same bug is present in the upstream images.
+- If you'd like to install Immich directly from the upstream project, use the official [Docker images](https://immich.app/docs/install/docker-compose).
+- Please only report bugs upstream if they also occur in the official images.
 
 <p align="center">
   <img src="docs/docs/assets/immich-dist.png">
@@ -10,7 +11,7 @@ If you like to have Immich installed directly from the Immich project use the of
 
 ## About
 
-In short, this is an [Immich](https://immich.app/) Distribution packaged inside a [snap](https://snapcraft.io/docs) package. The package is inspired of the official Immich images. It will be similar, but not identical with the official Docker-based installation. Extra tools are included, they should be non-intrusive and you can ignore them if you like.
+In short, this is an [Immich](https://immich.app/) Distribution packaged inside a [snap](https://snapcraft.io/docs) package. The package is inspired by the official Immich images. It will be similar, but not identical with the official Docker-based installation. Extra tools are included; they are non-intrusive and can be ignored if you prefer.
 
 <strong>For more information see the project page at https://immich-distribution.nsg.cc</strong>
 
@@ -25,7 +26,7 @@ In short, this is an [Immich](https://immich.app/) Distribution packaged inside 
 sudo snap install immich-distribution
 ```
 
-For detailed installation instructions with recommendations and hardware requirements, automatic updates and configuration see the [installation documentation](https://immich-distribution.nsg.cc/install/) pages at the projects website. 
+For detailed installation instructions, including hardware requirements, automatic updates, and configuration—see the [installation documentation](https://immich-distribution.nsg.cc/install/) on the project’s website. 
 
 ## Documentation
 

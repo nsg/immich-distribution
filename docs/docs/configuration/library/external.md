@@ -1,26 +1,26 @@
 # External Libraries
 
-Immich has support for External Libraries. They are folders stored outside Immich own internal library. You can read more about libraries on the [official documentation](https://immich.app/docs/features/libraries). You manage them from Immich Web via a browser, but the available locations are limited due Immich Distributions sandbox.
+Immich supports External Libraries, which are folders stored outside Immich's own internal library structure. You can read more about libraries in the [official documentation](https://immich.app/docs/features/libraries). You manage these libraries from Immich Web via a browser. However, the locations you can add are limited by the Immich Distribution sandbox.
 
 ## Sandbox
 
-Immich Distribution is a snap package, and snap packages are typically running inside a sandbox. That's a security feature most known from phones where an application is isolated from other applications. That limits where Immich Distribution can read and write data, to work around that you need do _mount_ your data to the correct location.
+Immich Distribution is a Snap package, and Snap packages typically run inside a sandbox. This is a security feature, similar to how applications on phones are isolated. This sandbox limits where Immich Distribution can read and write data. To use external folders, you need to _mount_ them into a location accessible by the Snap.
 
-Locations Immich can access, and are suitable for images are `/var/snap/immich-distribution/common` and `/root/snap/immich-distribution/common`. The first location is used by Immich Distribution already, but feel free to create a subfolder there if you like.
+Locations that Immich can access, suitable for external libraries, include subfolders within `/var/snap/immich-distribution/common` and `/root/snap/immich-distribution/common`. The first path is already used by Immich Distribution for its internal data, but you can create a unique subfolder there.
 
 ## Mount
 
-You can work around the sandbox by either mounting the new drive/mount directly to the correct spot, or, use a bind mount. Links like symlinks will not work!
+You can make external storage accessible to Immich by either mounting a drive/partition directly to an allowed location or by using a bind mount for an existing directory. Standard symbolic links (symlinks) will not work due to the sandbox.
 
 ### Mount a drive, partition, volume or network share
 
-Make a subfolder under one of the suitable locations, for example `/var/snap/immich-distribution/common/my-library-pictures` or `/root/snap/immich-distribution/common/pictures` and mount it to that location.
+Create a subfolder under one of the suitable locations (e.g., `/var/snap/immich-distribution/common/my-external-library` or `/root/snap/immich-distribution/common/shared-pictures`) and then mount your drive, partition, or network share to this newly created subfolder.
 
 !!! note "Future name collision"
-    I would choose a folder under `/root/snap/immich-distribution/common` to reduce the risk for future name collitions. If you like to use `/var/snap/immich-distribution/common`, pick a unique name.
+    Choosing a folder under `/root/snap/immich-distribution/common` is generally recommended to reduce the risk of name collisions with files the Snap package might create in `/var/snap/immich-distribution/common`. If you use `/var/snap/immich-distribution/common`, ensure your subfolder has a unique name.
 
 ### Use a bind mount
 
-You can also bind mount a folder from one path of the filesystem to another. So let's assume that your pictures are located in `/data/pictures`. You need to bind mount that to `/root/snap/immich-distribution/common/pictures` and add the later path to Immich.
+Alternatively, you can use a bind mount to make an existing folder accessible. For example, if your pictures are located in `/data/pictures` (which is outside the sandbox), you would bind mount `/data/pictures` to an accessible path like `/root/snap/immich-distribution/common/pictures`. Then, you add this latter path (`/root/snap/immich-distribution/common/pictures`) as an external library in Immich.
 
-For more information about mounts see [the storage how to](howto.md).
+For detailed instructions on creating mounts, refer to [the storage how-to guide](howto.md).
