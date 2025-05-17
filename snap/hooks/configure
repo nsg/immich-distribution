@@ -24,10 +24,6 @@ if [[ $(snapctl get database-password) == "" ]]; then
     snapctl set database-password="$(random_string)"
 fi
 
-if [[ $(snapctl get typesense-key) == "" ]]; then
-    snapctl set typesense-key="$(random_string)"
-fi
-
 if [[ $(snapctl get haproxy-http-bind) == "" ]]; then
     snapctl set haproxy-http-bind="*:80"
 fi
