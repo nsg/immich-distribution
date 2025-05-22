@@ -12,7 +12,7 @@ There is also a breaking change in the API between the mobile application and th
 
 !!! Danger "Breaking change in the mobile app"
     Please ensure both your mobile app and the server are updated to v1.133.0.
-    Older versions of the Immich mobile app will **not** work correctly with server version v1.133.0. The updated mobile app should be available on the respective app stores concurrently with this server release.
+    Older versions of the Immich mobile app will **not** work correctly with server version v1.133.0.
 
 ## Upgrading from 1.107.2 or older
 
