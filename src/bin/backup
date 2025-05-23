@@ -9,12 +9,11 @@ export PGDATA="$SNAP_COMMON/pgsql/data"
 TIME="$(date +%FT%H%M%S)"
 
 usage() {
-    echo "$0 [-d [-n <name>]] [-a] [-l]"
+    echo "$0 [-d <name>] [-a] [-l]"
     echo
-    echo -e "-d\tBackup database (uses custom name if provided by a preceding -n option)."
+    echo -e "-d\tBackup database (use provided name directly after -d option)."
     echo -e "-a\tBackup assets (images, videos, ...)"
     echo -e "-l\tList backups"
-    echo -e "-n <name>\tSpecify a custom name for the database backup (used by -d option)."
     echo
     echo "The recommended way to backup Immich is to do a" \
          "database backup, and then manually backup the" \
@@ -112,12 +111,10 @@ root_check
 
 [ -z $1 ] && usage
 
-CUSTOM_DB_NAME="" # Initialize custom database name variable
-
-while getopts dahlsn: option; do # Added n: to handle argument for -n
+while getopts d:ahls option; do
     case "$option" in
         d) 
-            backup_database "manual" "$CUSTOM_DB_NAME"
+            backup_database "manual" "$OPTARG"
             ;;
         a)
             backup_assets
@@ -133,9 +130,6 @@ while getopts dahlsn: option; do # Added n: to handle argument for -n
             else
                 echo "Daily database backup is disabled"
             fi
-            ;;
-        n)
-            CUSTOM_DB_NAME="$OPTARG"
             ;;
         *|h)
             usage
