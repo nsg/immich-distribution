@@ -6,7 +6,7 @@
 . $SNAP/bin/load-env
 
 # Backup the database before the migration from pgvecto.rs to VectorChord
-if ! $SNAP/backup -d pgvectors; then
+if ! $SNAP/backup -D pgvectors; then
     echo "Failed to create and validate database backup during pre-refresh."
     exit 1
 fi

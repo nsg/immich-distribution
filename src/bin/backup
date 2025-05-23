@@ -9,9 +9,10 @@ export PGDATA="$SNAP_COMMON/pgsql/data"
 TIME="$(date +%FT%H%M%S)"
 
 usage() {
-    echo "$0 [-d <name>] [-a] [-l]"
+    echo "$0 [-d] [-D <name>] [-a] [-l]"
     echo
-    echo -e "-d\tBackup database (use provided name directly after -d option)."
+    echo -e "-d\tBackup database (timestamp-based)."
+    echo -e "-D\tBackup database with a custom name."
     echo -e "-a\tBackup assets (images, videos, ...)"
     echo -e "-l\tList backups"
     echo
@@ -111,28 +112,31 @@ root_check
 
 [ -z $1 ] && usage
 
-while getopts d:ahls option; do
+while getopts dD:ahls option; do
     case "$option" in
-        d) 
+        d)
+            backup_database "manual" ""
+            ;;
+        D)
             backup_database "manual" "$OPTARG"
             ;;
-        a)
-            backup_assets
-            ;;
-        l)
-            list_backups
-            ;;
-        s)
-            if [ "$BACKUP_DATABASE_DAILY" == "true" ]; then
-                echo "Running daily database backup"
-                backup_database "daily" "" # Daily backups do not use custom names
-                clean_up_daily_backups
-            else
-                echo "Daily database backup is disabled"
-            fi
-            ;;
-        *|h)
-            usage
-            ;;
-    esac
-done
+         a)
+             backup_assets
+             ;;
+         l)
+             list_backups
+             ;;
+         s)
+             if [ "$BACKUP_DATABASE_DAILY" == "true" ]; then
+                 echo "Running daily database backup"
+                 backup_database "daily" "" # Daily backups do not use custom names
+                 clean_up_daily_backups
+             else
+                 echo "Daily database backup is disabled"
+             fi
+             ;;
+         *|h)
+             usage
+             ;;
+     esac
+ done
