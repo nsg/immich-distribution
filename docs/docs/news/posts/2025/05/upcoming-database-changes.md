@@ -16,4 +16,4 @@ There is also a breaking change in the API between the mobile application and th
 
 ## Upgrading from 1.107.2 or older
 
-Due to the automatic updates in the package format, most users are on recent versions. Snap Store metrics show that only 0.5% of users are running releases this old. To protect these users, I will block updates from versions older than 1.107.2 in the release containing the VectorChord migration. If you are one of these rare users, you need to manually update to a newer intermediate release.
+Due to the automatic updates in the package format, most users are on recent versions. Snap Store metrics show that only 0.5% of users are running releases this old. If you are one of these rare users, you need to manually update to a newer intermediate release before upgrading to the most recent release.
