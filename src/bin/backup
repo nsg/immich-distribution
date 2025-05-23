@@ -7,11 +7,12 @@ export PGDATA="$SNAP_COMMON/pgsql/data"
 TIME="$(date +%FT%H%M%S)"
 
 usage() {
-    echo "$0 [-d] [-a]"
+    echo "$0 [-d [-n <name>]] [-a] [-l]"
     echo
-    echo -e "-d\tBackup database"
+    echo -e "-d\tBackup database (uses custom name if provided by a preceding -n option)."
     echo -e "-a\tBackup assets (images, videos, ...)"
     echo -e "-l\tList backups"
+    echo -e "-n <name>\tSpecify a custom name for the database backup (used by -d option)."
     echo
     echo "The recommended way to backup Immich is to do a" \
          "database backup, and then manually backup the" \
@@ -24,15 +25,31 @@ clean_up_daily_backups() {
 }
 
 backup_database() {
-    if [ "$1" == "daily" ]; then
-        local backup_db_file="$SNAP_COMMON/backups/immich_database_daily_${SNAP_VERSION}_${TIME}.sql.xz"
-    else
-        local backup_db_file="$SNAP_COMMON/backups/immich_database_${SNAP_VERSION}_${TIME}.sql.xz"
+    local backup_mode="$1" # "daily" or "manual"
+    local custom_filename_part="$2" # custom name string, or empty
+
+    local base_prefix="immich_database"
+    local file_suffix=".sql.xz"
+    local filename_middle_part
+
+    if [ "$backup_mode" == "daily" ]; then
+        # Daily backups always use SNAP_VERSION and TIME, ignore custom_filename_part
+        filename_middle_part="daily_${SNAP_VERSION}_${TIME}"
+    else # "manual" mode
+        if [ -n "$custom_filename_part" ]; then
+            # Manual backup with a custom name part
+            filename_middle_part="${SNAP_VERSION}_${custom_filename_part}"
+        else
+            # Manual backup with default (timestamp-based) name part
+            filename_middle_part="${SNAP_VERSION}_${TIME}"
+        fi
     fi
+
+    local backup_db_file="$SNAP_COMMON/backups/${base_prefix}_${filename_middle_part}${file_suffix}"
 
     echo "Creating database backup: $backup_db_file"
     cd "$SNAP_COMMON/backups"
-    drop_privileges $SNAP/usr/local/pgsql/bin/pg_dumpall -U postgres --clean --if-exists | xz > $backup_db_file
+    drop_privileges $SNAP/usr/local/pgsql/bin/pg_dumpall -U postgres --clean --if-exists | xz > "$backup_db_file"
 }
 
 backup_assets() {
@@ -70,10 +87,12 @@ root_check
 
 [ -z $1 ] && usage
 
-while getopts dahls option; do
+CUSTOM_DB_NAME="" # Initialize custom database name variable
+
+while getopts dahlsn: option; do # Added n: to handle argument for -n
     case "$option" in
         d) 
-            backup_database
+            backup_database "manual" "$CUSTOM_DB_NAME"
             ;;
         a)
             backup_assets
@@ -84,11 +103,14 @@ while getopts dahls option; do
         s)
             if [ "$BACKUP_DATABASE_DAILY" == "true" ]; then
                 echo "Running daily database backup"
-                backup_database daily
+                backup_database "daily" "" # Daily backups do not use custom names
                 clean_up_daily_backups
             else
                 echo "Daily database backup is disabled"
             fi
+            ;;
+        n)
+            CUSTOM_DB_NAME="$OPTARG"
             ;;
         *|h)
             usage
