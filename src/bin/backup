@@ -62,13 +62,13 @@ backup_database() {
         exit 1
     fi
 
-    if ! xzcat "$backup_db_file" | grep -q -- "-- PostgreSQL database dump complete"; then
+    if ! xzgrep -q -- "-- PostgreSQL database dump complete" "$backup_db_file"; then
         echo "Database dump incomplete: '-- PostgreSQL database dump complete' not found in $backup_db_file."
         rm -f "$backup_db_file"
         exit 1
     fi
 
-    if ! xzcat "$backup_db_file" | grep -q -- "-- PostgreSQL database cluster dump complete"; then
+    if ! xzgrep -q -- "-- PostgreSQL database cluster dump complete" "$backup_db_file"; then
         echo "Database dump incomplete: '-- PostgreSQL database cluster dump complete' not found in $backup_db_file."
         rm -f "$backup_db_file"
         exit 1
