@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -o pipefail
+
 . $SNAP/bin/load-env
 
 export PGDATA="$SNAP_COMMON/pgsql/data"
@@ -49,7 +51,30 @@ backup_database() {
 
     echo "Creating database backup: $backup_db_file"
     cd "$SNAP_COMMON/backups"
-    drop_privileges $SNAP/usr/local/pgsql/bin/pg_dumpall -U postgres --clean --if-exists | xz > "$backup_db_file"
+    if ! drop_privileges $SNAP/usr/local/pgsql/bin/pg_dumpall -U postgres --clean --if-exists | xz > "$backup_db_file"; then
+        echo "Failed to execute pg_dumpall or xz."
+        rm -f "$backup_db_file"
+        exit 1
+    fi
+
+    if [ ! -s "$backup_db_file" ]; then
+        echo "Failed to create database backup or backup file is empty: $backup_db_file"
+        exit 1
+    fi
+
+    if ! xzcat "$backup_db_file" | grep -q -- "-- PostgreSQL database dump complete"; then
+        echo "Database dump incomplete: '-- PostgreSQL database dump complete' not found in $backup_db_file."
+        rm -f "$backup_db_file"
+        exit 1
+    fi
+
+    if ! xzcat "$backup_db_file" | grep -q -- "-- PostgreSQL database cluster dump complete"; then
+        echo "Database dump incomplete: '-- PostgreSQL database cluster dump complete' not found in $backup_db_file."
+        rm -f "$backup_db_file"
+        exit 1
+    fi
+
+    echo "Database backup successful and validated: $backup_db_file"
 }
 
 backup_assets() {

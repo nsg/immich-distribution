@@ -6,22 +6,8 @@
 . $SNAP/bin/load-env
 
 # Backup the database before the migration from pgvecto.rs to VectorChord
-$SNAP/backup -d -n "pgvectors"
-
-BACKUP_FILE="$SNAP_COMMON/backups/immich_database_${SNAP_VERSION}_pgvectors.sql.xz"
-
-if [ ! -s "$BACKUP_FILE" ]; then
-    echo "Failed to create database backup"
-    exit 1
-fi
-
-if ! xzcat "$BACKUP_FILE" | grep -q -- "-- PostgreSQL database dump complete"; then
-    echo "Database dump incomplete: '-- PostgreSQL database dump complete' not found in backup."
-    exit 1
-fi
-
-if ! xzcat "$BACKUP_FILE" | grep -q -- "-- PostgreSQL database cluster dump complete"; then
-    echo "Database dump incomplete: '-- PostgreSQL database cluster dump complete' not found in backup."
+if ! $SNAP/backup -d -n "pgvectors"; then
+    echo "Failed to create and validate database backup during pre-refresh."
     exit 1
 fi
 
