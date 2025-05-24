@@ -1,6 +1,6 @@
 name: immich-distribution
 title: Immich Distribution
-version: "v1.133.0"
+version: "v1.133.1"
 base: core22
 grade: stable
 confinement: strict
@@ -164,7 +164,7 @@ parts:
   server:
     plugin: nil
     source: https://github.com/immich-app/immich.git
-    source-tag: v1.133.0
+    source-tag: v1.133.1
     override-build: |
       craftctl default
 
@@ -256,7 +256,7 @@ parts:
   web:
     plugin: nil
     source: https://github.com/immich-app/immich.git
-    source-tag: v1.133.0
+    source-tag: v1.133.1
     override-build: |
       # Build typescript-sdk, this is included by cli and web
       cd open-api/typescript-sdk
@@ -277,7 +277,7 @@ parts:
   machine-learning:
     plugin: uv
     source: https://github.com/immich-app/immich.git
-    source-tag: v1.133.0
+    source-tag: v1.133.1
     source-subdir: machine-learning
     uv-extras:
       - cpu
