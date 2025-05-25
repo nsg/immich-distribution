@@ -93,6 +93,7 @@ list_backups() {
         echo "$database_backup_files"
     fi
 
+    echo
     echo "[Immich] Database backups"
     database_backup_files=$(ls -lh $SNAP_COMMON/upload/backups/immich-db-backup-*.sql.gz 2>/dev/null)
     if [ -z "$database_backup_files" ]; then
