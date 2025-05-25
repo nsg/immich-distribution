@@ -112,9 +112,10 @@ list_backups() {
     fi
 
     echo
-    echo "To restore a backup, use the following commands:"
+    echo "To restore a Immich Distribution backup, use the following commands:"
     echo "immich-distribution.restore -d <database_backup>"
     echo "immich-distribution.restore -a <assets_backup>"
+    echo "To restore a Immich backup, see the official documentation."
 }
 
 root_check
