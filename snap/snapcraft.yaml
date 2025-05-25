@@ -13,27 +13,23 @@ website: https://immich-distribution.nsg.cc
 contact: https://github.com/nsg/immich-distribution/issues
 source-code: https://github.com/nsg/immich-distribution
 issues: https://github.com/nsg/immich-distribution/issues
-summary: This is an Immich Distribution packaged by the community.
+summary: Community-packaged Immich for easy self-hosted photo and video management.
 description: |
-  This is an Immich Distribution packaged inside a snap package.
-  The package is inspired by the official Immich images.
-  It will be similar but not identical to the official
-  Docker-based installation.
+  This is a community-packaged Immich distribution, conveniently bundled as a snap package.
+  Inspired by the official Immich images, this package offers an experience similar to the Docker-based installation, though with some differences tailored for the snap environment.
 
-  Immich Distribution ships the same software but with limited customization.
-  The main focus is ease of use; a simple `snap install immich-distribution` on a publicly available server should yield a fully working Immich installation.
-  Non-intrusive extra tools are included, which can be ignored if not needed.
+  Immich Distribution delivers the core Immich software with a focus on ease of use. A simple `snap install immich-distribution` on a publicly accessible server aims to provide a fully functional Immich instance. While customization options are streamlined, non-intrusive extra tools are included and can be optionally utilized.
+
+  For important updates, news, and release notes, please keep track of our announcements at https://immich-distribution.nsg.cc/news/.
 
   **Resources**
 
   * https://immich-distribution.nsg.cc
   * https://github.com/nsg/immich-distribution
 
-  Immich Distribution is an independent community project that packages the software in a snap package.
-  This project is not affiliated with the upstream Immich project, its developers, or FUTO.
-  For more information, please refer to the links above.
+  Immich Distribution is an independent community project. It is not affiliated with the upstream Immich project, its developers, or FUTO. For further details, please consult the resources linked above.
 
-  For support, please open an issue on our GitHub page.
+  For support, please open an issue on our GitHub repository.
 
 system-usernames:
   snap_daemon: shared
