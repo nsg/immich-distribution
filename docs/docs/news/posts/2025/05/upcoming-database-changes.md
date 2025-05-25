@@ -18,12 +18,8 @@ There is also a breaking change in the API between the mobile application and th
 
 Due to the automatic updates in the package format, most users are on recent versions. Snap Store metrics show that only 0.5% of users are running releases this old. If you are one of these rare users, you need to manually update to a newer intermediate release before upgrading to the most recent release.
 
-## Automatic database backup
+## Database backup
 
-An upcoming update will include a feature that performs a one-time automatic backup of your database. This backup is a precautionary measure, aligning with upstream recommendations, to safeguard your data during the transition and provide a recovery point should any issues arise.
+There are a lot of database changes, which introduces some risk. If you have not done so already, this is probably a good time to enable automatic database backups. You can either use the [built in backup job](https://immich.app/docs/administration/backup-and-restore#automatic-database-dumps) (should be enabled by default), or the [backup tool included in this snap](/configuration/backup-restore/).
 
-The backup file will be saved to `/var/snap/immich-distribution/common/backups/immich_database_*_pgvectors.sql.xz`.
-
-Please be aware that this backup process will consume additional disk space. If your installation has limited storage, there is a small risk of running out of disk space. This backup will be automatically removed in a future update to reclaim disk space for users who no longer require it.
-
-If you require assistance or encounter any issues, please open an issue in the GitHub repository.
+Use `immich-distribution.backup -l` to list existing backups.
