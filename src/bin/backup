@@ -85,7 +85,7 @@ backup_assets() {
 }
 
 list_backups() {
-    echo "Database backups:"
+    echo "[Immich Distribution] Database backups:"
     database_backup_files=$(ls -lh $SNAP_COMMON/backups/immich_database_*.sql.xz 2>/dev/null)
     if [ -z "$database_backup_files" ]; then
         echo "No database backups found"
@@ -93,8 +93,16 @@ list_backups() {
         echo "$database_backup_files"
     fi
 
+    echo "[Immich] Database backups"
+    database_backup_files=$(ls -lh $SNAP_COMMON/upload/backups/immich-db-backup-*.sql.gz 2>/dev/null)
+    if [ -z "$database_backup_files" ]; then
+        echo "No Immich database backups found"
+    else
+        echo "$database_backup_files"
+    fi
+
     echo
-    echo "Assets backups:"
+    echo "[Immich Distribution] Assets backups:"
     assets_backup_files=$(ls -lh $SNAP_COMMON/backups/immich_assets_*.tar.xz 2>/dev/null)
     if [ -z "$assets_backup_files" ]; then
         echo "No assets backups found"
