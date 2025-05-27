@@ -1,4 +1,15 @@
 #!/bin/bash
+set -euo pipefail
+
+if [ -z "$SNAP" ]; then
+    if [ -e "/snap/immich-distribution/current" ]; then
+        export SNAP=$(readlink -f /snap/immich-distribution/current)
+        echo "SNAP not defined, using $SNAP" >&2
+    else
+        echo "Error: SNAP environment variable is not defined and couldn't find /snap/immich-distribution/current" >&2
+        exit 1
+    fi
+fi
 
 . $SNAP/bin/load-env
 
