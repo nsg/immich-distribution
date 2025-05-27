@@ -1,0 +1,7 @@
+#!/bin/bash
+
+. $SNAP/bin/load-env
+
+export PGDATA="$SNAP_COMMON/pgsql/data"
+
+exec $SNAP/usr/local/pgsql/bin/pg_dumpall $@
