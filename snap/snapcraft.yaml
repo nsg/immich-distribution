@@ -169,7 +169,7 @@ parts:
       # Apply patches
       patch -p0 < $CRAFT_STAGE/pg_dumpall-path.path
 
-      SHARP_VERSION=0.34.0
+      SHARP_VERSION=0.34.2
       NODE_ADDON_API_VERSION=8.3.1
       NODE_GYP_VERSION=11.2.0
 
