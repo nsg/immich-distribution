@@ -61,7 +61,7 @@ docs:
 
 #
 # Incus based build environment, can be used if you have Incus installed, and not
-# the needed tooling to build snaps locally. This will create an Ubuntu 22.04 VM
+# the needed tooling to build snaps locally. This will create an Ubuntu 24.04 VM
 # with the needed tooling and build the snap there. The current directory will be
 # mounted into the VM at /build.
 #
@@ -73,12 +73,12 @@ docs:
 
 .PHONY: incus-setup
 incus-setup:
-	incus init images:ubuntu/22.04 immich-distribution --vm -c limits.memory=6GiB -d root,size=30GiB
+	incus init images:ubuntu/24.04 immich-distribution --vm -c limits.memory=6GiB -d root,size=30GiB
 	incus config device add immich-distribution build disk source=${PWD} path=/build
 	incus start immich-distribution
 	sleep 30 # wait for the VM to boot
 	incus exec immich-distribution -- sudo apt update
-	incus exec immich-distribution -- sudo apt install snapd podman make python3.10-venv curl git jq -y
+	incus exec immich-distribution -- sudo apt install snapd podman make python3.12-venv curl git jq -y
 	sleep 10 # wait snapd to start
 	incus exec immich-distribution -- sudo snap install --classic snapcraft
 	incus exec immich-distribution -- sudo snap install lxd
