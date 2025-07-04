@@ -61,7 +61,7 @@ docs:
 
 #
 # Incus based build environment, can be used if you have Incus installed, and not
-# the needed tooling to build snaps locally. This will create an Ubuntu 22.04 VM
+# the needed tooling to build snaps locally. This will create an Ubuntu 24.04 VM
 # with the needed tooling and build the snap there. The current directory will be
 # mounted into the VM at /build.
 #
@@ -73,12 +73,12 @@ docs:
 
 .PHONY: incus-setup
 incus-setup:
-	incus init images:ubuntu/22.04 immich-distribution --vm -c limits.memory=6GiB -d root,size=30GiB
+	incus init images:ubuntu/24.04 immich-distribution --vm -c limits.memory=6GiB -d root,size=30GiB
 	incus config device add immich-distribution build disk source=${PWD} path=/build
 	incus start immich-distribution
 	sleep 30 # wait for the VM to boot
 	incus exec immich-distribution -- sudo apt update
-	incus exec immich-distribution -- sudo apt install snapd podman make python3.10-venv curl git jq -y
+	incus exec immich-distribution -- sudo apt install snapd podman make python3.12-venv curl git jq -y
 	sleep 10 # wait snapd to start
 	incus exec immich-distribution -- sudo snap install --classic snapcraft
 	incus exec immich-distribution -- sudo snap install lxd
@@ -86,6 +86,18 @@ incus-setup:
 
 incus-%:
 	incus exec immich-distribution -- bash -c 'cd /build && make $*'
+
+.PHONY: incus-install-artifact
+incus-install-artifact:
+	@echo "Installing the latest development snap package from ~/Downloads inside the Incus VM ..."
+	@latest="$(shell ls -1t ~/Downloads/development-snap-package*.zip | head -1)"; \
+	if [ -z "$$latest" ]; then \
+		echo "No development snap package found in ~/Downloads"; \
+		exit 1; \
+	fi; \
+	echo "Installing $$latest ..."; \
+	unzip -p "$$latest" | incus file push - immich-distribution/root/development-snap-package.snap
+	incus exec immich-distribution -- sudo snap install --dangerous /root/development-snap-package.snap
 
 .PHONY: incus-destroy
 incus-destroy:
