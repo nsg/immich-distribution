@@ -47,6 +47,8 @@ check-selenium:
 	nc -v -w1 127.0.0.1 4444 || (echo "Selenium is not running"; exit 1)
 
 selenium:
+	@echo "Starting Selenium with Chrome in a Podman container..."
+	@echo "Access it via http://127.0.0.1:7900?autoconnect=true&password=secret"
 	podman run \
 		-p 4444:4444 \
 		-p 0.0.0.0:7900:7900 \
