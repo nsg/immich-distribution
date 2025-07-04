@@ -87,6 +87,18 @@ incus-setup:
 incus-%:
 	incus exec immich-distribution -- bash -c 'cd /build && make $*'
 
+.PHONY: incus-install-artifact
+incus-install-artifact:
+	@echo "Installing the latest development snap package from ~/Downloads inside the Incus VM ..."
+	@latest="$(shell ls -1t ~/Downloads/development-snap-package*.zip | head -1)"; \
+	if [ -z "$$latest" ]; then \
+		echo "No development snap package found in ~/Downloads"; \
+		exit 1; \
+	fi; \
+	echo "Installing $$latest ..."; \
+	unzip -p "$$latest" | incus file push - immich-distribution/root/development-snap-package.snap
+	incus exec immich-distribution -- sudo snap install --dangerous /root/development-snap-package.snap
+
 .PHONY: incus-destroy
 incus-destroy:
 	incus delete -f immich-distribution
