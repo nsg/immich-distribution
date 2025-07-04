@@ -73,7 +73,9 @@ class TestImmichPrep(BaseCase):
 
         self.assert_title("Onboarding - Immich")
         self.click("button:contains('Theme')")
-        self.click("button:contains('Privacy')")
+        self.click("button:contains('Language')")
+        self.click("button:contains('Server Privacy')")
+        self.click("button:contains('User Privacy')")
         self.click("button:contains('Storage Template')")
         self.click("button:contains('Done')")
         self.assert_title("Photos - Immich")
@@ -96,7 +98,9 @@ class TestImmichPrep(BaseCase):
         self.wait_for_element("h2")
         self.click("button:contains('API Keys')")
         self.click("button:contains('New API Key')")
-        self.type("input[id='name']", "test\n")
+        self.type("input[id='name']", "test")
+        self.click("button[id='select-all-permissions']")
+        self.click("button:contains('Create')")
         secret = self.get_text("textarea[id='secret']")
         with open("secret.txt", "w") as f:
             f.write(secret)
