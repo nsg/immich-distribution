@@ -27,6 +27,9 @@ test-selenium: ${PYTEST} ${PYTEST_LOCALTEST_DEPENDENCIES} test-assets wait
 test-sync: test-assets wait
 	./test_sync.sh
 
+test-cli: wait
+	./test_cli.sh
+
 test_prep_%: .env/bin/seleniumbase test-assets
 	${PYTEST} tests_prep.py --server=127.0.0.1 --port=4444 --headed -k $* --html=report/index.html
 

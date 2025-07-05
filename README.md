@@ -45,6 +45,37 @@ See the documentation site at [immich-distribution.nsg.cc](https://immich-distri
 | [HAProxy](https://www.haproxy.org/) | Service that proxies traffic to Immich web and server |
 | [lego](https://github.com/go-acme/lego) | A Let's Encrypt ACME client used to checkout TLS certificates |
 
+## CLI Extensions
+
+Immich Distribution extends the upstream Immich CLI with additional commands for automation and administration. These commands are fully non-interactive and suitable for scripting and unattended use.
+
+### Create Admin API Key
+
+Generate API keys for the admin user directly from the command line:
+
+```bash
+# Create an API key with all permissions (simplest approach)
+sudo immich-distribution.immich-admin create-admin-api-key
+
+# Create an API key with a custom name
+sudo immich-distribution.immich-admin create-admin-api-key --name "My Admin Key"
+
+# Create an API key with specific permissions (e.g., for sync service)
+sudo immich-distribution.immich-admin create-admin-api-key \
+  --name "Sync Service Key" \
+  --permissions "asset.upload,asset.delete,user.read"
+```
+
+**Options:**
+- `--name, -n`: Set a custom name for the API key (default: "Admin CLI Key")
+- `--permissions, -p`: Specify permissions as a comma-separated list, or use "all" for full access (default: "all")
+
+This command is particularly useful for:
+- Initial setup and configuration automation
+- Creating API keys for the [sync service](https://immich-distribution.nsg.cc/configuration/sync/)
+- Scripted deployments and CI/CD pipelines
+- Headless server management
+
 ## License
 
 All files in this repository are released under the [MIT](https://opensource.org/license/mit) license. Upstream Immich was also licensed under the MIT license, but have changed to [AGPLv3](https://opensource.org/license/agpl-v3) after [2024-02-12](https://github.com/immich-app/immich/pull/7046).

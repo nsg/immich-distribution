@@ -38,6 +38,20 @@ You can use any file synchronization software of your choice. For full functiona
 
 Ensure that Immich Distribution Sync has permissions to read **and** remove files managed by your chosen synchronization software.
 
+### API key
+
+To use the sync feature, you need an API key with appropriate permissions. You can create an API key for the admin user using the included CLI command:
+
+```bash
+# Create API key with all permissions (simplest approach)
+sudo immich-distribution.immich-admin create-admin-api-key
+
+# Create API key with specific permissions needed for sync feature
+sudo immich-distribution.immich-admin create-admin-api-key --name "Sync Service Key" --permissions "asset.upload,asset.delete,user.read"
+```
+
+Alternatively, you can create API keys through Immich Web under **Account Settings** → **API Keys**.
+
 ## Configure
 
 ```bash
