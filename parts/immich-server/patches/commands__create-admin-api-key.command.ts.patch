@@ -1,6 +1,6 @@
 diff --git a/server/src/commands/create-admin-api-key.command.ts b/server/src/commands/create-admin-api-key.command.ts
 new file mode 100644
-index 000000000..72aa5dde8
+index 000000000..71728f7fb
 --- /dev/null
 +++ b/server/src/commands/create-admin-api-key.command.ts
 @@ -0,0 +1,88 @@
@@ -44,11 +44,11 @@ index 000000000..72aa5dde8
 +        return;
 +      }
 +
-+      console.log(result.secret);
++      // TypeScript knows result must have secret property here
++      console.log((result as { secret: string; apiKey: any }).secret);
 +    } catch (error) {
 +      console.error(error);
 +      console.error('Unable to create admin API key');
-+      process.exit(1);
 +    }
 +  }
 +

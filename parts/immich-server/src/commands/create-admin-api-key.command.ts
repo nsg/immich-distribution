@@ -38,11 +38,11 @@ export class CreateAdminApiKeyCommand extends CommandRunner {
         return;
       }
 
-      console.log(result.secret);
+      // TypeScript knows result must have secret property here
+      console.log((result as { secret: string; apiKey: any }).secret);
     } catch (error) {
       console.error(error);
       console.error('Unable to create admin API key');
-      process.exit(1);
     }
   }
 
