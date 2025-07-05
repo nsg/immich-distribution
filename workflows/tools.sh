@@ -70,11 +70,43 @@ has_version_tracking_issue() {
 }
 
 get_latest_release() {
-    curl -s https://api.github.com/repos/immich-app/immich/releases/latest | jq -r '.tag_name'
+    local retries=10
+    local delay=2
+    local result
+    
+    for i in $(seq 1 $retries); do
+        result=$(curl -s https://api.github.com/repos/immich-app/immich/releases/latest | jq -r '.tag_name')
+        
+        if [ -n "$result" ] && [ "$result" != "null" ]; then
+            echo "$result"
+            return 0
+        fi
+        
+        echo "Attempt $i failed, retrying in $delay seconds..." >&2
+        sleep $delay
+    done
+    
+    echo "$result"
 }
 
 get_latest_releases() {
-    curl -s https://api.github.com/repos/immich-app/immich/releases | jq -r '.[].tag_name'
+    local retries=10
+    local delay=2
+    local result
+    
+    for i in $(seq 1 $retries); do
+        result=$(curl -s https://api.github.com/repos/immich-app/immich/releases | jq -r '.[].tag_name')
+        
+        if [ -n "$result" ] && [ "$result" != "null" ]; then
+            echo "$result"
+            return 0
+        fi
+        
+        echo "Attempt $i failed, retrying in $delay seconds..." >&2
+        sleep $delay
+    done
+    
+    echo "$result"
 }
 
 get_latest_release_for_major_minor() {
