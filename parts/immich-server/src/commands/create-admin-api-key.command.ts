@@ -6,6 +6,7 @@ interface CreateAdminApiKeyOptions {
   permissions?: string;
   userEmail?: string;
   userId?: string;
+  check?: boolean;
 }
 
 @Command({
@@ -29,8 +30,13 @@ export class CreateAdminApiKeyCommand extends CommandRunner {
         permissions,
         useAllPermissions,
         options.userEmail,
-        options.userId
+        options.userId,
+        options.check
       );
+
+      if ('existing' in result && result.existing) {
+        return;
+      }
 
       console.log(result.secret);
     } catch (error) {
@@ -70,5 +76,13 @@ export class CreateAdminApiKeyCommand extends CommandRunner {
   })
   parseUserId(value: string): string {
     return value;
+  }
+
+  @Option({
+    flags: '-c, --check',
+    description: 'Only create the API key if one with the same name does not already exist',
+  })
+  parseCheck(): boolean {
+    return true;
   }
 }

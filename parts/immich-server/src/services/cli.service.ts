@@ -74,7 +74,8 @@ export class CliService extends BaseService {
     useAllPermissions: boolean = false,
     userEmail?: string,
     userId?: string,
-  ): Promise<{ secret: string; apiKey: any }> {
+    checkExisting: boolean = false,
+  ): Promise<{ secret: string; apiKey: any } | { existing: true }> {
     let targetUser;
 
     if (userEmail) {
@@ -93,6 +94,15 @@ export class CliService extends BaseService {
         throw new Error('No admin user found');
       }
       targetUser = admin;
+    }
+
+    // If check is enabled, look for existing key with same name
+    if (checkExisting) {
+      const existingKeys = await this.apiKeyRepository.getByUserId(targetUser.id);
+      const existingKey = existingKeys.find(key => key.name === keyName);
+      if (existingKey) {
+        return { existing: true };
+      }
     }
 
     let permissions: Permission[] = [];
