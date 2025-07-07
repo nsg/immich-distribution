@@ -120,6 +120,7 @@ apps:
     command: bin/manager
     daemon: simple
     restart-delay: 60s
+    timer: "00:00-24:00/24"
     after:
       - immich-server
 
