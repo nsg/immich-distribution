@@ -36,10 +36,6 @@ if [[ $(snapctl get acme-port) == "" ]]; then
     snapctl set acme-port="$(free_port)"
 fi
 
-if [[ $(snapctl get manager-migrations-version) == "" ]]; then
-    snapctl set manager-migrations-version="0"
-fi
-
 if [[ $(snapctl get sync-delete-threshold) == "" ]]; then
     snapctl set sync-delete-threshold="300"
 fi
@@ -54,6 +50,7 @@ snapctl unset metrics-api-enabled
 snapctl unset metrics-host-enabled
 snapctl unset metrics-io-enabled
 snapctl unset metrics-job-enabled
+snapctl unset manager-migrations-version
 
 if [[ $(snapctl get backup-database-daily) == "" ]]; then
     snapctl set backup-database-daily="false"

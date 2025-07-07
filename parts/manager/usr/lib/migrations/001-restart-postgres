@@ -1,8 +1,0 @@
-
-manager_migration_1() {
-    if [ -e "$SNAP/usr/local/pgsql/share/extension/vectors--0.2.0.sql" ]; then
-        echo "Wait five minutes and then restart postgres. Immich has upgraded vecto.rs and we follow upstreams advice to restart postgres once after this upgrade."
-        sleep 300
-        snapctl restart immich-distribution.postgres
-    fi
-}

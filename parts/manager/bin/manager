@@ -1,39 +1,16 @@
 #!/bin/bash
 set -eu -o pipefail
 
-# The manager is a small service that run different maintenance tasks in the
-# background that can't be run from the hooks during installation/upgrade.
+# The manager runs maintenance tasks in the background that can't be run 
+# from the hooks during installation/upgrade.
 
-MANAGER_MIGRATIONS_VERSION_TARGET="1"
-
-validate_version() {
-    if [[ ! $1 =~ ^[0-9]+$ ]]; then
-        echo "Invalid manager-migrations-version: $1"
-        exit 1
+# Check API key twice a day (at 06 and 18), the minute depends on the timer.
+# I regularly check this in case the user deletes the API key. This key will
+# be critical for the operation of the snap.
+CURRENT_HOUR=$(date +%H)
+if [[ "$CURRENT_HOUR" == "06" || "$CURRENT_HOUR" == "18" ]]; then
+    API_KEY_OUTPUT=$($SNAP/bin/immich-admin create-admin-api-key --name "immich-distribution" --check 2>/dev/null || true)
+    if [[ ${#API_KEY_OUTPUT} -gt 30 ]]; then
+        snapctl set admin-api-key="$API_KEY_OUTPUT"
     fi
-}
-
-# Load migrations
-for file in $SNAP/usr/lib/migrations/*; do
-    . "$file"
-done
-
-while sleep 5; do
-    MANAGER_MIGRATIONS_VERSION="$(snapctl get manager-migrations-version)"
-    validate_version "$MANAGER_MIGRATIONS_VERSION"
-
-    if [[ $MANAGER_MIGRATIONS_VERSION -lt $MANAGER_MIGRATIONS_VERSION_TARGET ]]; then
-        echo "Running manager migrations from version $MANAGER_MIGRATIONS_VERSION to $MANAGER_MIGRATIONS_VERSION_TARGET"
-        while [[ $MANAGER_MIGRATIONS_VERSION -lt $MANAGER_MIGRATIONS_VERSION_TARGET ]]; do
-            MANAGER_MIGRATIONS_VERSION=$((MANAGER_MIGRATIONS_VERSION + 1))
-            "manager_migration_$MANAGER_MIGRATIONS_VERSION"
-            if [[ $? -ne 0 ]]; then
-                echo "Failed to run manager migration $MANAGER_MIGRATIONS_VERSION"
-                exit 1
-            fi
-            snapctl set manager-migrations-version="$MANAGER_MIGRATIONS_VERSION"
-        done
-    else
-        sleep 60
-    fi
-done
+fi
