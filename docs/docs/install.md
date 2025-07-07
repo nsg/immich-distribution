@@ -72,7 +72,12 @@ See [HAProxy](configuration/haproxy.md) if you like to change the http or https 
 
 ![](/assets/immich-loading.png){ align=right .img-scale }
 
-If you installed immich-distribution to a server with the IP `192.168.1.10` open a browser and navigate to `http://192.168.1.10`. The services can take up to a minute to fully start, especially the machine learning components are slow.
+After installing Immich Distribution, the services will start automatically in the background. You can access Immich through your web browser by navigating to:
+
+- **If installed on your local computer:** Open `http://localhost` in your web browser
+- **If installed on a remote server:** Open `http://SERVER-IP-ADDRESS` in your web browser (replace SERVER-IP-ADDRESS with the actual IP address of your server)
+
+For example, if you installed immich-distribution on a server with the IP address `192.168.1.10`, you would navigate to `http://192.168.1.10` in your browser.
 
 The official [Post Install Steps](https://immich.app/docs/install/post-install) will guide you to setup your account, and how to configure your mobile application.
 
