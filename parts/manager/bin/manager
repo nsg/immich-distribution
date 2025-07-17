@@ -9,8 +9,11 @@ set -eu -o pipefail
 # be critical for the operation of the snap.
 CURRENT_HOUR=$(date +%H)
 if [[ "$CURRENT_HOUR" == "06" || "$CURRENT_HOUR" == "18" ]]; then
-    API_KEY_OUTPUT=$($SNAP/bin/immich-admin create-admin-api-key --name "immich-distribution" --check 2>/dev/null || true)
-    if [[ ${#API_KEY_OUTPUT} -gt 30 ]]; then
-        snapctl set admin-api-key="$API_KEY_OUTPUT"
+    if API_KEY_OUTPUT=$($SNAP/bin/immich-admin create-api-key --name "immich-distribution" --check); then
+        if [[ ${#API_KEY_OUTPUT} -gt 30 ]]; then
+            snapctl set admin-api-key="$API_KEY_OUTPUT"
+        fi
+    else
+        echo "Failed to create/check API key" >&2
     fi
 fi
