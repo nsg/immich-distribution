@@ -18,7 +18,4 @@ __pycache__
 /tests/.env/
 /prime
 /.vscode
-/ai/immich
-/ai/reports
-/ai/final_report.md
 /upstream
