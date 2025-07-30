@@ -67,6 +67,14 @@ done
 
 [ -z "${TITLE-}" ] && help_message
 
+# Check if admin API key exists
+api_key="$(snapctl get admin-api-key 2>/dev/null || echo "")"
+if [ -z "$api_key" ]; then
+    echo "Error: Admin API key not available. System may still be initializing." >&2
+    echo "Please try again in a few minutes." >&2
+    exit 1
+fi
+
 if [ -n "${USERID-}" ]; then
     send_notification "$USERID"
 else
