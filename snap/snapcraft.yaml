@@ -174,6 +174,8 @@ parts:
       git apply -p1 $CRAFT_STAGE/commands__create-admin-api-key.command.ts.patch
       git apply -p1 $CRAFT_STAGE/commands__index.ts.patch
       git apply -p1 $CRAFT_STAGE/services__cli.service.ts.patch
+      git apply -p1 $CRAFT_STAGE/services__notification-admin.service.ts.patch
+      
 
       SHARP_VERSION=0.34.2
       NODE_ADDON_API_VERSION=8.3.1

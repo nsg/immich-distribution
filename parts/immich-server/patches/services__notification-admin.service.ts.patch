@@ -1,0 +1,16 @@
+diff --git a/server/src/services/notification-admin.service.ts b/server/src/services/notification-admin.service.ts
+index 9b1c8c0a1..2e4f5d3b8 100644
+--- a/server/src/services/notification-admin.service.ts
++++ b/server/src/services/notification-admin.service.ts
+@@ -18,7 +18,10 @@ export class NotificationAdminService extends BaseService {
+       data: dto.data,
+     });
+ 
+-    return mapNotification(item);
++    const mappedNotification = mapNotification(item);
++    this.eventRepository.clientSend('on_notification', dto.userId, mappedNotification);
++
++    return mappedNotification;
+   }
+ 
+   async sendTestEmail(id: string, dto: SystemConfigSmtpDto, tempTemplate?: string) {
