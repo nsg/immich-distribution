@@ -126,6 +126,15 @@ apps:
     after:
       - immich-server
 
+  manager-bootstrap:
+    command: bin/manager bootstrap
+    daemon: simple
+    restart-delay: 2m
+    plugs:
+      - network
+    after:
+      - immich-server
+
   backup:
     command: bin/backup
 
