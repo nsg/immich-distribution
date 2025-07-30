@@ -132,6 +132,11 @@ apps:
   restore:
     command: bin/restore
 
+  notification:
+    command: bin/notification
+    plugs:
+      - network
+
   lets-encrypt:
     command: bin/acme-init
     plugs:

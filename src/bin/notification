@@ -1,0 +1,96 @@
+#!/bin/bash
+set -euo pipefail
+
+. $SNAP/bin/load-env
+
+help_message() {
+    echo "Usage: notification -t title [-u userId] [-l level] [-T type] [-D description]" >&2
+    echo "  -t title       : Title of the notification (required)"
+    echo "  -u userId      : User ID to send the notification to (optional, sends to all admin users if omitted)"
+    echo "  -l level       : Level of the notification (optional: success, error, warning, info)"
+    echo "  -T type        : Type of the notification (optional: JobFailed, BackupFailed, SystemMessage, Custom)"
+    echo "  -D description : Description of the notification (optional)"
+    exit 1
+}
+
+send_notification() {
+    local api_url="${IMMICH_SERVER_URL}/api/admin/notifications"
+    local api_key="$(snapctl get admin-api-key)"
+    local uid="$1"
+    
+    local json_payload=$(jq -n \
+        --arg title "$TITLE" \
+        --arg userId "$uid" \
+        '{title: $title, userId: $userId}')
+    
+    if [ -n "${LEVEL-}" ]; then
+        json_payload=$(echo "$json_payload" | jq --arg level "$LEVEL" '. + {level: $level}')
+    fi
+    
+    if [ -n "${TYPE-}" ]; then
+        json_payload=$(echo "$json_payload" | jq --arg type "$TYPE" '. + {type: $type}')
+    fi
+    
+    if [ -n "${DESCRIPTION-}" ]; then
+        json_payload=$(echo "$json_payload" | jq --arg description "$DESCRIPTION" '. + {description: $description}')
+    fi
+    
+    if ! curl -s -X POST "$api_url" \
+        -H "Content-Type: application/json" \
+        -H "x-api-key: $api_key" \
+        -d "$json_payload" > /dev/null; then
+        echo "Error: Failed to send notification to user $uid" >&2
+        return 1
+    fi
+    
+    echo "Notification sent successfully to user: $uid"
+}
+
+get_admin_users() {
+    local api_key="$(snapctl get admin-api-key)"
+    curl -s "${IMMICH_SERVER_URL}/api/admin/users" \
+        -H "Accept: application/json" \
+        -H "x-api-key: $api_key" | \
+        jq -r '.[] | select(.isAdmin == true) | .id'
+}
+
+while getopts t:u:l:T:D: flag; do
+    case $flag in
+        t) TITLE=$OPTARG ;;
+        u) USERID=$OPTARG ;;
+        l) LEVEL=$OPTARG ;;
+        T) TYPE=$OPTARG ;;
+        D) DESCRIPTION=$OPTARG ;;
+        *) help_message ;;
+    esac
+done
+
+[ -z "${TITLE-}" ] && help_message
+
+if [ -n "${USERID-}" ]; then
+    send_notification "$USERID"
+else
+    admin_users=$(get_admin_users)
+    if [ -z "$admin_users" ]; then
+        echo "Error: No admin users found" >&2
+        exit 1
+    fi
+    
+    failed_count=0
+    success_count=0
+    
+    echo "$admin_users" | while read -r uid; do
+        if send_notification "$uid"; then
+            success_count=$((success_count + 1))
+        else
+            failed_count=$((failed_count + 1))
+        fi
+    done
+    
+    if [ $failed_count -eq 0 ]; then
+        echo "All notifications sent successfully"
+    else
+        echo "Some notifications failed to send" >&2
+        exit 1
+    fi
+fi
