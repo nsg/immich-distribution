@@ -32,6 +32,6 @@ $$;
 
 -- Trigger that calls the function above on deletion of assets
 CREATE OR REPLACE TRIGGER trigger_assets_delete_audits
-BEFORE DELETE ON assets
+BEFORE DELETE ON asset
 FOR EACH ROW
 EXECUTE PROCEDURE log_assets_delete_audits();
