@@ -46,13 +46,13 @@ If you need to create API keys programmatically or via CLI, you can use the incl
 
 ```bash
 # Create API key for a specific user by email (recommended for sync)
-sudo immich-distribution.immich-admin create-admin-api-key \
+sudo immich-distribution.immich-admin create-api-key \
   --name "Sync Service Key" \
   --permissions "asset.upload,asset.delete,user.read" \
   --user-email "user@example.com"
 
 # Create API key for admin user with all permissions
-sudo immich-distribution.immich-admin create-admin-api-key
+sudo immich-distribution.immich-admin create-api-key
 ```
 
 For complete documentation and all available options, see the main [README](https://github.com/nsg/immich-distribution#generate-api-keys).

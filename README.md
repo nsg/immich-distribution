@@ -55,21 +55,21 @@ Create API keys for users directly from the command line. The recommended approa
 
 ```bash
 # Create an API key with all permissions for admin user
-sudo immich-distribution.immich-admin create-admin-api-key
+sudo immich-distribution.immich-admin create-api-key
 
 # Create an API key for a specific user by email
-sudo immich-distribution.immich-admin create-admin-api-key \
+sudo immich-distribution.immich-admin create-api-key \
   --name "My API Key" \
   --user-email "user@example.com"
 
 # Create an API key with specific permissions (e.g., for sync service)
-sudo immich-distribution.immich-admin create-admin-api-key \
+sudo immich-distribution.immich-admin create-api-key \
   --name "Sync Service Key" \
   --permissions "asset.upload,asset.delete,user.read" \
   --user-email "sync-user@example.com"
 
 # Only create the key if one with the same name doesn't already exist
-sudo immich-distribution.immich-admin create-admin-api-key \
+sudo immich-distribution.immich-admin create-api-key \
   --name "Automation Key" \
   --check
 ```
