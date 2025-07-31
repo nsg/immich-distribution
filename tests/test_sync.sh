@@ -77,7 +77,7 @@ processes_in_cgroup() {
 }
 
 get_sync_service_journal_messages() {
-    journalctl --no-pager -n 10 -e -u snap.immich-distribution.sync-service.service
+    journalctl --no-pager -n 25 -e -u snap.immich-distribution.sync-service.service
 }
 
 get_sync_service_status() {
