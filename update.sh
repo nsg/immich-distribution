@@ -49,6 +49,8 @@ CHECK_FILES="
     server/src/migrations
     server/Dockerfile
     server/start.sh
+    server/src/services/cli.service.ts
+    server/src/commands/index.ts
     web/README.md
     web/Dockerfile
     web/src/lib/components/shared-components/version-announcement-box.svelte
