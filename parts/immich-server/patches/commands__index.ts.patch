@@ -1,15 +1,15 @@
 diff --git a/server/src/commands/index.ts b/server/src/commands/index.ts
-index ce085f6e3..d154cc2b1 100644
+index 46a8d13e3..9271e4bb6 100644
 --- a/server/src/commands/index.ts
 +++ b/server/src/commands/index.ts
 @@ -1,3 +1,4 @@
 +import { CreateAdminApiKeyCommand } from 'src/commands/create-admin-api-key.command';
  import { GrantAdminCommand, PromptEmailQuestion, RevokeAdminCommand } from 'src/commands/grant-admin';
  import { ListUsersCommand } from 'src/commands/list-users.command';
- import { DisableOAuthLogin, EnableOAuthLogin } from 'src/commands/oauth-login';
-@@ -17,4 +18,5 @@ export const commands = [
-   VersionCommand,
-   GrantAdminCommand,
-   RevokeAdminCommand,
+ import {
+@@ -25,4 +26,5 @@ export const commandsAndQuestions = [
+   ChangeMediaLocationCommand,
+   PromptMediaLocationQuestions,
+   PromptConfirmMoveQuestions,
 +  CreateAdminApiKeyCommand,
  ];
