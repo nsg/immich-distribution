@@ -126,11 +126,25 @@ apps:
     after:
       - immich-server
 
+  manager-bootstrap:
+    command: bin/manager bootstrap
+    daemon: simple
+    restart-delay: 2m
+    plugs:
+      - network
+    after:
+      - immich-server
+
   backup:
     command: bin/backup
 
   restore:
     command: bin/restore
+
+  notification:
+    command: bin/notification
+    plugs:
+      - network
 
   lets-encrypt:
     command: bin/acme-init
@@ -174,6 +188,8 @@ parts:
       git apply -p1 $CRAFT_STAGE/commands__create-admin-api-key.command.ts.patch
       git apply -p1 $CRAFT_STAGE/commands__index.ts.patch
       git apply -p1 $CRAFT_STAGE/services__cli.service.ts.patch
+      git apply -p1 $CRAFT_STAGE/services__notification-admin.service.ts.patch
+      
 
       SHARP_VERSION=0.34.2
       NODE_ADDON_API_VERSION=8.3.1

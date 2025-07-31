@@ -18,6 +18,7 @@ nav:
     - configuration/haproxy.md
     - configuration/sync.md
     - Immich Admin Extensions: configuration/cli-administration.md
+    - Notifications: configuration/notifications.md
     - configuration/metrics.md
   - Contribute:
     - Upgrade: build/upgrade.md

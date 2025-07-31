@@ -1,14 +1,12 @@
 #!/bin/bash
 set -eu -o pipefail
 
+. $SNAP/bin/load-env
+
 # The manager runs maintenance tasks in the background that can't be run 
 # from the hooks during installation/upgrade.
 
-# Check API key twice a day (at 06 and 18), the minute depends on the timer.
-# I regularly check this in case the user deletes the API key. This key will
-# be critical for the operation of the snap.
-CURRENT_HOUR=$(date +%H)
-if [[ "$CURRENT_HOUR" == "06" || "$CURRENT_HOUR" == "18" ]]; then
+create_api_key() {
     if API_KEY_OUTPUT=$($SNAP/bin/immich-admin create-api-key --name "immich-distribution" --check); then
         if [[ ${#API_KEY_OUTPUT} -gt 30 ]]; then
             snapctl set admin-api-key="$API_KEY_OUTPUT"
@@ -16,4 +14,31 @@ if [[ "$CURRENT_HOUR" == "06" || "$CURRENT_HOUR" == "18" ]]; then
     else
         echo "Failed to create/check API key" >&2
     fi
+}
+
+# Check if this is a bootstrap run (wait for server and create API key once)
+if [[ "${1:-}" == "bootstrap" ]]; then
+    echo "Bootstrap: Waiting for Immich server to be ready..."
+    
+    # Wait up to 10 minutes for the server to be ready
+    for i in {1..120}; do
+        if immich_server_ready; then
+            echo "Bootstrap: Creating admin API key..."
+            create_api_key
+            exit 0
+        fi
+        echo "Bootstrap: Waiting for server... (attempt $i/120)"
+        sleep 5
+    done
+    
+    echo "Bootstrap: Timeout waiting for Immich server to be ready" >&2
+    exit 1
+fi
+
+# Check API key twice a day (at 06 and 18), the minute depends on the timer.
+# I regularly check this in case the user deletes the API key. This key will
+# be critical for the operation of the snap.
+CURRENT_HOUR=$(date +%H)
+if [[ "$CURRENT_HOUR" == "06" || "$CURRENT_HOUR" == "18" ]]; then
+    create_api_key
 fi
