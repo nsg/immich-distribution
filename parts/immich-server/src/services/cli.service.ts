@@ -165,7 +165,7 @@ export class CliService extends BaseService {
 
     let permissions: Permission[] = [];
     if (useAllPermissions) {
-      permissions = [Permission.ALL];
+      permissions = [Permission.All];
     } else if (permissionsString.trim()) {
       const permissionStrings = permissionsString.split(',').map(p => p.trim()).filter(p => p);
       permissions = permissionStrings.map(p => p as Permission);

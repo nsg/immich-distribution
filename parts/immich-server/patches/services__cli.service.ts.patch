@@ -1,5 +1,5 @@
 diff --git a/server/src/services/cli.service.ts b/server/src/services/cli.service.ts
-index 674b885dc..b7c2c18c4 100644
+index 674b885dc..8c0620bd5 100644
 --- a/server/src/services/cli.service.ts
 +++ b/server/src/services/cli.service.ts
 @@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
@@ -53,7 +53,7 @@ index 674b885dc..b7c2c18c4 100644
 +
 +    let permissions: Permission[] = [];
 +    if (useAllPermissions) {
-+      permissions = [Permission.ALL];
++      permissions = [Permission.All];
 +    } else if (permissionsString.trim()) {
 +      const permissionStrings = permissionsString.split(',').map(p => p.trim()).filter(p => p);
 +      permissions = permissionStrings.map(p => p as Permission);
