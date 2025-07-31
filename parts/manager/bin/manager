@@ -2,9 +2,27 @@
 set -eu -o pipefail
 
 . $SNAP/bin/load-env
+. $SNAP/etc/manager.conf
 
-# The manager runs maintenance tasks in the background that can't be run 
-# from the hooks during installation/upgrade.
+send_system_notification() {
+    local title="$1"
+    local description="$2"
+    
+    local notification_hash=$(echo -n "$title$description" | sha256sum | cut -d' ' -f1)
+    local sent_hash=$(snapctl get sent-notification-hash)
+    
+    if [ "$sent_hash" = "$notification_hash" ]; then
+        return 0
+    fi
+    
+    if $SNAP/bin/notification -t "$title" -T "SystemMessage" -l "info" -D "$description"; then
+        snapctl set sent-notification-hash="$notification_hash"
+        return 0
+    else
+        echo "Failed to send system notification: $title" >&2
+        return 1
+    fi
+}
 
 create_api_key() {
     if API_KEY_OUTPUT=$($SNAP/bin/immich-admin create-api-key --name "immich-distribution" --check); then
@@ -42,3 +60,6 @@ CURRENT_HOUR=$(date +%H)
 if [[ "$CURRENT_HOUR" == "06" || "$CURRENT_HOUR" == "18" ]]; then
     create_api_key
 fi
+
+# Send a system notifications to the user
+send_system_notification "$NOTIFICATION_TITLE" "$NOTIFICATION_DESCRIPTION"
