@@ -147,6 +147,7 @@ if ! echo "$output" | grep -q "CREATE FUNCTION"; then
 fi
 
 if ! echo "$output" | grep -q "CREATE TRIGGER"; then
+    echo "$output"
     die "Expected to find 'CREATE TRIGGER' in service logs"
 fi
 
