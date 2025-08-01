@@ -48,15 +48,15 @@ git checkout $NEW_RELEASE_TAG
 CHECK_FILES="
     server/src/migrations
     server/Dockerfile
-    server/start.sh
+    server/bin/start.sh
+    server/src/services/cli.service.ts
+    server/src/commands/index.ts
     web/README.md
     web/Dockerfile
-    web/src/lib/components/shared-components/version-announcement-box.svelte
     cli/README.md
     machine-learning/README.md
     machine-learning/Dockerfile
-    machine-learning/start.sh
-    machine-learning/gunicorn_conf.py
+    machine-learning/pyproject.toml
     docker/example.env
     docker/docker-compose.yml
     docs/docs/install/environment-variables.md

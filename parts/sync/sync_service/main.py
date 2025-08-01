@@ -98,10 +98,10 @@ class ImmichDatabase:
 
         with self.conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
             cur.execute("""
-                SELECT assets.id
-                FROM assets
+                SELECT asset.id
+                FROM asset
                 INNER JOIN assets_filesync_lookup
-                ON assets.checksum = assets_filesync_lookup.checksum
+                ON asset.checksum = assets_filesync_lookup.checksum
                 WHERE assets_filesync_lookup.asset_path = %s
                 AND assets_filesync_lookup.user_id = %s
             """, (asset_path, user_id))
@@ -113,10 +113,10 @@ class ImmichDatabase:
 
         with self.conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
             cur.execute("""
-                SELECT assets.id
-                FROM assets
+                SELECT asset.id
+                FROM asset
                 INNER JOIN assets_filesync_lookup
-                ON assets.checksum = assets_filesync_lookup.checksum
+                ON asset.checksum = assets_filesync_lookup.checksum
                 WHERE assets_filesync_lookup.checksum = %s
                 AND assets_filesync_lookup.user_id = %s
             """, (checksum, user_id))
@@ -128,10 +128,10 @@ class ImmichDatabase:
 
         with self.conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
             cur.execute("""
-                SELECT assets."createdAt"
-                FROM assets
+                SELECT asset."createdAt"
+                FROM asset
                 INNER JOIN assets_filesync_lookup
-                ON assets.checksum = assets_filesync_lookup.checksum
+                ON asset.checksum = assets_filesync_lookup.checksum
                 WHERE assets_filesync_lookup.asset_path = %s
                 AND assets_filesync_lookup.user_id = %s
             """, (asset_path, user_id))

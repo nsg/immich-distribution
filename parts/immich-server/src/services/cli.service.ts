@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { isAbsolute } from 'node:path';
 import { SALT_ROUNDS } from 'src/constants';
 import { UserAdminResponseDto, mapUserAdmin } from 'src/dtos/user.dto';
 import { Permission } from 'src/enum';
@@ -68,6 +69,63 @@ export class CliService extends BaseService {
     await this.updateConfig(config);
   }
 
+  async getSampleFilePaths(): Promise<string[]> {
+    const [assets, people, users] = await Promise.all([
+      this.assetRepository.getFileSamples(),
+      this.personRepository.getFileSamples(),
+      this.userRepository.getFileSamples(),
+    ]);
+
+    const paths = [];
+
+    for (const person of people) {
+      paths.push(person.thumbnailPath);
+    }
+
+    for (const user of users) {
+      paths.push(user.profileImagePath);
+    }
+
+    for (const asset of assets) {
+      paths.push(
+        asset.originalPath,
+        asset.sidecarPath,
+        asset.encodedVideoPath,
+        ...asset.files.map((file) => file.path),
+      );
+    }
+
+    return paths.filter(Boolean) as string[];
+  }
+
+  async migrateFilePaths({
+    oldValue,
+    newValue,
+    confirm,
+  }: {
+    oldValue: string;
+    newValue: string;
+    confirm: (data: { sourceFolder: string; targetFolder: string }) => Promise<boolean>;
+  }): Promise<boolean> {
+    let sourceFolder = oldValue;
+    if (sourceFolder.startsWith('./')) {
+      sourceFolder = sourceFolder.slice(2);
+    }
+
+    const targetFolder = newValue;
+    if (!isAbsolute(targetFolder)) {
+      throw new Error('Target media location must be an absolute path');
+    }
+
+    if (!(await confirm({ sourceFolder, targetFolder }))) {
+      return false;
+    }
+
+    await this.databaseRepository.migrateFilePaths(sourceFolder, targetFolder);
+
+    return true;
+  }
+
   async createAdminApiKey(
     keyName: string = 'Admin CLI Key',
     permissionsString: string = '',
@@ -107,7 +165,7 @@ export class CliService extends BaseService {
 
     let permissions: Permission[] = [];
     if (useAllPermissions) {
-      permissions = [Permission.ALL];
+      permissions = [Permission.All];
     } else if (permissionsString.trim()) {
       const permissionStrings = permissionsString.split(',').map(p => p.trim()).filter(p => p);
       permissions = permissionStrings.map(p => p as Permission);
