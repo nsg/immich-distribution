@@ -77,6 +77,7 @@ jobs:
       - name: Backup database and assets
         run: |
           sudo immich-distribution.backup -a -d
+          rm -rf ./backups
           cp -rv /var/snap/immich-distribution/common/backups .
 
       - name: Upload backups and secret.txt
@@ -111,6 +112,7 @@ jobs:
       - name: Backup database and assets
         run: |
           sudo immich-distribution.backup -a -d
+          rm -rf ./backups
           cp -rv /var/snap/immich-distribution/common/backups .
 
       - name: Upload backups and secret.txt
@@ -173,6 +175,7 @@ jobs:
       - name: Backup database and assets after upgrade
         run: |
           sudo immich-distribution.backup -a -d
+          rm -rf ./backups
           cp -rv /var/snap/immich-distribution/common/backups .
 
       - name: Upload post-upgrade backups
