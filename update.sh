@@ -46,7 +46,7 @@ fi
 git checkout $NEW_RELEASE_TAG
 
 CHECK_FILES="
-    server/src/migrations
+    server/src/schema/tables/asset.table.ts
     server/Dockerfile
     server/bin/start.sh
     server/src/services/cli.service.ts
