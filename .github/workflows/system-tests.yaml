@@ -155,11 +155,13 @@ jobs:
         run: |
           sudo cp -rv ./backups/immich_database_*.sql.xz /var/snap/immich-distribution/common/backups
           sudo immich-distribution.restore -y -d /var/snap/immich-distribution/common/backups/immich_database_*.sql.xz
+          sudo rm /var/snap/immich-distribution/common/backups/immich_database_*.sql.xz
 
       - name: Restore assets
         run: |
           sudo cp -rv ./backups/immich_assets_*.tar.xz /var/snap/immich-distribution/common/backups
           sudo immich-distribution.restore -y -a /var/snap/immich-distribution/common/backups/immich_assets_*.tar.xz
+          sudo rm /var/snap/immich-distribution/common/backups/immich_assets_*.tar.xz
 
       - name: Download snap artifact
         uses: actions/download-artifact@v4
