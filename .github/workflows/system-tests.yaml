@@ -77,12 +77,113 @@ jobs:
       - name: Backup database and assets
         run: |
           sudo immich-distribution.backup -a -d
+          rm -rf ./backups
           cp -rv /var/snap/immich-distribution/common/backups .
 
       - name: Upload backups and secret.txt
         uses: actions/upload-artifact@v4
         with:
           name: backups
+          path: |
+            backups
+            tests/secret.txt
+
+  prep-backup-store:
+    name: Prepare backup state from store package
+    runs-on: ubuntu-latest
+
+    services:
+      selenium:
+        image: selenium/standalone-chrome:latest
+        options: --shm-size=2gb
+        ports:
+          - 4444:4444
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: TEST | Install package from store
+        run: sudo snap install immich-distribution
+
+      - name: TEST | Run Prepare Tests
+        run: make test-prep -C tests
+
+      - name: Backup database and assets
+        run: |
+          sudo immich-distribution.backup -a -d
+          rm -rf ./backups
+          cp -rv /var/snap/immich-distribution/common/backups .
+
+      - name: Upload backups and secret.txt
+        uses: actions/upload-artifact@v4
+        with:
+          name: backups-store
+          path: |
+            backups
+            tests/secret.txt
+
+  upgrade:
+    name: Upgrade from Store to Development
+    runs-on: ubuntu-latest
+
+    needs: [build-snap, prep-backup-store]
+
+    services:
+      selenium:
+        image: selenium/standalone-chrome:latest
+        options: --shm-size=2gb
+        ports:
+          - 4444:4444
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: TEST | Install package from store
+        run: sudo snap install immich-distribution
+
+      - name: Download backups artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: backups-store
+
+      - name: Wait Immich Distribution to start
+        run: make wait -C tests
+
+      - name: Restore database
+        run: |
+          sudo cp -rv ./backups/immich_database_*.sql.xz /var/snap/immich-distribution/common/backups
+          sudo immich-distribution.restore -y -d /var/snap/immich-distribution/common/backups/immich_database_*.sql.xz
+          sudo rm /var/snap/immich-distribution/common/backups/immich_database_*.sql.xz
+
+      - name: Restore assets
+        run: |
+          sudo cp -rv ./backups/immich_assets_*.tar.xz /var/snap/immich-distribution/common/backups
+          sudo immich-distribution.restore -y -a /var/snap/immich-distribution/common/backups/immich_assets_*.tar.xz
+          sudo rm /var/snap/immich-distribution/common/backups/immich_assets_*.tar.xz
+
+      - name: Download snap artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: development-snap-package
+
+      - name: TEST | Upgrade to development package
+        run: sudo snap install --dangerous *.snap
+
+      - name: Wait Immich Distribution to restart after upgrade
+        run: make wait -C tests
+
+      - name: Backup database and assets after upgrade
+        run: |
+          sudo immich-distribution.backup -a -d
+          rm -rf ./backups
+          cp -rv /var/snap/immich-distribution/common/backups .
+
+      - name: Upload post-upgrade backups
+        uses: actions/upload-artifact@v4
+        with:
+          name: backups-upgraded
           path: |
             backups
             tests/secret.txt
@@ -119,10 +220,18 @@ jobs:
         run: make test-selenium -C tests
 
   assets:
-    name: Test Assets
+    name: Test Assets - ${{ matrix.backup-type }}
     runs-on: ubuntu-latest
 
-    needs: prep-backup
+    needs: [prep-backup, upgrade]
+
+    strategy:
+      matrix:
+        include:
+          - backup-type: "development"
+            backup-artifact: "backups"
+          - backup-type: "upgraded"
+            backup-artifact: "backups-upgraded"
 
     services:
       selenium:
@@ -146,7 +255,7 @@ jobs:
       - name: Download backups artifact
         uses: actions/download-artifact@v4
         with:
-          name: backups
+          name: ${{ matrix.backup-artifact }}
 
       - name: Wait Immich Distribution to start
         run: make wait -C tests
@@ -165,10 +274,18 @@ jobs:
         run: make test-selenium -C tests
 
   sync:
-    name: Test Sync Service
+    name: Test Sync Service - ${{ matrix.backup-type }}
     runs-on: ubuntu-latest
 
-    needs: prep-backup
+    needs: [prep-backup, upgrade]
+
+    strategy:
+      matrix:
+        include:
+          - backup-type: "development"
+            backup-artifact: "backups"
+          - backup-type: "upgraded"
+            backup-artifact: "backups-upgraded"
 
     services:
       selenium:
@@ -193,7 +310,7 @@ jobs:
       - name: Download backups artifact
         uses: actions/download-artifact@v4
         with:
-          name: backups
+          name: ${{ matrix.backup-artifact }}
 
       - name: Wait Immich Distribution to start
         run: make wait -C tests
@@ -212,10 +329,18 @@ jobs:
         run: EXPECTED_INITIAL_IMAGE_COUNT=0 make test-sync -C tests
 
   cli:
-    name: Test CLI
+    name: Test CLI - ${{ matrix.backup-type }}
     runs-on: ubuntu-latest
 
-    needs: prep-backup
+    needs: [prep-backup, upgrade]
+
+    strategy:
+      matrix:
+        include:
+          - backup-type: "development"
+            backup-artifact: "backups"
+          - backup-type: "upgraded"
+            backup-artifact: "backups-upgraded"
 
     steps:
       - name: Checkout code
@@ -233,7 +358,7 @@ jobs:
       - name: Download backups artifact
         uses: actions/download-artifact@v4
         with:
-          name: backups
+          name: ${{ matrix.backup-artifact }}
 
       - name: Wait Immich Distribution to start
         run: make wait -C tests
