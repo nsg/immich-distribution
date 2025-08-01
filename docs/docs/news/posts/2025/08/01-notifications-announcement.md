@@ -1,6 +1,8 @@
 ---
 date: 2025-08-01
 authors: [nsg]
+categories:
+  - Notifications
 ---
 
 # Important Notifications & Backup database
