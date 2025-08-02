@@ -6,11 +6,16 @@ Register a new user, generate API keys, and some simple validations.
 """
 
 import socket
+import os
 
 from seleniumbase import BaseCase
 BaseCase.main(__name__, __file__)
 
 def get_ip_address():
+    immich_ip = os.getenv('IMMICH_IP')
+    if immich_ip:
+        return immich_ip
+
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     s.connect(("8.8.8.8", 80))
     return s.getsockname()[0]

@@ -102,6 +102,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          ref: e41e858b2371dfba9b5b92d26fb5b7176e825496
 
       - name: TEST | Install package from store
         run: sudo snap install immich-distribution
