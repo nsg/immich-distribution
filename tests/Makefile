@@ -30,10 +30,10 @@ test-sync: test-assets wait
 test-cli: wait
 	./test_cli.sh
 
-test_prep_%: .env/bin/seleniumbase test-assets
+test_prep_%: ${PYTEST} ${PYTEST_LOCALTEST_DEPENDENCIES}
 	${PYTEST} tests_prep.py --server=127.0.0.1 --port=4444 --headed -k $* --html=report/index.html
 
-test_selenium_%: .env/bin/seleniumbase test-assets
+test_selenium_%: ${PYTEST} ${PYTEST_LOCALTEST_DEPENDENCIES} test-assets
 	${PYTEST} tests_selenium.py --server=127.0.0.1 --port=4444 --headed -k $* --html=report/index.html
 
 test-assets:
