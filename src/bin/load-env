@@ -66,12 +66,21 @@ export ACME_STAGING="$(snapctl get acme-staging)"
 export ACME_CHALLENGE_TYPE="$(snapctl get acme-challenge-type)"
 export ACME_CONFIG_PATH="$SNAP_COMMON/acme"
 
+export HAPROXY_CONF_FILE="haproxy.cfg"
 export HTTPS_ENABLED="$(snapctl get https-enabled)"
+export HTTP_ENABLED="$(snapctl get http-enabled)"
 
-if [ "x$HTTPS_ENABLED" == "xtrue" ]; then
-    export HAPROXY_CONF_FILE="haproxy-tls.cfg"
+# Set frontend states based on enabled/disabled settings
+if [ "x$HTTP_ENABLED" == "xfalse" ]; then
+    export HAPROXY_HTTP_FRONTEND_STATE="disabled"
 else
-    export HAPROXY_CONF_FILE="haproxy.cfg"
+    export HAPROXY_HTTP_FRONTEND_STATE=""
+fi
+
+if [ "x$HTTPS_ENABLED" == "xfalse" ]; then
+    export HAPROXY_HTTPS_FRONTEND_STATE="disabled"
+else
+    export HAPROXY_HTTPS_FRONTEND_STATE=""
 fi
 
 export HAPROXY_HTTP_BIND="$(snapctl get haproxy-http-bind)"

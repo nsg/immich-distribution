@@ -32,6 +32,10 @@ if [[ $(snapctl get haproxy-https-bind) == "" ]]; then
     snapctl set haproxy-https-bind="*:443"
 fi
 
+if [[ $(snapctl get http-enabled) == "" ]]; then
+    snapctl set http-enabled="true"
+fi
+
 if [[ $(snapctl get acme-port) == "" ]]; then
     snapctl set acme-port="$(free_port)"
 fi
