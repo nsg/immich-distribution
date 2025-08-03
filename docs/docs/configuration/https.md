@@ -8,7 +8,7 @@ HTTPS requires a domain name (e.g., `immich.example.com`); it will not work with
 
 You can use a domain name you already own, purchase one, or use a free dynamic DNS provider. Point the DNS A record for your chosen domain name to your Immich server's public IP address. Ensure you can access your Immich instance via `http://your.domain.name` (note the **http**).
 
-Your Immich installation must be accessible from the internet on TCP port 80. If you are running this on a home network, you will need to configure port forwarding on your router to forward external port 80 to your Immich server's internal port 80. A server hosted with a cloud provider typically won't require router port forwarding, but you may need to adjust firewall rules.
+Your Immich installation must be accessible from the internet on TCP port 80 (for http challenge) or port 443 (for https/tls challenge). If you are running this on a home network, you will need to configure port forwarding on your router. A server hosted with a cloud provider typically won't require router port forwarding, but you may need to adjust firewall rules.
 
 ## Configure
 
@@ -17,6 +17,20 @@ Use snapd's configuration options to set `acme-domain` and `acme-email` to their
 ```sh 
 sudo snap set immich-distribution acme-domain="your.domain.name"
 sudo snap set immich-distribution acme-email="immich@example.com"
+```
+
+### Challenge Type
+
+By default, certificates are issued over http, to use https, change `acme-challenge-type`.
+
+```sh
+sudo snap set immich-distribution acme-challenge-type="tls"
+```
+
+To revert to http challenge:
+
+```sh
+sudo snap set immich-distribution acme-challenge-type="http"
 ```
 
 ## Issue the certificate
@@ -31,8 +45,18 @@ Try accessing your site via `https://your.domain.name`. If it loads successfully
 
 ## Troubleshoot
 
+**For HTTP-01 challenge (default):**
+
 1. Ensure your Immich instance is accessible on port 80 from the public internet.
 2. Requests to `http://your.domain.name/.well-known/acme-challenge/` must reach the Immich Distribution instance for the ACME challenge to succeed.
+
+**For TLS-ALPN-01 challenge:**
+
+1. Ensure your Immich instance is accessible on port 443 from the public internet.
+2. Requests to `https://your.domain.name/.well-known/acme-challenge/` must reach the Immich Distribution instance for the ACME challenge to succeed. No HTTP access required.
+
+**General troubleshooting:**
+
 3. Check the HAProxy logs for errors: `journalctl -eu snap.immich-distribution.haproxy`.
 4. You can re-run `sudo immich-distribution.lets-encrypt`. However, be aware of Let's Encrypt's rate limits if you run it too frequently.
 5. For extended troubleshooting without hitting production rate limits, consider using the [Let's Encrypt staging environment](https://letsencrypt.org/docs/staging-environment/) by setting `sudo snap set immich-distribution acme-staging="true"` before running the command.
