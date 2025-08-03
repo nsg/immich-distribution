@@ -1,0 +1,8 @@
+#!/bin/bash
+
+# Add this file to ignore the checks in this hook
+[ -e "$SNAP_COMMON/no-post-refresh-hook" ] && exit 0
+
+. $SNAP/bin/load-env
+
+exit 0
