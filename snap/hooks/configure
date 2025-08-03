@@ -36,6 +36,10 @@ if [[ $(snapctl get acme-port) == "" ]]; then
     snapctl set acme-port="$(free_port)"
 fi
 
+if [[ $(snapctl get acme-challenge-type) == "" ]]; then
+    snapctl set acme-challenge-type="http"
+fi
+
 if [[ $(snapctl get sync-delete-threshold) == "" ]]; then
     snapctl set sync-delete-threshold="300"
 fi

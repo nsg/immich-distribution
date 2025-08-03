@@ -63,6 +63,7 @@ export ACME_PORT="$(snapctl get acme-port)"
 export ACME_DOMAIN="$(snapctl get acme-domain)"
 export ACME_EMAIL="$(snapctl get acme-email)"
 export ACME_STAGING="$(snapctl get acme-staging)"
+export ACME_CHALLENGE_TYPE="$(snapctl get acme-challenge-type)"
 export ACME_CONFIG_PATH="$SNAP_COMMON/acme"
 
 export HTTPS_ENABLED="$(snapctl get https-enabled)"

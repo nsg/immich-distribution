@@ -10,11 +10,16 @@ if [ x$ACME_STAGING == xtrue ]; then
     echo "Using the Let's Encrypt Staging Environment"
 fi
 
+if [ x$ACME_CHALLENGE_TYPE == xtls ]; then
+    CHALLENGE_ARGS="--tls --tls.port=:${ACME_PORT}"
+else
+    CHALLENGE_ARGS="--http --http.port=:${ACME_PORT}"
+fi
+
 $SNAP/bin/lego $(lego_staging_string) \
     --path="$ACME_CONFIG_PATH" \
     --email="$ACME_EMAIL" \
     --domains="$ACME_DOMAIN" \
-    --http \
-    --http.port=":${ACME_PORT}" \
+    $CHALLENGE_ARGS \
     renew \
     --renew-hook="$SNAP/bin/renew-hook"
