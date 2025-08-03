@@ -9,6 +9,7 @@ nav:
     - Introduction: configuration/index.md
     - configuration/security.md
     - HTTPS: configuration/https.md
+    - Node.js Options: configuration/nodejs.md
     - Library:
       - Storage Locations: configuration/library/storage.md
       - External Library: configuration/library/external.md
