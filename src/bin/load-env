@@ -79,6 +79,11 @@ export HAPROXY_HTTPS_BIND="$(snapctl get haproxy-https-bind)"
 export SYNC_DELETE_THRESHOLD="$(snapctl get sync-delete-threshold)"
 export BACKUP_DATABASE_DAILY="$(snapctl get backup-database-daily)"
 
+NODE_OPTIONS_VALUE="$(snapctl get node-options)"
+if [ -n "$NODE_OPTIONS_VALUE" ]; then
+    export NODE_OPTIONS="$NODE_OPTIONS_VALUE"
+fi
+
 drop_privileges() {
     $SNAP/usr/bin/setpriv \
         --clear-groups \
