@@ -85,25 +85,28 @@ If this installation is exposed to the public internet I stronly suggest that yo
 
 ## Updates
 
-Updates are by **default** automatic, this is a core concept of the package format. I write the software with that in mind so I will never push a breaking change. You should never have a broken system as a result of an automatic update.
+Updates are by **default** automatic, this is a core concept of the package format. I write the software with that in mind assuming users update regularly from version to version, so I will never push a breaking change. You should never have a broken system as a result of an automatic update. However, if you skip many versions for any reason, check the [news section](/news/) to avoid missing critical upgrade instructions.
 
 ??? Note "Disable or control automatic updates"
 
     The advantages with automatic updates usually outweights the disadvantages for ordinary users, that's why automatic updates are on by default. If you have other needs this behavior can be changed with the following commands.
 
-    **Please note** that if you do not update regularly (that's about once a week, at minimum) I can't guarantee that updates are completely trouble free. They should be, but I test only updates done sequentially from version to version.
-    
+    You can schedule updates for convenient times. For more scheduling options and detailed control, see [snapd's documentation](https://snapcraft.io/docs/keeping-snaps-up-to-date).
+
     ```bash title="Prevent updates over the weekend"
-    snap refresh --hold=72h immich-distribution # (1)
+    snap refresh --hold=72h immich-distribution
     ```
 
-    1. Change this to a value to your likeing. See the [documentation](https://snapcraft.io/docs/keeping-snaps-up-to-date) for more information.
+    ```bash title="Schedule updates for specific times"
+    # Updates only between 2-4 AM daily
+    snap set system refresh.timer=02:00-04:00
+    ```
 
-    ```bash title="Never update automatically"
+    **Please note** that if you do not update regularly (that's about once a month, at minimum) I can't guarantee that updates are completely trouble free. They should be, but I test only updates done sequentially from version to version. **Always check the [news section](/news/) before updating** when disabling automatic updates, as occasionally there are breaking changes that require specific upgrade procedures when jumping multiple versions.
+
+    ```bash title="Never update automatically (not recommended)"
     snap refresh --hold=forever immich-distribution
     ```
-
-    Another alternative is to pick a time when updates are applied, like in the middle in the night. For more information about that, and much more see [snapd:s documentation](https://snapcraft.io/docs/keeping-snaps-up-to-date).
 
 **Do not expect me to release updates the same day** as an upstream Immich release. I hope to do so in a **reasonable time**. When Immich releases an update I will build and push an update to the candidate channel when I beleave I got it right (my server uses this channel) and try it out myself for a few days. I will relese the build to the stable channel after a few days, if everyting works.
 
