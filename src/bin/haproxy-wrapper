@@ -3,11 +3,14 @@
 . $SNAP/bin/load-env
 
 mkdir -p $ACME_CONFIG_PATH/haproxy
-rm -f $ACME_CONFIG_PATH/haproxy/cert.crt{,.key}
 
-if [ "x$HTTPS_ENABLED" == "xtrue" ]; then
+if [ "x$HTTPS_ENABLED" == "xtrue" ] && [ -n "$ACME_DOMAIN" ]; then
+    # ACME-managed certificates: create symlinks from certificates directory
+    rm -f $ACME_CONFIG_PATH/haproxy/cert.crt{,.key}
     ln -s "$ACME_CONFIG_PATH/certificates/$ACME_DOMAIN.crt" $ACME_CONFIG_PATH/haproxy/cert.crt
     ln -s "$ACME_CONFIG_PATH/certificates/$ACME_DOMAIN.key" $ACME_CONFIG_PATH/haproxy/cert.crt.key
 fi
+# If HTTPS is enabled but no ACME_DOMAIN is set, assume manual certificate management
+# Certificates should be placed directly in $ACME_CONFIG_PATH/haproxy/
 
 $SNAP/bin/haproxy -W -f $SNAP/etc/$HAPROXY_CONF_FILE -p $SNAP_DATA/haproxy.pid
