@@ -17,7 +17,7 @@ rm -rf $SNAP_COMMON/reverse-geocoding-dump
 rm -rf $SNAP_COMMON/typesense
 snapctl unset typesense-key
 
-mkdir -p $SNAP_COMMON/{pgsql,redis,reverse-geocoding-dump,upload,sync,backups,acme,cache}
+mkdir -p $SNAP_COMMON/{pgsql,redis,reverse-geocoding-dump,upload,sync,backups,acme/haproxy,cache}
 chown snap_daemon:snap_daemon $SNAP_COMMON/pgsql
 
 if [[ $(snapctl get database-password) == "" ]]; then
@@ -30,6 +30,14 @@ fi
 
 if [[ $(snapctl get haproxy-https-bind) == "" ]]; then
     snapctl set haproxy-https-bind="*:443"
+fi
+
+if [[ $(snapctl get http-enabled) == "" ]]; then
+    snapctl set http-enabled="true"
+fi
+
+if [[ $(snapctl get https-enabled) == "" ]]; then
+    snapctl set https-enabled="false"
 fi
 
 if [[ $(snapctl get acme-port) == "" ]]; then

@@ -51,14 +51,14 @@ A computer with a relatively modern Intel or AMD based CPU. You need **at minimu
 
 ### Used ports
 
-Immich Distribution requires ports `3001-3003`, `8081-8082`, `5432` and `6379` to be unused, port `80` is also required by default, and port `443` if you enable https. It also allocates free ports in the `34000-36000` range.
+Immich Distribution requires ports `3001-3003`, `8081-8082`, `5432` and `6379` to be unused, port `80` is also required by default (unless disabled), and port `443` if you enable https. It also allocates free ports in the `34000-36000` range.
 See [HAProxy](configuration/haproxy.md) if you like to change the http or https ports. Immich will fail to start if these ports are used by another application.
 
 ??? Info "Used ports with service names"
 
     | Port | Interface | Configurable | Comment |
     | ---- | --------- | ------------ | ------- |
-    | `80`   | all | YES | HAProxy - Reverse proxy |
+    | `80`   | all | YES | HAProxy - Reverse proxy (unless disabled) |
     | `443`  | all | YES | HAProxy (only if HTTPS is enabled) |
     | `3001-3003` | lo | NO | Immich Services |
     | `8081-8082` | all | NO | Metrics (Prometheus) |

@@ -377,3 +377,122 @@ jobs:
 
       - name: TEST | Run CLI Tests
         run: make test-cli -C tests
+
+  certificate-management:
+    name: Test Manual Certificate Management
+    runs-on: ubuntu-latest
+
+    needs: build-snap
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download snap artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: development-snap-package
+
+      - name: TEST | Install package
+        run: sudo snap install --dangerous *.snap
+
+      - name: Wait for Immich Distribution to start
+        run: make wait -C tests
+
+      - name: TEST | Verify default HTTP-only configuration
+        run: |
+          echo "Testing default HTTP-only behavior..."
+          
+          # Verify HTTP port 80 is listening
+          sudo ss -tlnp | grep ':80 ' || (echo "ERROR: Port 80 not listening" && exit 1)
+          
+          # Verify HTTPS port 443 is NOT listening (should fail)
+          if sudo ss -tlnp | grep ':443 '; then
+            echo "ERROR: Port 443 should not be listening in HTTP-only mode"
+            exit 1
+          fi
+          
+          # Test HAProxy stats page shows HTTP frontend enabled, HTTPS disabled
+          curl -s 'http://localhost/haproxy;csv' | grep -E "^http,FRONTEND" || (echo "ERROR: HTTP frontend not found" && exit 1)
+          
+          # Verify HTTPS frontend is missing
+          if curl -s 'http://localhost/haproxy;csv' | grep -E "^https,FRONTEND"; then
+            echo "ERROR: HTTPS frontend should not be present in HTTP-only mode"
+            exit 1
+          fi
+          
+          echo "✓ HTTP-only configuration verified"
+
+      - name: TEST | Generate self-signed certificate
+        run: |
+          echo "Generating self-signed certificate..."
+          
+          # Create certificate directory (should already exist from configure hook)
+          sudo mkdir -p /var/snap/immich-distribution/common/acme/haproxy
+          
+          # Generate private key
+          sudo openssl genrsa -out /var/snap/immich-distribution/common/acme/haproxy/cert.crt.key 2048
+          
+          # Generate self-signed certificate
+          sudo openssl req -new -x509 \
+            -key /var/snap/immich-distribution/common/acme/haproxy/cert.crt.key \
+            -out /var/snap/immich-distribution/common/acme/haproxy/cert.crt \
+            -days 365 \
+            -subj "/C=US/ST=TestState/L=TestCity/O=TestOrg/CN=localhost"
+          
+          # Verify certificate was created and is valid
+          sudo openssl x509 -in /var/snap/immich-distribution/common/acme/haproxy/cert.crt -text -noout | grep -q "CN = localhost" || (echo "ERROR: Certificate creation failed" && exit 1)
+          
+          echo "✓ Self-signed certificate generated successfully"
+
+      - name: TEST | Enable HTTPS and verify dual HTTP/HTTPS operation
+        run: |
+          echo "Enabling HTTPS with manual certificate..."
+          
+          # Enable HTTPS (this should restart HAProxy automatically)
+          sudo snap set immich-distribution https-enabled="true"
+          
+          # Wait a moment for HAProxy to restart
+          sleep 5
+          
+          # Verify both HTTP and HTTPS ports are now listening
+          sudo ss -tlnp | grep ':80 ' || (echo "ERROR: Port 80 not listening after HTTPS enable" && exit 1)
+          sudo ss -tlnp | grep ':443 ' || (echo "ERROR: Port 443 not listening after HTTPS enable" && exit 1)
+          
+          # Verify HAProxy stats show both frontends enabled
+          curl -s 'http://localhost/haproxy;csv' | grep -E "^http,FRONTEND" || (echo "ERROR: HTTP frontend not found" && exit 1)
+          curl -s 'http://localhost/haproxy;csv' | grep -E "^https,FRONTEND" || (echo "ERROR: HTTPS frontend not found" && exit 1)
+          
+          echo "✓ Dual HTTP/HTTPS operation verified"
+
+      - name: TEST | Disable HTTP and verify HTTPS-only operation
+        run: |
+          echo "Disabling HTTP frontend for HTTPS-only operation..."
+          
+          # Disable HTTP frontend
+          sudo snap set immich-distribution http-enabled="false"
+          
+          # Wait a moment for HAProxy to restart
+          sleep 5
+          
+          # Verify port 80 is closed
+          if sudo ss -tlnp | grep ':80 '; then
+            echo "ERROR: Port 80 should not be listening in HTTPS-only mode"
+            exit 1
+          fi
+          
+          # Verify HTTPS port is still listening
+          sudo ss -tlnp | grep ':443 ' || (echo "ERROR: Port 443 not listening after HTTP disable" && exit 1)
+          
+          # Verify HAProxy stats show HTTP frontend disabled, HTTPS enabled
+          # Access stats via HTTPS since HTTP is disabled
+          curl -k -s 'https://localhost/haproxy;csv' | grep -E "^https,FRONTEND" || (echo "ERROR: HTTPS frontend not found" && exit 1)
+          
+          # Verify HTTP frontend is missing
+          if curl -k -s 'https://localhost/haproxy;csv' | grep -E "^http,FRONTEND"; then
+            echo "ERROR: HTTP frontend should not be present in HTTPS-only mode"
+            exit 1
+          fi
+          
+          echo "✓ HTTPS-only operation verified"
+
