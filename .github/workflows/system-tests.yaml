@@ -413,7 +413,7 @@ jobs:
           fi
           
           # Test HAProxy stats page shows HTTP frontend enabled, HTTPS disabled
-          curl -s http://localhost/haproxy | grep -q "frontend.*http.*UP" || (echo "ERROR: HTTP frontend not UP" && exit 1)
+          curl -s 'http://localhost/haproxy;csv' | grep -E "^http,FRONTEND" || (echo "ERROR: HTTP frontend not found" && exit 1)
           
           # Test basic HTTP connectivity
           curl -s http://localhost/api/server-info/ping | grep -q '"res":"pong"' || (echo "ERROR: HTTP ping failed" && exit 1)
@@ -467,8 +467,8 @@ jobs:
           curl -k -s https://localhost/api/server-info/ping | grep -q '"res":"pong"' || (echo "ERROR: HTTPS ping failed" && exit 1)
           
           # Verify HAProxy stats show both frontends enabled
-          curl -s http://localhost/haproxy | grep -q "frontend.*http.*UP" || (echo "ERROR: HTTP frontend not UP" && exit 1)
-          curl -s http://localhost/haproxy | grep -q "frontend.*https.*UP" || (echo "ERROR: HTTPS frontend not UP" && exit 1)
+          curl -s 'http://localhost/haproxy;csv' | grep -E "^http,FRONTEND" || (echo "ERROR: HTTP frontend not found" && exit 1)
+          curl -s 'http://localhost/haproxy;csv' | grep -E "^https,FRONTEND" || (echo "ERROR: HTTPS frontend not found" && exit 1)
           
           echo "✓ Dual HTTP/HTTPS operation verified"
 
@@ -496,7 +496,7 @@ jobs:
           
           # Verify HAProxy stats show HTTP frontend disabled, HTTPS enabled
           # Access stats via HTTPS since HTTP is disabled
-          curl -k -s https://localhost/haproxy | grep -q "frontend.*https.*UP" || (echo "ERROR: HTTPS frontend not UP" && exit 1)
+          curl -k -s 'https://localhost/haproxy;csv' | grep -E "^https,FRONTEND" || (echo "ERROR: HTTPS frontend not found" && exit 1)
           
           echo "✓ HTTPS-only operation verified"
 
