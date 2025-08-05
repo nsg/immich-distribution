@@ -77,10 +77,10 @@ else
     export HAPROXY_HTTP_FRONTEND_STATE=""
 fi
 
-if [ "x$HTTPS_ENABLED" == "xfalse" ]; then
-    export HAPROXY_HTTPS_FRONTEND_STATE="disabled"
-else
+if [ "x$HTTPS_ENABLED" == "xtrue" ]; then
     export HAPROXY_HTTPS_FRONTEND_STATE=""
+else
+    export HAPROXY_HTTPS_FRONTEND_STATE="disabled"
 fi
 
 export HAPROXY_HTTP_BIND="$(snapctl get haproxy-http-bind)"
