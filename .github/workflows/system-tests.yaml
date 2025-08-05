@@ -377,3 +377,126 @@ jobs:
 
       - name: TEST | Run CLI Tests
         run: make test-cli -C tests
+
+  certificate-management:
+    name: Test Manual Certificate Management
+    runs-on: ubuntu-latest
+
+    needs: build-snap
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download snap artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: development-snap-package
+
+      - name: TEST | Install package
+        run: sudo snap install --dangerous *.snap
+
+      - name: Wait for Immich Distribution to start
+        run: make wait -C tests
+
+      - name: TEST | Verify default HTTP-only configuration
+        run: |
+          echo "Testing default HTTP-only behavior..."
+          
+          # Verify HTTP port 80 is listening
+          sudo ss -tlnp | grep ':80 ' || (echo "ERROR: Port 80 not listening" && exit 1)
+          
+          # Verify HTTPS port 443 is NOT listening (should fail)
+          if sudo ss -tlnp | grep ':443 '; then
+            echo "ERROR: Port 443 should not be listening in HTTP-only mode"
+            exit 1
+          fi
+          
+          # Test HAProxy stats page shows HTTP frontend enabled, HTTPS disabled
+          curl -s http://localhost/haproxy | grep -q "frontend.*http.*UP" || (echo "ERROR: HTTP frontend not UP" && exit 1)
+          
+          # Test basic HTTP connectivity
+          curl -s http://localhost/api/server-info/ping | grep -q '"res":"pong"' || (echo "ERROR: HTTP ping failed" && exit 1)
+          
+          echo "✓ HTTP-only configuration verified"
+
+      - name: TEST | Generate self-signed certificate
+        run: |
+          echo "Generating self-signed certificate..."
+          
+          # Create certificate directory (should already exist from configure hook)
+          sudo mkdir -p /var/snap/immich-distribution/common/acme/haproxy
+          
+          # Generate private key
+          sudo openssl genrsa -out /var/snap/immich-distribution/common/acme/haproxy/cert.crt.key 2048
+          
+          # Generate self-signed certificate
+          sudo openssl req -new -x509 \
+            -key /var/snap/immich-distribution/common/acme/haproxy/cert.crt.key \
+            -out /var/snap/immich-distribution/common/acme/haproxy/cert.crt \
+            -days 365 \
+            -subj "/C=US/ST=TestState/L=TestCity/O=TestOrg/CN=localhost"
+          
+          # Set proper permissions
+          sudo chown root:root /var/snap/immich-distribution/common/acme/haproxy/cert.crt*
+          sudo chmod 600 /var/snap/immich-distribution/common/acme/haproxy/cert.crt*
+          
+          # Verify certificate was created and is valid
+          sudo openssl x509 -in /var/snap/immich-distribution/common/acme/haproxy/cert.crt -text -noout | grep -q "CN = localhost" || (echo "ERROR: Certificate creation failed" && exit 1)
+          
+          echo "✓ Self-signed certificate generated successfully"
+
+      - name: TEST | Enable HTTPS and verify dual HTTP/HTTPS operation
+        run: |
+          echo "Enabling HTTPS with manual certificate..."
+          
+          # Enable HTTPS (this should restart HAProxy automatically)
+          sudo snap set immich-distribution https-enabled="true"
+          
+          # Wait a moment for HAProxy to restart
+          sleep 5
+          
+          # Verify both HTTP and HTTPS ports are now listening
+          sudo ss -tlnp | grep ':80 ' || (echo "ERROR: Port 80 not listening after HTTPS enable" && exit 1)
+          sudo ss -tlnp | grep ':443 ' || (echo "ERROR: Port 443 not listening after HTTPS enable" && exit 1)
+          
+          # Test HTTP still works
+          curl -s http://localhost/api/server-info/ping | grep -q '"res":"pong"' || (echo "ERROR: HTTP ping failed after HTTPS enable" && exit 1)
+          
+          # Test HTTPS works (ignore certificate warnings for self-signed cert)
+          curl -k -s https://localhost/api/server-info/ping | grep -q '"res":"pong"' || (echo "ERROR: HTTPS ping failed" && exit 1)
+          
+          # Verify HAProxy stats show both frontends enabled
+          curl -s http://localhost/haproxy | grep -q "frontend.*http.*UP" || (echo "ERROR: HTTP frontend not UP" && exit 1)
+          curl -s http://localhost/haproxy | grep -q "frontend.*https.*UP" || (echo "ERROR: HTTPS frontend not UP" && exit 1)
+          
+          echo "✓ Dual HTTP/HTTPS operation verified"
+
+      - name: TEST | Disable HTTP and verify HTTPS-only operation
+        run: |
+          echo "Disabling HTTP frontend for HTTPS-only operation..."
+          
+          # Disable HTTP frontend
+          sudo snap set immich-distribution http-enabled="false"
+          
+          # Wait a moment for HAProxy to restart
+          sleep 5
+          
+          # Verify HTTPS port is still listening
+          sudo ss -tlnp | grep ':443 ' || (echo "ERROR: Port 443 not listening after HTTP disable" && exit 1)
+          
+          # Verify HTTP port is no longer accepting connections (or returns error)
+          if curl -s --connect-timeout 5 http://localhost/api/server-info/ping 2>/dev/null; then
+            echo "ERROR: HTTP should not be accessible when disabled"
+            exit 1
+          fi
+          
+          # Test HTTPS still works
+          curl -k -s https://localhost/api/server-info/ping | grep -q '"res":"pong"' || (echo "ERROR: HTTPS ping failed after HTTP disable" && exit 1)
+          
+          # Verify HAProxy stats show HTTP frontend disabled, HTTPS enabled
+          # Access stats via HTTPS since HTTP is disabled
+          curl -k -s https://localhost/haproxy | grep -q "frontend.*https.*UP" || (echo "ERROR: HTTPS frontend not UP" && exit 1)
+          
+          echo "✓ HTTPS-only operation verified"
+
