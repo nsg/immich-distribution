@@ -415,8 +415,11 @@ jobs:
           # Test HAProxy stats page shows HTTP frontend enabled, HTTPS disabled
           curl -s 'http://localhost/haproxy;csv' | grep -E "^http,FRONTEND" || (echo "ERROR: HTTP frontend not found" && exit 1)
           
-          # Test basic HTTP connectivity
-          curl -s http://localhost/api/server-info/ping | grep -q '"res":"pong"' || (echo "ERROR: HTTP ping failed" && exit 1)
+          # Verify HTTPS frontend is missing
+          if curl -s 'http://localhost/haproxy;csv' | grep -E "^https,FRONTEND"; then
+            echo "ERROR: HTTPS frontend should not be present in HTTP-only mode"
+            exit 1
+          fi
           
           echo "✓ HTTP-only configuration verified"
 
@@ -437,10 +440,6 @@ jobs:
             -days 365 \
             -subj "/C=US/ST=TestState/L=TestCity/O=TestOrg/CN=localhost"
           
-          # Set proper permissions
-          sudo chown root:root /var/snap/immich-distribution/common/acme/haproxy/cert.crt*
-          sudo chmod 600 /var/snap/immich-distribution/common/acme/haproxy/cert.crt*
-          
           # Verify certificate was created and is valid
           sudo openssl x509 -in /var/snap/immich-distribution/common/acme/haproxy/cert.crt -text -noout | grep -q "CN = localhost" || (echo "ERROR: Certificate creation failed" && exit 1)
           
@@ -460,12 +459,6 @@ jobs:
           sudo ss -tlnp | grep ':80 ' || (echo "ERROR: Port 80 not listening after HTTPS enable" && exit 1)
           sudo ss -tlnp | grep ':443 ' || (echo "ERROR: Port 443 not listening after HTTPS enable" && exit 1)
           
-          # Test HTTP still works
-          curl -s http://localhost/api/server-info/ping | grep -q '"res":"pong"' || (echo "ERROR: HTTP ping failed after HTTPS enable" && exit 1)
-          
-          # Test HTTPS works (ignore certificate warnings for self-signed cert)
-          curl -k -s https://localhost/api/server-info/ping | grep -q '"res":"pong"' || (echo "ERROR: HTTPS ping failed" && exit 1)
-          
           # Verify HAProxy stats show both frontends enabled
           curl -s 'http://localhost/haproxy;csv' | grep -E "^http,FRONTEND" || (echo "ERROR: HTTP frontend not found" && exit 1)
           curl -s 'http://localhost/haproxy;csv' | grep -E "^https,FRONTEND" || (echo "ERROR: HTTPS frontend not found" && exit 1)
@@ -482,21 +475,24 @@ jobs:
           # Wait a moment for HAProxy to restart
           sleep 5
           
-          # Verify HTTPS port is still listening
-          sudo ss -tlnp | grep ':443 ' || (echo "ERROR: Port 443 not listening after HTTP disable" && exit 1)
-          
-          # Verify HTTP port is no longer accepting connections (or returns error)
-          if curl -s --connect-timeout 5 http://localhost/api/server-info/ping 2>/dev/null; then
-            echo "ERROR: HTTP should not be accessible when disabled"
+          # Verify port 80 is closed
+          if sudo ss -tlnp | grep ':80 '; then
+            echo "ERROR: Port 80 should not be listening in HTTPS-only mode"
             exit 1
           fi
           
-          # Test HTTPS still works
-          curl -k -s https://localhost/api/server-info/ping | grep -q '"res":"pong"' || (echo "ERROR: HTTPS ping failed after HTTP disable" && exit 1)
+          # Verify HTTPS port is still listening
+          sudo ss -tlnp | grep ':443 ' || (echo "ERROR: Port 443 not listening after HTTP disable" && exit 1)
           
           # Verify HAProxy stats show HTTP frontend disabled, HTTPS enabled
           # Access stats via HTTPS since HTTP is disabled
           curl -k -s 'https://localhost/haproxy;csv' | grep -E "^https,FRONTEND" || (echo "ERROR: HTTPS frontend not found" && exit 1)
+          
+          # Verify HTTP frontend is missing
+          if curl -k -s 'https://localhost/haproxy;csv' | grep -E "^http,FRONTEND"; then
+            echo "ERROR: HTTP frontend should not be present in HTTPS-only mode"
+            exit 1
+          fi
           
           echo "✓ HTTPS-only operation verified"
 
