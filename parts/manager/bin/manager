@@ -34,6 +34,38 @@ create_api_key() {
     fi
 }
 
+check_database_migration_needed() {
+    local media_path_prefix="$1"
+    query_db -Atq <<< "
+        select exists (
+            select 1 from (
+                select \"originalPath\" as p from asset where \"originalPath\" like '${media_path_prefix}%'
+                union all select \"sidecarPath\" from asset where coalesce(\"sidecarPath\",'') like '${media_path_prefix}%'
+                union all select \"encodedVideoPath\" from asset where coalesce(\"encodedVideoPath\",'') like '${media_path_prefix}%'
+                union all select \"path\" from asset_file where \"path\" like '${media_path_prefix}%'
+                union all select \"profileImagePath\" from \"user\" where coalesce(\"profileImagePath\",'') like '${media_path_prefix}%'
+                union all select \"thumbnailPath\" from person where coalesce(\"thumbnailPath\",'') like '${media_path_prefix}%'
+            ) s limit 1
+        );
+    " | grep -q t
+}
+
+migrate_database_media_paths() {
+    # Check and migrate legacy media paths
+    for from_path in \
+        "/var/snap/immich-distribution/common/data" \
+        "/usr/src/app/upload" \
+        "/data" \
+        "upload"
+    do
+        if check_database_migration_needed "$from_path"; then
+            echo "Migrating media paths from $from_path to $IMMICH_MEDIA_LOCATION"
+            printf '%s\n%s\ny\n' "$from_path" "$IMMICH_MEDIA_LOCATION" \
+                | $SNAP/bin/immich-admin change-media-location || true
+        fi
+    done
+}
+
 # Check if this is a bootstrap run (wait for server and create API key once)
 if [[ "${1:-}" == "bootstrap" ]]; then
     echo "Bootstrap: Waiting for Immich server to be ready..."
@@ -43,6 +75,8 @@ if [[ "${1:-}" == "bootstrap" ]]; then
         if immich_server_ready; then
             echo "Bootstrap: Creating admin API key..."
             create_api_key
+            echo "Bootstrap: Checking for media path migration..."
+            migrate_database_media_paths
             exit 0
         fi
         echo "Bootstrap: Waiting for server... (attempt $i/120)"
