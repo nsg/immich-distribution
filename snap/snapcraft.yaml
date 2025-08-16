@@ -187,6 +187,7 @@ parts:
       patch -p0 < $CRAFT_STAGE/pg_dumpall-path.path
       git apply -p1 $CRAFT_STAGE/commands__create-admin-api-key.command.ts.patch
       git apply -p1 $CRAFT_STAGE/commands__index.ts.patch
+      git apply -p1 $CRAFT_STAGE/commands__media-location.command.ts.patch
       git apply -p1 $CRAFT_STAGE/services__cli.service.ts.patch
       git apply -p1 $CRAFT_STAGE/services__notification-admin.service.ts.patch
       
