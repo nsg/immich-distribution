@@ -7,16 +7,22 @@ set -eu -o pipefail
 send_system_notification() {
     local title="$1"
     local description="$2"
+    local use_cache="${3:-true}"
     
-    local notification_hash=$(echo -n "$title$description" | sha256sum | cut -d' ' -f1)
-    local sent_hash=$(snapctl get sent-notification-hash)
-    
-    if [ "$sent_hash" = "$notification_hash" ]; then
-        return 0
+    if [ "$use_cache" = "true" ]; then
+        local notification_hash=$(echo -n "$title$description" | sha256sum | cut -d' ' -f1)
+        local sent_hash=$(snapctl get sent-notification-hash)
+        
+        if [ "$sent_hash" = "$notification_hash" ]; then
+            return 0
+        fi
     fi
     
     if $SNAP/bin/notification -t "$title" -T "SystemMessage" -l "info" -D "$description"; then
-        snapctl set sent-notification-hash="$notification_hash"
+        if [ "$use_cache" = "true" ]; then
+            local notification_hash=$(echo -n "$title$description" | sha256sum | cut -d' ' -f1)
+            snapctl set sent-notification-hash="$notification_hash"
+        fi
         return 0
     else
         echo "Failed to send system notification: $title" >&2
@@ -34,7 +40,61 @@ create_api_key() {
     fi
 }
 
-# Check if this is a bootstrap run (wait for server and create API key once)
+check_database_migration_needed() {
+    local media_path_prefix="$1"
+    query_db -Atq <<< "
+        select exists (
+            select 1 from (
+                select \"originalPath\" as p from asset where \"originalPath\" like '${media_path_prefix}%'
+                union all select \"sidecarPath\" from asset where coalesce(\"sidecarPath\",'') like '${media_path_prefix}%'
+                union all select \"encodedVideoPath\" from asset where coalesce(\"encodedVideoPath\",'') like '${media_path_prefix}%'
+                union all select \"path\" from asset_file where \"path\" like '${media_path_prefix}%'
+                union all select \"profileImagePath\" from \"user\" where coalesce(\"profileImagePath\",'') like '${media_path_prefix}%'
+                union all select \"thumbnailPath\" from person where coalesce(\"thumbnailPath\",'') like '${media_path_prefix}%'
+            ) s limit 1
+        );
+    " | grep -q t
+}
+
+migrate_database_media_paths() {
+    local current_media_location="$IMMICH_MEDIA_LOCATION"
+    local migration_performed=false
+    
+    for from_path in \
+        "/var/snap/immich-distribution/common/data" \
+        "/usr/src/app/upload" \
+        "/data" \
+        "upload"
+    do
+        if [ "$from_path" = "$current_media_location" ]; then
+            continue
+        fi
+        
+        if check_database_migration_needed "$from_path"; then
+            echo "Legacy media paths detected: $from_path"
+            echo "Automatically migrating database paths from $from_path to $current_media_location"
+            
+            if $SNAP/bin/immich-admin change-media-location --from "$from_path" --to "$current_media_location"; then
+                echo "Successfully migrated database paths from $from_path to $current_media_location"
+                migration_performed=true
+            else
+                echo "Failed to migrate database paths from $from_path to $current_media_location" >&2
+                send_system_notification \
+                    "Automatic Media Path Migration Failed" \
+                    "Failed to migrate from $from_path to $current_media_location. Manual intervention may be required. See: https://immich-distribution.nsg.cc/configuration/change-media-location/" \
+                    "false"
+            fi
+        fi
+    done
+    
+    if [ "$migration_performed" = "true" ]; then
+        send_system_notification \
+            "Media Path Migration Complete" \
+            "Database paths have been automatically updated to match the current media location: $current_media_location" \
+            "false"
+    fi
+}
+
 if [[ "${1:-}" == "bootstrap" ]]; then
     echo "Bootstrap: Waiting for Immich server to be ready..."
     
@@ -43,6 +103,8 @@ if [[ "${1:-}" == "bootstrap" ]]; then
         if immich_server_ready; then
             echo "Bootstrap: Creating admin API key..."
             create_api_key
+            echo "Bootstrap: Checking for media path migration..."
+            migrate_database_media_paths
             exit 0
         fi
         echo "Bootstrap: Waiting for server... (attempt $i/120)"
@@ -53,13 +115,10 @@ if [[ "${1:-}" == "bootstrap" ]]; then
     exit 1
 fi
 
-# Check API key twice a day (at 06 and 18), the minute depends on the timer.
-# I regularly check this in case the user deletes the API key. This key will
-# be critical for the operation of the snap.
+# Check API key twice daily (06:00 and 18:00) - critical for snap operation
 CURRENT_HOUR=$(date +%H)
 if [[ "$CURRENT_HOUR" == "06" || "$CURRENT_HOUR" == "18" ]]; then
     create_api_key
 fi
 
-# Send a system notifications to the user
 send_system_notification "$NOTIFICATION_TITLE" "$NOTIFICATION_DESCRIPTION"

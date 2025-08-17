@@ -15,6 +15,7 @@ nav:
       - External Library: configuration/library/external.md
       - How To: configuration/library/howto.md
     - configuration/backup-restore.md
+    - Change Media Location: configuration/change-media-location.md
     - configuration/postgres.md
     - configuration/haproxy.md
     - configuration/sync.md
