@@ -112,7 +112,7 @@ incus-setup:
 	incus exec $(INCUS_FULL_INSTANCE) -- sudo snap install lxd
 	incus exec $(INCUS_FULL_INSTANCE) -- sudo lxd init --auto
 
-incus-%:
+incus-build:
 	@if [ "$(INCUS_REMOTE)" = "local" ]; then \
 		incus exec $(INCUS_FULL_INSTANCE) -- bash -c 'cd /build && make $*'; \
 	else \
@@ -124,6 +124,9 @@ incus-%:
 		tar $$EXCLUDES -cf - . | incus exec $(INCUS_FULL_INSTANCE) -- bash -c 'rm -rf /build && mkdir -p /build && tar -xf - -C /build'; \
 		incus exec $(INCUS_FULL_INSTANCE) -- bash -c 'cd /build && make $*'; \
 	fi
+
+incus-%:
+	incus exec $(INCUS_FULL_INSTANCE) -- bash -c 'cd /build && make $*'
 
 .PHONY: incus-install-artifact
 incus-install-artifact:
