@@ -266,8 +266,10 @@ parts:
       - node/20/stable
     stage-packages:
       - nsg-redis
-      - nsg-postgres
       - nsg-libvips
+      - nsg-postgres
+      - nsg-pgvector
+      - nsg-vectorchord
     after:
       - jellyfin-ffmpeg
       - parts-server-patches
