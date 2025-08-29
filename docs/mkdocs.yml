@@ -4,7 +4,9 @@ edit_uri: edit/master/docs/docs/
 nav:
   - About: about.md
   - News: [news/index.md]
-  - Installation: install.md
+  - Installation:
+    - install.md
+    - install/upgrade-from-old-releases.md
   - Configuration:
     - Introduction: configuration/index.md
     - configuration/security.md
