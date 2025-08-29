@@ -5,6 +5,9 @@ LXD_NAME = $(shell lxc list --project snapcraft snapcraft-immich-distribution -c
 INCUS_INSTANCE ?= idt
 INCUS_REMOTE ?= local
 INCUS_FULL_INSTANCE := $(INCUS_REMOTE):$(INCUS_INSTANCE)
+INCUS_PROFILES ?= default
+INCUS_PROFILE_FLAGS := $(foreach p,$(INCUS_PROFILES),-p $(p))
+INCUS_CLUSTER_MEMBER ?= $(INCUS_REMOTE)
 
 all: build install
 	:
@@ -76,13 +79,30 @@ docs:
 # Prefix a make target with "incus-" to run it inside the VM.
 #
 # Variables controlling Incus targets:
-#   INCUS_INSTANCE  (default: idt)
-#   INCUS_REMOTE    (default: local)
+#   INCUS_INSTANCE   (default: idt)
+#   INCUS_REMOTE     (default: local)
+#   INCUS_PROFILES   (default: default) space separated list applied at init
+#   INCUS_CLUSTER_MEMBER (default: INCUS_REMOTE) if set and remote is a cluster, pins instance with --target
 
 .PHONY: incus-setup
 incus-setup:
-	incus init images:ubuntu/24.04 $(INCUS_FULL_INSTANCE) --vm -c limits.memory=6GiB -d root,size=30GiB
-	incus config device add $(INCUS_FULL_INSTANCE) build disk source=${PWD} path=/build
+	@cluster_flag=""; \
+	if incus cluster list $(INCUS_REMOTE): >/dev/null 2>&1; then \
+		if [ -n "$(INCUS_CLUSTER_MEMBER)" ]; then \
+			cluster_flag="--target $(INCUS_CLUSTER_MEMBER)"; \
+			printf 'Cluster detected; using target %s\n' "$(INCUS_CLUSTER_MEMBER)"; \
+		else \
+			printf 'Cluster detected; no INCUS_CLUSTER_MEMBER specified.\n'; \
+		fi; \
+	else \
+		printf 'No cluster detected for remote %s.\n' "$(INCUS_REMOTE)"; \
+	fi; \
+	incus init images:ubuntu/24.04 $(INCUS_FULL_INSTANCE) --vm $(INCUS_PROFILE_FLAGS) $$cluster_flag -c limits.memory=6GiB -d root,size=30GiB
+	@if [ "$(INCUS_REMOTE)" = "local" ]; then \
+		incus config device add $(INCUS_FULL_INSTANCE) build disk source=${PWD} path=/build; \
+	else \
+		echo "Skipping host build disk attach on remote $(INCUS_REMOTE)"; \
+	fi
 	incus start $(INCUS_FULL_INSTANCE)
 	sleep 30 # wait for the VM to boot
 	incus exec $(INCUS_FULL_INSTANCE) -- sudo apt update
