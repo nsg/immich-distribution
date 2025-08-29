@@ -113,7 +113,17 @@ incus-setup:
 	incus exec $(INCUS_FULL_INSTANCE) -- sudo lxd init --auto
 
 incus-%:
-	incus exec $(INCUS_FULL_INSTANCE) -- bash -c 'cd /build && make $*'
+	@if [ "$(INCUS_REMOTE)" = "local" ]; then \
+		incus exec $(INCUS_FULL_INSTANCE) -- bash -c 'cd /build && make $*'; \
+	else \
+		echo "Syncing sources to remote $(INCUS_FULL_INSTANCE) ..."; \
+		EXCLUDES="--exclude=.git"; \
+		if [ -f .gitignore ]; then \
+			EXCLUDES="$$EXCLUDES $$(grep -Ev '^(#|$|!)' .gitignore | sed -E 's#^/+##; s#^#--exclude=#' | tr '\n' ' ')"; \
+		fi; \
+		tar $$EXCLUDES -cf - . | incus exec $(INCUS_FULL_INSTANCE) -- bash -c 'rm -rf /build && mkdir -p /build && tar -xf - -C /build'; \
+		incus exec $(INCUS_FULL_INSTANCE) -- bash -c 'cd /build && make $*'; \
+	fi
 
 .PHONY: incus-install-artifact
 incus-install-artifact:
