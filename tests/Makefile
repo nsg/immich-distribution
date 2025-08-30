@@ -30,6 +30,9 @@ test-sync: test-assets wait
 test-cli: wait
 	./test_cli.sh
 
+test-vectorchord: wait
+	./test_vectorchord.sh
+
 test_prep_%: ${PYTEST} ${PYTEST_LOCALTEST_DEPENDENCIES}
 	${PYTEST} tests_prep.py --server=127.0.0.1 --port=4444 --headed -k $* --html=report/index.html
 

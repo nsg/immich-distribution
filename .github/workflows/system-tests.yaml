@@ -378,6 +378,61 @@ jobs:
       - name: TEST | Run CLI Tests
         run: make test-cli -C tests
 
+  vectorchord:
+    name: Test VectorChord - ${{ matrix.backup-type }}
+    runs-on: ubuntu-latest
+
+    needs: [prep-backup, upgrade]
+
+    strategy:
+      matrix:
+        include:
+          - backup-type: "development"
+            backup-artifact: "backups"
+          - backup-type: "upgraded"
+            backup-artifact: "backups-upgraded"
+
+    services:
+      selenium:
+        image: selenium/standalone-chrome:latest
+        options: --shm-size=2gb
+        ports:
+          - 4444:4444
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download snap artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: development-snap-package
+
+      - name: TEST | Install package
+        run: |
+          sudo snap install --dangerous *.snap
+
+      - name: Download backups artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ matrix.backup-artifact }}
+
+      - name: Wait Immich Distribution to start
+        run: make wait -C tests
+
+      - name: Restore database
+        run: |
+          sudo cp -rv ./backups/immich_database_*.sql.xz /var/snap/immich-distribution/common/backups
+          sudo immich-distribution.restore -y -d /var/snap/immich-distribution/common/backups/immich_database_*.sql.xz
+
+      - name: Restore assets
+        run: |
+          sudo cp -rv ./backups/immich_assets_*.tar.xz /var/snap/immich-distribution/common/backups
+          sudo immich-distribution.restore -y -a /var/snap/immich-distribution/common/backups/immich_assets_*.tar.xz
+
+      - name: TEST | Run VectorChord Tests
+        run: make test-vectorchord -C tests
+
   certificate-management:
     name: Test Manual Certificate Management
     runs-on: ubuntu-latest
