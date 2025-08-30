@@ -153,6 +153,9 @@ jobs:
       - name: Wait Immich Distribution to start
         run: make wait -C tests
 
+      - name: TEST | Verify pre-upgrade VectorChord state
+        run: make test-vectorchord-pre-upgrade -C tests
+
       - name: Restore database
         run: |
           sudo cp -rv ./backups/immich_database_*.sql.xz /var/snap/immich-distribution/common/backups
@@ -175,6 +178,15 @@ jobs:
 
       - name: Wait Immich Distribution to restart after upgrade
         run: make wait -C tests
+
+      - name: TEST | Run VectorChord Tests
+        run: make test-vectorchord -C tests
+
+      - name: Print journal on VectorChord test failure
+        if: failure()
+        run: |
+          echo "Test failed. Printing journal logs..."
+          sudo journalctl -u snap.immich-distribution.* --no-pager -n 500
 
       - name: Backup database and assets after upgrade
         run: |
@@ -274,6 +286,20 @@ jobs:
 
       - name: TEST | Run Selenium Tests
         run: make test-selenium -C tests
+
+      - name: Backup database and assets after selenium tests
+        run: |
+          sudo immich-distribution.backup -a -d
+          rm -rf ./backups
+          cp -rv /var/snap/immich-distribution/common/backups .
+
+      - name: Upload assets test state
+        uses: actions/upload-artifact@v4
+        with:
+          name: assets-test-state-${{ matrix.backup-type }}
+          path: |
+            backups
+            tests/secret.txt
 
   sync:
     name: Test Sync Service - ${{ matrix.backup-type }}
