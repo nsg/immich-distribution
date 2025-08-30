@@ -51,10 +51,10 @@ def on_page_content(html, page, config, files):
         "{{snapstore_versions}}": lambda data: _build_versions_table(data),
         "{{snapstore_revision}}": lambda data: str(_latest_stable_revision(data)),
         "{{snapstore_version}}": lambda data: _latest_stable_version(data),
-        "{{snapstore_revision_old}}": lambda data: str(int(_latest_stable_revision(data)) - 10) if _latest_stable_revision(data) else "",
-        "{{snapstore_revision_oldish}}": lambda data: str(int(_latest_stable_revision(data)) - 7) if _latest_stable_revision(data) else "",
-        "{{snapstore_revision_newish}}": lambda data: str(int(_latest_stable_revision(data)) - 3) if _latest_stable_revision(data) else "",
-        "{{snapstore_revision_block}}": lambda data: str(int(_latest_stable_revision(data)) - 5) if _latest_stable_revision(data) else "",
+        "{{snapstore_revision_old}}": lambda data: (lambda rev: str(int(rev) - 10) if rev else "")(_latest_stable_revision(data)),
+        "{{snapstore_revision_oldish}}": lambda data: (lambda rev: str(int(rev) - 7) if rev else "")(_latest_stable_revision(data)),
+        "{{snapstore_revision_newish}}": lambda data: (lambda rev: str(int(rev) - 3) if rev else "")(_latest_stable_revision(data)),
+        "{{snapstore_revision_block}}": lambda data: (lambda rev: str(int(rev) - 5) if rev else "")(_latest_stable_revision(data)),
     }
     needed = [m for m in macros if m in html]
     if not needed:
