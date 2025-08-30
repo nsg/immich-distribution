@@ -43,6 +43,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: development-snap-package
+          retention-days: 7
           if-no-files-found: error
           path: "*.snap"
 
@@ -84,6 +85,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: backups
+          retention-days: 1
           path: |
             backups
             tests/secret.txt
@@ -121,6 +123,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: backups-store
+          retention-days: 1
           path: |
             backups
             tests/secret.txt
@@ -198,6 +201,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: backups-upgraded
+          retention-days: 1
           path: |
             backups
             tests/secret.txt
@@ -297,6 +301,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: assets-test-state-${{ matrix.backup-type }}
+          retention-days: 1
           path: |
             backups
             tests/secret.txt
