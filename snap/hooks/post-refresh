@@ -10,7 +10,7 @@ PREV_REV="$(snapctl get previous.revision || true)"
 if [ -n "$PREV_REV" ] && [ -n "$SNAP_REVISION" ]; then
 	if [ "$PREV_REV" -gt 0 ] 2>/dev/null; then
 		DIFF=$((SNAP_REVISION - PREV_REV))
-		if [ "$DIFF" -gt 5 ]; then
+		if [ "$DIFF" -gt 3 ]; then
 			echo "ERROR: Update spans $DIFF revisions (from $PREV_REV to $SNAP_REVISION)." >&2
 			echo "This large jump is unsupported. See: https://immich-distribution.nsg.cc/install/upgrade-from-old-releases" >&2
 			exit 1

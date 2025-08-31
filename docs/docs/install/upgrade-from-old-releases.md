@@ -29,4 +29,4 @@ sudo snap refresh immich-distribution --revision=1234
     If you try to upgrade directly from revision **{{snapstore_revision_block}}** or older to **{{snapstore_revision}}**, updates will be blocked.
 
 !!! note
-    The block functionality was implemented in revision **227**, but everything else here is still true. If you have disabled automatic updates, please do not upgrade to many revisions at once.
+    The block functionality was implemented in revision **228**, but everything else here is still true. If you have disabled automatic updates, please do not upgrade to many revisions at once.
