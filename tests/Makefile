@@ -36,6 +36,9 @@ test-vectorchord: wait
 test-vectorchord-pre-upgrade: wait
 	./test_vectorchord_pre_upgrade.sh
 
+test-upgrade-blocking: wait
+	./test_upgrade_blocking.sh
+
 test_prep_%: ${PYTEST} ${PYTEST_LOCALTEST_DEPENDENCIES}
 	${PYTEST} tests_prep.py --server=127.0.0.1 --port=4444 --headed -k $* --html=report/index.html
 
