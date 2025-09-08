@@ -17,8 +17,8 @@ This automatic migration will move your Immich instance from the deprecated pgve
 The migration follows a phased approach to ensure stability:
 
 - **Revision 228+**: VectorChord migration begins rolling out
-- **Revision 232+**: Remove pgvecto.rs from the image ([#326](https://github.com/nsg/immich-distribution/issues/326))
-- **Revision 237+**: Clean up old pgvecto.rs database schema ([#327](https://github.com/nsg/immich-distribution/issues/327))
+- **Revision 236+**: Remove pgvecto.rs from the image ([#326](https://github.com/nsg/immich-distribution/issues/326))
+- **Revision 145+**: Clean up old pgvecto.rs database schema ([#327](https://github.com/nsg/immich-distribution/issues/327))
 
 For more details about this migration, see the [earlier announcement](01-notifications-announcement.md).
 
