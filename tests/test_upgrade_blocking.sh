@@ -45,43 +45,6 @@ get_current_stable_revision() {
     exit 1
 }
 
-# Function to check if a revision exists in the store
-check_revision_exists() {
-    local target_revision="$1"
-    local response
-    local retries=3
-    local retry=0
-    
-    while [ $retry -lt $retries ]; do
-        response=$(curl -s -H "Snap-Device-Series: 16" \
-            "https://api.snapcraft.io/v2/snaps/info/immich-distribution")
-        
-        if [ $? -eq 0 ] && [ -n "$response" ]; then
-            # Check if the revision exists
-            found=$(echo "$response" | jq -r --arg target "$target_revision" '
-                .["channel-map"][]? | 
-                select(.revision == ($target | tonumber)) | 
-                .revision
-            ' 2>/dev/null | head -1)
-            
-            if [ -n "$found" ] && [ "$found" != "null" ]; then
-                echo "1"
-                return 0
-            else
-                echo "0"
-                return 0
-            fi
-        fi
-        
-        retry=$((retry + 1))
-        echo "Retry $retry/$retries: Failed to check revision existence, retrying..." >&2
-        sleep 2
-    done
-    
-    echo "ERROR: Failed to check revision existence after $retries attempts" >&2
-    return 1
-}
-
 # Helper function to remove and install a specific revision
 install_revision() {
     local revision="$1"
@@ -201,41 +164,16 @@ main() {
         exit 1
     fi
     
-    # Check if target revisions exist in the store
+    # Calculate target revisions
     target_revision_cr_minus_5=$((current_stable_revision - 5))
     target_revision_cr_minus_3=$((current_stable_revision - 3))
     
-    echo "Checking if revision $target_revision_cr_minus_5 exists in store..."
-    if [ "$(check_revision_exists "$target_revision_cr_minus_5")" != "1" ]; then
-        echo "WARNING: Revision $target_revision_cr_minus_5 not found in store, skipping large jump test" >&2
-        run_large_jump_test=false
-    else
-        echo "✓ Revision $target_revision_cr_minus_5 found"
-        run_large_jump_test=true
-    fi
-    
-    echo "Checking if revision $target_revision_cr_minus_3 exists in store..."
-    if [ "$(check_revision_exists "$target_revision_cr_minus_3")" != "1" ]; then
-        echo "WARNING: Revision $target_revision_cr_minus_3 not found in store, skipping small jump test" >&2
-        run_small_jump_test=false
-    else
-        echo "✓ Revision $target_revision_cr_minus_3 found"
-        run_small_jump_test=true
-    fi
-    
-    if [ "$run_large_jump_test" = false ] && [ "$run_small_jump_test" = false ]; then
-        echo "ERROR: No target revisions available for testing" >&2
-        exit 1
-    fi
+    echo "Will test upgrade blocking from revision $target_revision_cr_minus_5 to $current_stable_revision (5 revision jump)"
+    echo "Will test upgrade allowing from revision $target_revision_cr_minus_3 to $current_stable_revision (3 revision jump)"
     
     # Run tests
-    if [ "$run_large_jump_test" = true ]; then
-        test_upgrade_blocking_large_jump "$current_stable_revision" "$target_revision_cr_minus_5"
-    fi
-    
-    if [ "$run_small_jump_test" = true ]; then
-        test_upgrade_allowing_small_jump "$current_stable_revision" "$target_revision_cr_minus_3"
-    fi
+    test_upgrade_blocking_large_jump "$current_stable_revision" "$target_revision_cr_minus_5"
+    test_upgrade_allowing_small_jump "$current_stable_revision" "$target_revision_cr_minus_3"
 }
 
 # Check if we're being sourced or executed
