@@ -67,7 +67,7 @@ attempt_upgrade() {
     echo "Attempting upgrade to revision $target_revision..."
     
     set +e  # Don't exit on error
-    sudo snap refresh immich-distribution --revision="$target_revision" 2>&1 | tee upgrade_output.log
+    sudo snap refresh immich-distribution --revision="$target_revision" > upgrade_output.log 2>&1
     local upgrade_result=$?
     set -e
     
