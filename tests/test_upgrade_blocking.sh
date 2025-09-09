@@ -12,8 +12,8 @@ set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# Function to get current stable revision from snap store
-get_current_stable_revision() {
+# Function to get current edge revision from snap store
+get_current_edge_revision() {
     local response
     local retries=3
     local retry=0
@@ -23,10 +23,10 @@ get_current_stable_revision() {
             "https://api.snapcraft.io/v2/snaps/info/immich-distribution")
         
         if [ $? -eq 0 ] && [ -n "$response" ]; then
-            # Extract the latest stable revision
+            # Extract the latest edge revision
             latest_rev=$(echo "$response" | jq -r '
                 .["channel-map"][]? | 
-                select(.channel.name == "latest/stable" or .channel.name == "stable") | 
+                select(.channel.name == "latest/edge" or .channel.name == "edge") | 
                 .revision | tonumber
             ' 2>/dev/null | sort -n | tail -1)
             
@@ -148,32 +148,32 @@ test_upgrade_allowing_small_jump() {
 
 # Main test execution
 main() {
-    echo "Getting current stable revision from snap store..."
-    current_stable_revision=$(get_current_stable_revision)
+    echo "Getting current edge revision from snap store..."
+    current_edge_revision=$(get_current_edge_revision)
     
-    if [ -z "$current_stable_revision" ] || [ "$current_stable_revision" = "0" ]; then
-        echo "ERROR: Could not determine current stable revision" >&2
+    if [ -z "$current_edge_revision" ] || [ "$current_edge_revision" = "0" ]; then
+        echo "ERROR: Could not determine current edge revision" >&2
         exit 1
     fi
     
-    echo "Current stable revision: $current_stable_revision"
+    echo "Current edge revision: $current_edge_revision"
     
     # Check if we have enough revisions for testing
-    if [ "$current_stable_revision" -lt 6 ]; then
-        echo "ERROR: Current stable revision ($current_stable_revision) is too low for testing" >&2
+    if [ "$current_edge_revision" -lt 6 ]; then
+        echo "ERROR: Current edge revision ($current_edge_revision) is too low for testing" >&2
         exit 1
     fi
     
     # Calculate target revisions
-    target_revision_cr_minus_5=$((current_stable_revision - 5))
-    target_revision_cr_minus_3=$((current_stable_revision - 3))
+    target_revision_cr_minus_5=$((current_edge_revision - 5))
+    target_revision_cr_minus_3=$((current_edge_revision - 3))
     
-    echo "Will test upgrade blocking from revision $target_revision_cr_minus_5 to $current_stable_revision (5 revision jump)"
-    echo "Will test upgrade allowing from revision $target_revision_cr_minus_3 to $current_stable_revision (3 revision jump)"
+    echo "Will test upgrade blocking from revision $target_revision_cr_minus_5 to $current_edge_revision (5 revision jump)"
+    echo "Will test upgrade allowing from revision $target_revision_cr_minus_3 to $current_edge_revision (3 revision jump)"
     
     # Run tests
-    test_upgrade_blocking_large_jump "$current_stable_revision" "$target_revision_cr_minus_5"
-    test_upgrade_allowing_small_jump "$current_stable_revision" "$target_revision_cr_minus_3"
+    test_upgrade_blocking_large_jump "$current_edge_revision" "$target_revision_cr_minus_5"
+    test_upgrade_allowing_small_jump "$current_edge_revision" "$target_revision_cr_minus_3"
 }
 
 # Check if we're being sourced or executed
