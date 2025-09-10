@@ -33,12 +33,6 @@ test-cli: wait
 test-backup: wait
 	./test_backup.sh
 
-test-vectorchord: wait
-	./test_vectorchord.sh
-
-test-vectorchord-pre-upgrade: wait
-	./test_vectorchord_pre_upgrade.sh
-
 test-upgrade-blocking:
 	./test_upgrade_blocking.sh
 

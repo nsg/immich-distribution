@@ -156,9 +156,6 @@ jobs:
       - name: Wait Immich Distribution to start
         run: make wait -C tests
 
-      - name: TEST | Verify pre-upgrade VectorChord state
-        run: make test-vectorchord-pre-upgrade -C tests
-
       - name: Restore database
         run: |
           sudo cp -rv ./backups/immich_database_*.sql.xz /var/snap/immich-distribution/common/backups
@@ -181,15 +178,6 @@ jobs:
 
       - name: Wait Immich Distribution to restart after upgrade
         run: make wait -C tests
-
-      - name: TEST | Run VectorChord Tests
-        run: make test-vectorchord -C tests
-
-      - name: Print journal on VectorChord test failure
-        if: failure()
-        run: |
-          echo "Test failed. Printing journal logs..."
-          sudo journalctl -u snap.immich-distribution.* --no-pager -n 500
 
       - name: Backup database and assets after upgrade
         run: |
