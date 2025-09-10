@@ -237,6 +237,51 @@ jobs:
       - name: TEST | Run Selenium Tests
         run: make test-selenium -C tests
 
+  backup:
+    name: Built-in Immich Backup Functionality Tests
+    runs-on: ubuntu-latest
+
+    needs: prep-backup
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download snap artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: development-snap-package
+
+      - name: TEST | Install package
+        run: sudo snap install --dangerous *.snap
+
+      - name: Download backups artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: backups
+
+      - name: Wait Immich Distribution to start
+        run: make wait -C tests
+
+      - name: Restore database
+        run: |
+          sudo cp -rv ./backups/immich_database_*.sql.xz /var/snap/immich-distribution/common/backups
+          sudo immich-distribution.restore -y -d /var/snap/immich-distribution/common/backups/immich_database_*.sql.xz
+
+      - name: Restore assets
+        run: |
+          sudo cp -rv ./backups/immich_assets_*.tar.xz /var/snap/immich-distribution/common/backups
+          sudo immich-distribution.restore -y -a /var/snap/immich-distribution/common/backups/immich_assets_*.tar.xz
+
+      - name: TEST | Run Backup Tests
+        run: make test-backup -C tests
+
+      - name: Print journal on backup test failure
+        if: failure()
+        run: |
+          echo "Backup test failed. Printing journal logs..."
+          sudo journalctl -u snap.immich-distribution.* --no-pager -n 500
+
   assets:
     name: Test Assets - ${{ matrix.backup-type }}
     runs-on: ubuntu-latest

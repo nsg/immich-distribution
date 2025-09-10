@@ -30,6 +30,9 @@ test-sync: test-assets wait
 test-cli: wait
 	./test_cli.sh
 
+test-backup: wait
+	./test_backup.sh
+
 test-vectorchord: wait
 	./test_vectorchord.sh
 
