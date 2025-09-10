@@ -11,8 +11,14 @@ if [ -z "$SNAP" ]; then
     fi
 fi
 
-. $SNAP/bin/load-env
+if [ -z "$SNAP_COMMON" ]; then
+    export SNAP_COMMON="/var/snap/immich-distribution/common"
+fi
 
+export LD_LIBRARY_PATH="$SNAP/usr/local/pgsql/lib:$LD_LIBRARY_PATH"
+export PATH="$SNAP/usr/local/bin:$PATH"
 export PGDATA="$SNAP_COMMON/pgsql/data"
+export LC_ALL="C"
+export LC_CTYPE="C"
 
 exec $SNAP/usr/local/pgsql/bin/pg_dumpall $@
