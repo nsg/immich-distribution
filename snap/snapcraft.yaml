@@ -178,9 +178,16 @@ parts:
     plugin: nil
     source: https://github.com/immich-app/immich.git
     source-tag: v1.139.4
+    build-environment:
+      - SHARP_FORCE_GLOBAL_LIBVIPS: "true"
+      - COREPACK_ENABLE_DOWNLOAD_PROMPT: "0"
+      - CI: "1"
     override-build: |
       craftctl default
       
+      npm install --global corepack@latest
+      corepack enable pnpm
+
       cd server
 
       # Apply patches
@@ -190,49 +197,21 @@ parts:
       git apply -p1 $CRAFT_STAGE/commands__media-location.command.ts.patch
       git apply -p1 $CRAFT_STAGE/services__cli.service.ts.patch
       git apply -p1 $CRAFT_STAGE/services__notification-admin.service.ts.patch
-      
-
-      SHARP_VERSION=0.34.2
-      NODE_ADDON_API_VERSION=8.3.1
-      NODE_GYP_VERSION=11.2.0
-
-      if [[ "$(node -p "require('./package.json').dependencies.sharp")" == "^$SHARP_VERSION" ]]; then
-        echo "Sharp version is correct"
-      else
-        echo "Sharp version is incorrect"
-        exit 1
-      fi
-
-      # needed for sharp to build from source
-      npm install --save node-addon-api@$NODE_ADDON_API_VERSION
-      npm install --save node-gyp@$NODE_GYP_VERSION
-
-      # Now build the Immich server
-      npm ci
-      npm run build
-      npm prune --omit=dev #--omit=optional
-
-      # Verify that sharp thinks it should use the global libvips
-      (
-        cd node_modules/sharp/src
-        if [[ "$(node -p "Boolean(require('../lib/libvips').useGlobalLibvips()).toString()")" != "true" ]]; then
-          echo "Error Sharp useGlobalLibvips returned false. Global libvips is not used."
-          exit 1
-        fi
-      )
-
-      # Verify that sharp was built from source, and that the binary is still present (after ci & prune)
-      if [[ ! -e node_modules/sharp/src/build/Release/sharp-linux-x64.node ]]; then
-        echo "Sharp was not built from source, missing sharp-linux-x64.node"
-        exit 1
-      fi
 
       mkdir -p ${CRAFT_PART_INSTALL}/usr/src/app
-      cp -r node_modules ${CRAFT_PART_INSTALL}/usr/src/app
-      cp -r dist ${CRAFT_PART_INSTALL}/usr/src/app
-      cp -r bin ${CRAFT_PART_INSTALL}/usr/src/app
-      cp -r resources ${CRAFT_PART_INSTALL}/usr/src/app
-      cp package.json package-lock.json ${CRAFT_PART_INSTALL}/usr/src/app
+
+      pnpm --filter immich --frozen-lockfile build
+      pnpm --filter immich --frozen-lockfile --prod --no-optional deploy ${CRAFT_PART_INSTALL}/usr/src/app
+
+      rm -rf ${CRAFT_PART_INSTALL}/usr/src/app/.nvmrc
+      rm -rf ${CRAFT_PART_INSTALL}/usr/src/app/.prettierignore
+      rm -rf ${CRAFT_PART_INSTALL}/usr/src/app/.prettierrc
+      rm -rf ${CRAFT_PART_INSTALL}/usr/src/app/Dockerfile
+      rm -rf ${CRAFT_PART_INSTALL}/usr/src/app/nest-cli.json
+      rm -rf ${CRAFT_PART_INSTALL}/usr/src/app/package.json
+      rm -rf ${CRAFT_PART_INSTALL}/usr/src/app/pnpm-lock.yaml
+      rm -rf ${CRAFT_PART_INSTALL}/usr/src/app/test
+      rm -rf ${CRAFT_PART_INSTALL}/usr/src/app/bin
 
     build-packages:
       - git
@@ -288,16 +267,18 @@ parts:
     plugin: nil
     source: https://github.com/immich-app/immich.git
     source-tag: v1.139.4
+    build-environment:
+      - COREPACK_ENABLE_DOWNLOAD_PROMPT: "0"
+      - CI: "1"
     override-build: |
-      # Build typescript-sdk, this is included by cli and web
-      cd open-api/typescript-sdk
-      npm ci
-      npm run build
 
-      # Build Immich Web
-      cd ../../web
-      npm ci
-      npm run build
+      npm install --global corepack@latest
+      corepack enable pnpm
+
+      cd web
+
+      pnpm --filter @immich/sdk --filter immich-web --frozen-lockfile --force install
+      pnpm --filter @immich/sdk --filter immich-web build
 
       # Install the resulting web application
       mkdir -p ${CRAFT_PART_INSTALL}/var/lib/immich/build
