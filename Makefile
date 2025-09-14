@@ -97,7 +97,7 @@ incus-setup:
 	else \
 		printf 'No cluster detected for remote %s.\n' "$(INCUS_REMOTE)"; \
 	fi; \
-	incus init images:ubuntu/24.04 $(INCUS_FULL_INSTANCE) --vm $(INCUS_PROFILE_FLAGS) $$cluster_flag -c limits.memory=6GiB -d root,size=30GiB
+	incus init images:ubuntu/24.04 $(INCUS_FULL_INSTANCE) --vm $(INCUS_PROFILE_FLAGS) $$cluster_flag -c limits.memory=6GiB -d root,size=60GiB
 	@if [ "$(INCUS_REMOTE)" = "local" ]; then \
 		incus config device add $(INCUS_FULL_INSTANCE) build disk source=${PWD} path=/build; \
 	else \
@@ -112,9 +112,12 @@ incus-setup:
 	incus exec $(INCUS_FULL_INSTANCE) -- sudo snap install lxd
 	incus exec $(INCUS_FULL_INSTANCE) -- sudo lxd init --auto
 
-incus-build:
+incus-build: incus-sync
+	incus exec $(INCUS_FULL_INSTANCE) -- bash -c 'cd /build && make $*'
+
+incus-sync:
 	@if [ "$(INCUS_REMOTE)" = "local" ]; then \
-		incus exec $(INCUS_FULL_INSTANCE) -- bash -c 'cd /build && make $*'; \
+		echo "Local remote, no need to sync"; \
 	else \
 		echo "Syncing sources to remote $(INCUS_FULL_INSTANCE) ..."; \
 		EXCLUDES="--exclude=.git"; \
@@ -122,7 +125,6 @@ incus-build:
 			EXCLUDES="$$EXCLUDES $$(grep -Ev '^(#|$|!)' .gitignore | sed -E 's#^/+##; s#^#--exclude=#' | tr '\n' ' ')"; \
 		fi; \
 		tar $$EXCLUDES -cf - . | incus exec $(INCUS_FULL_INSTANCE) -- bash -c 'rm -rf /build && mkdir -p /build && tar -xf - -C /build'; \
-		incus exec $(INCUS_FULL_INSTANCE) -- bash -c 'cd /build && make $*'; \
 	fi
 
 incus-%:
