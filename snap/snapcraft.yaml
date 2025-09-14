@@ -208,7 +208,6 @@ parts:
       rm -rf ${CRAFT_PART_INSTALL}/usr/src/app/.prettierrc
       rm -rf ${CRAFT_PART_INSTALL}/usr/src/app/Dockerfile
       rm -rf ${CRAFT_PART_INSTALL}/usr/src/app/nest-cli.json
-      rm -rf ${CRAFT_PART_INSTALL}/usr/src/app/package.json
       rm -rf ${CRAFT_PART_INSTALL}/usr/src/app/pnpm-lock.yaml
       rm -rf ${CRAFT_PART_INSTALL}/usr/src/app/test
       rm -rf ${CRAFT_PART_INSTALL}/usr/src/app/bin
