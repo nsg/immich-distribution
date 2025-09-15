@@ -5,10 +5,12 @@ I use this page to track custom built deb-packages that I have built as a depend
 ## Repository
 
 ```
-deb [arch=amd64 signed-by=/etc/apt/keyrings/nsg.gpg] http://apt.nsg.cc jammy main
+deb [signed-by=/etc/apt/trusted.gpg.d/nsg.gpg] https://nsg.github.io/aptly/deb ./
 ```
 
-You find the key at `snap/keys/`, you need to dearmor it with `cat 8FA0B5E3.asc | gpg --dearmor -o /etc/apt/keyrings/nsg.gpg`
+You can import the GPG key with: `curl -Ls https://nsg.github.io/aptly/nsg.gpg | gpg --dearmor -o /etc/apt/trusted.gpg.d/nsg.gpg`
+
+For more information and available packages, visit: [https://nsg.github.io/aptly/](https://nsg.github.io/aptly/).
 
 ## Package dependency
 
@@ -23,8 +25,8 @@ end
 
 nsg-cgif --- nsg-libvips
 nsg-libraw --- nsg-imagemagick
-nsg-x256 --- nsg-imagemagick
-nsg-x256 --- nsg-libheif
+nsg-x265 --- nsg-imagemagick
+nsg-x265 --- nsg-libheif
 nsg-libde265 --- nsg-libheif
 nsg-libde265 --- nsg-imagemagick
 nsg-libheif --- nsg-imagemagick
@@ -35,21 +37,50 @@ nsg-libvips -.- sharp
 
 Immich uses sharp for image processing. Sharp uses libvips, and libvips has imagemagick as a backend and uses it as a fallback engine if it can't handle an image format directly.
 
-### Immich
+### VectorChord
+
+```mermaid
+flowchart LR
+
+subgraph Immich
+    server
+end
+
+nsg-vectorchord --- nsg-pgvector
+nsg-vectorchord --- nsg-postgres
+nsg-pgvector --- nsg-postgres
+nsg-postgres -.- server
+```
+
+### Immich Distribution
 
 ```mermaid
 flowchart TD
 
-nsg-ffmpeg --- server{{"Server"}}
-nsg-redis --- server
-nsg-postgres --- server
-nsg-libvips --- server
+subgraph Immich
+    Server
+    Web
+    machine-learning["Machine Learning"]
+end
 
-nsg-python --- machine-learning{{"Machine Learning"}}
+
+subgraph ID["Immich distribution"]
+    Immich
+    Server
+    Scripts
+    Sync
+end
+
+nsg-redis --- Server
+nsg-postgres --- Server
+nsg-libvips --- Server
+nsg-vectorchord --- Server
+
+nsg-python --- machine-learning
 nsg-mimalloc --- machine-learning
 
-nsg-haproxy --- scripts{{"Scripts"}}
-nsg-lego --- scripts
+nsg-haproxy --- Scripts
+nsg-lego --- Scripts
 
-nsg-python --- sync{{"Sync"}}
+nsg-python --- Sync
 ```
