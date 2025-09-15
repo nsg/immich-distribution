@@ -116,7 +116,26 @@ get_latest_release_for_major_minor() {
 }
 
 snapstore_version() {
-    snap info immich-distribution | awk "/^ *latest\/$1/{ print \$2 }" | cut -d'-' -f1
+    local retries=20
+    local delay=2
+    local result
+    
+    for i in $(seq 1 $retries); do
+        result=$(snap info immich-distribution 2>/dev/null | awk "/^ *latest\/$1/{ print \$2 }" | cut -d'-' -f1)
+        
+        if [ -n "$result" ] && [[ "$result" != *"error"* ]]; then
+            echo "$result"
+            return 0
+        fi
+        
+        if [ $i -lt $retries ]; then
+            echo "Attempt $i failed, retrying in $delay seconds..." >&2
+            sleep $delay
+            delay=$((delay * 2))
+        fi
+    done
+    
+    echo "$result"
 }
 
 version_to_int() {
