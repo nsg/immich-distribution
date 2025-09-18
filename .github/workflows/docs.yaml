@@ -20,6 +20,9 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
+    env:
+      SNAP_METRICS_KEY: ${{ secrets.SNAP_METRICS_KEY }}
+
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
