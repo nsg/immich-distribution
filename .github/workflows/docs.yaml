@@ -43,6 +43,10 @@ jobs:
           cd docs
           ../venv/bin/poetry install
 
+      - name: Install snapcraft
+        run: |
+          sudo snap install snapcraft --classic
+
       - name: Build site
         env:
           SNAP_METRICS_KEY: ${{ secrets.SNAP_METRICS_KEY }}
