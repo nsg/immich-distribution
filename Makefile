@@ -65,7 +65,7 @@ selenium:
 
 .PHONY: docs
 docs:
-	cd docs && poetry run mkdocs serve
+	cd docs && bash -c '[ -f .env ] && source .env; poetry run mkdocs serve'
 
 #
 # Incus based build environment, can be used if you have Incus installed, and not
