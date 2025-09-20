@@ -4,8 +4,47 @@ import os
 import json
 import subprocess
 from datetime import datetime, timedelta
+from functools import wraps
 
 
+def ttl_cache(seconds: int):
+    cache = {}
+
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            def _freeze(o):
+                try:
+                    hash(o)
+                    return o
+                except Exception:
+                    pass
+                if isinstance(o, dict):
+                    return tuple(sorted((k, _freeze(v)) for k, v in o.items()))
+                if isinstance(o, (list, tuple)):
+                    return tuple(_freeze(x) for x in o)
+                if isinstance(o, set):
+                    return tuple(sorted(_freeze(x) for x in o))
+                return repr(o)
+
+            key = (_freeze(args), _freeze(kwargs))
+            now = datetime.now()
+            if key in cache:
+                value, ts = cache[key]
+                if (now - ts).total_seconds() < seconds:
+                    age = int((now - ts).total_seconds())
+                    print(f"CACHE HIT: {func.__name__} cache hit (age: {age}s)")
+                    return value
+            value = func(*args, **kwargs)
+            cache[key] = (value, now)
+            return value
+
+        return wrapper
+
+    return decorator
+
+
+@ttl_cache(seconds=3600)
 def _fetch_snap_metrics():
     """Fetch metrics data via snapcraft, using already-sourced env credentials."""
     api_key = os.environ["SNAP_METRICS_KEY"]
@@ -54,6 +93,7 @@ def _fetch_snap_metrics():
         return f"<p>Error: {str(e)}</p>"
 
 
+@ttl_cache(seconds=900)
 def _build_metrics_chart(metrics_data):
     """Build a CSS-only chart showing metrics trends over time."""
     if isinstance(metrics_data, str):
@@ -258,6 +298,7 @@ def _build_metrics_chart(metrics_data):
     return chart_html
 
 
+@ttl_cache(seconds=900)
 def _build_combined_version_pie_charts(data=None):
     """Build side-by-side pie charts showing latest version and stable version adoption"""
     if data is None:
