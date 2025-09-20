@@ -163,12 +163,7 @@ def _build_metrics_chart(metrics_data):
     # Trim display_buckets to only include days with data
     if last_data_index >= 0:
         display_buckets = display_buckets[: last_data_index + 1]
-        print(f"DEBUG: After filtering, displaying {len(display_buckets)} days")
-        print(
-            f"DEBUG: Display range from {display_buckets[0] if display_buckets else 'N/A'} to {display_buckets[-1] if display_buckets else 'N/A'}"
-        )
     else:
-        print("DEBUG: No data found in any buckets")
         return "<p>No data available for the selected period</p>"
 
     chart_html = """
