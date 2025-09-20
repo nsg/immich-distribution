@@ -5,37 +5,32 @@
 
 . $SNAP/bin/load-env
 
-# Allow upgrades within same era or to next era; block skipping eras
+set -e
+PREV_REV="$(snapctl get previous.revision || true)"
 PREV_ERA="$(snapctl get previous.era || true)"
-CUR_ERA="$IMMICH_DISTRIBUTION_ERA"
 
-# If previous era is empty or non-numeric, treat it as current era
-case "$PREV_ERA" in
-    ''|*[!0-9]*) PREV_ERA="$CUR_ERA" ;;
-esac
+# Fallback: if previous.era isn't set, assume era 0
+if [ -z "$PREV_ERA" ]; then
+	PREV_ERA="0"
+fi
 
-if [ -n "$CUR_ERA" ] && [ -n "$PREV_ERA" ]; then
-	DIFF=$((CUR_ERA - PREV_ERA))
-	if [ "$DIFF" -gt 1 ]; then
-		echo "ERROR: Update skips eras (from $PREV_ERA to $CUR_ERA)." >&2
-		echo "Direct upgrades across multiple eras are unsupported." >&2
-		echo "See: https://immich-distribution.nsg.cc/install/upgrade-from-old-releases" >&2
-		exit 1
-	fi
+# Ensure first-time upgrades without pre-refresh don't fail downgrade check
+if [ -z "$PREV_REV" ]; then
+	PREV_REV="0"
+fi
+
+DIFF=$(( IMMICH_DISTRIBUTION_ERA - PREV_ERA ))
+if [ "$DIFF" -gt 1 ]; then
+	echo "ERROR: Update skips eras (from $PREV_ERA to $IMMICH_DISTRIBUTION_ERA)." >&2
+	echo "Direct upgrades across multiple eras are unsupported." >&2
+	echo "See: https://immich-distribution.nsg.cc/install/upgrade-from-old-releases" >&2
+	exit 1
 fi
 
 # Block downgrades by revision
-PREV_REV="$(snapctl get previous.revision || true)"
-CUR_REV="$SNAP_REVISION"
-
-case "$PREV_REV" in ''|*[!0-9]*) PREV_REV='' ;; esac
-case "$CUR_REV" in ''|*[!0-9]*) CUR_REV='' ;; esac
-
-if [ -n "$CUR_REV" ] && [ -n "$PREV_REV" ]; then
-	if [ "$CUR_REV" -lt "$PREV_REV" ]; then
-		echo "ERROR: Downgrades are not supported (from $PREV_REV to $CUR_REV)." >&2
-		exit 1
-	fi
+if [ "$SNAP_REVISION" -lt "$PREV_REV" ]; then
+	echo "ERROR: Downgrades are not supported (from $PREV_REV to $SNAP_REVISION)." >&2
+	exit 1
 fi
 
 exit 0
