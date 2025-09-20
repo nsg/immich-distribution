@@ -33,9 +33,6 @@ test-cli: wait
 test-backup: wait
 	./test_backup.sh
 
-test-upgrade-blocking:
-	./test_upgrade_blocking.sh
-
 test_prep_%: ${PYTEST} ${PYTEST_LOCALTEST_DEPENDENCIES}
 	${PYTEST} tests_prep.py --server=127.0.0.1 --port=4444 --headed -k $* --html=report/index.html
 
