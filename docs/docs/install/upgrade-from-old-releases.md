@@ -1,19 +1,6 @@
 # Upgrade from old releases
 
-Upgrading after skipping many revisions can be risky. Database migrations and other code are written and tested sequentially. Skipping many can surface untested combinations.
-
-## Find your current revision
-
-To see what revision (rev) you have installed, run the following command:
-```bash
-snap list immich-distribution
-```
-
-Example below (with real data from the stable channel)
-```
-Name                 Version   Rev  Tracking       Publisher  Notes
-immich-distribution  {{snapstore_version}}  {{snapstore_revision}}  latest/stable  nsg        -
-```
+Upgrading after skipping many revisions can be risky. Database migrations and other code are written and tested sequentially. To make this safer, upgrades are grouped into "eras" that must be applied in order.
 
 ## How to upgrade
 
@@ -28,18 +15,36 @@ immich-distribution  {{snapstore_version}}  {{snapstore_revision}}  latest/stabl
     rm /var/snap/immich-distribution/common/no-post-refresh-hook
     ```
 
-    Disabling the post-refresh hook is safe between version v1.138 to v1.141. If you have executed commands below and are stuck at a later revision, this should still work, but you may end up in a non stable channel. If you need help, open an issue at GitHub and I will help you. I will try to update this later with instructions how to return to the stable channel.
+    Disabling the post-refresh hook is safe between version v1.138 to v1.142. If you have executed commands below and are stuck at a later revision, this should still work, but you may end up in a non stable channel. If you need help, open an issue at GitHub and I will help you.
 
-Assuming that run the stable channel (you should), the latest revision is `{{snapstore_revision}}`. Any update before `{{snapstore_revision_block}}` is blocked. This should only happen if you have manually disabled automatic updates, if this is the case please read the [news](/news) carefully.
+Systems that are regularly updated should move between supported eras sequentially (for example: 1 → 2 → 3 → 4). If automatic updates have been disabled or you’ve fallen far behind and attempt to jump across eras (for example: 1 → 3), the post-refresh hook will block the upgrade to protect your data. In that case, refresh to an intermediate release from the next era, apply it, and then continue to the latest. See the [news](/news) for any additional notes.
 
-You need to upgrade to an intimidate version, for example if your current version is `{{snapstore_revision_old}}`, you need to upgrade to `{{snapstore_revision_oldish}}`, then `{{snapstore_revision_newish}}` and finally `{{snapstore_revision}}` (less than 3 revisions each time).
+## Historic Eras (stable channel)
+
+| Era | Version  | Revision | Notes                 |
+| --- | ---------| ---------| --------------------- |
+| 1   | v1.142.1 | 240      | Eras implemented, we are in the middle of the [VectorChord migration](/news/2025/08/31/vectorchord-migration-rollout/) |
+
+To move to a specific era on the stable channel, refresh to the revision listed for that era:
 
 ```sh
-sudo snap refresh immich-distribution --revision=1234
+sudo snap refresh immich-distribution --revision=<REVISION>
 ```
 
-!!! danger
-    If you try to upgrade directly from a revision before **{{snapstore_revision_block}}** to **{{snapstore_revision}}**, updates will be blocked.
+## Find your current revision
 
-!!! note
-    The block functionality was implemented in revision **228**, but everything else here is still true. If you have disabled automatic updates, please do not upgrade to many revisions at once.
+To see what revision (rev) you have installed, run the following command:
+```bash
+snap list immich-distribution
+```
+
+Example below (with real data from the stable channel)
+```
+Name                 Version   Rev  Tracking       Publisher  Notes
+immich-distribution  {{snapstore_version}}  {{snapstore_revision}}  latest/stable  nsg        -
+```
+
+## A note about Eras
+
+Eras are a safety feature in Immich Distribution. They prevent skipping too many versions at once, which could otherwise leave your system in an unsupported state or corrupt your database. Upstream Immich does not support large upgrade jumps; eras help protect your data by requiring sequential era-by-era upgrades. Most users who keep their systems up to date will never notice or need to care about eras.
+
