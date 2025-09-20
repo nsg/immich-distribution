@@ -8,5 +8,6 @@
 # Save the current version and revision as snap configuration keys
 snapctl set previous.version="$SNAP_VERSION" 2>/dev/null || true
 snapctl set previous.revision="$SNAP_REVISION" 2>/dev/null || true
+snapctl set previous.era="$IMMICH_DISTRIBUTION_ERA" 2>/dev/null || true
 
 exit 0

@@ -48,6 +48,8 @@ export IMMICH_THIRD_PARTY_BUG_FEATURE_URL="https://github.com/nsg/immich-distrib
 export IMMICH_THIRD_PARTY_DOCUMENTATION_URL="https://immich-distribution.nsg.cc"
 export IMMICH_THIRD_PARTY_SUPPORT_URL="https://github.com/nsg/immich-distribution/issues"
 
+export IMMICH_DISTRIBUTION_ERA="1"
+
 export MACHINE_LEARNING_LOG_LEVEL="warning"
 export MACHINE_LEARNING_IP="127.0.0.1"
 export MACHINE_LEARNING_CACHE_FOLDER="$SNAP_COMMON/cache"

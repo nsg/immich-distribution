@@ -5,16 +5,36 @@
 
 . $SNAP/bin/load-env
 
-# Block large revision jumps (>5) unless override file exists
+# Allow upgrades within same era or to next era; block skipping eras
+PREV_ERA="$(snapctl get previous.era || true)"
+CUR_ERA="$IMMICH_DISTRIBUTION_ERA"
+
+# If previous era is empty or non-numeric, treat it as current era
+case "$PREV_ERA" in
+    ''|*[!0-9]*) PREV_ERA="$CUR_ERA" ;;
+esac
+
+if [ -n "$CUR_ERA" ] && [ -n "$PREV_ERA" ]; then
+	DIFF=$((CUR_ERA - PREV_ERA))
+	if [ "$DIFF" -gt 1 ]; then
+		echo "ERROR: Update skips eras (from $PREV_ERA to $CUR_ERA)." >&2
+		echo "Direct upgrades across multiple eras are unsupported." >&2
+		echo "See: https://immich-distribution.nsg.cc/install/upgrade-from-old-releases" >&2
+		exit 1
+	fi
+fi
+
+# Block downgrades by revision
 PREV_REV="$(snapctl get previous.revision || true)"
-if [ -n "$PREV_REV" ] && [ -n "$SNAP_REVISION" ]; then
-	if [ "$PREV_REV" -gt 0 ] 2>/dev/null; then
-		DIFF=$((SNAP_REVISION - PREV_REV))
-		if [ "$DIFF" -gt 3 ]; then
-			echo "ERROR: Update spans $DIFF revisions (from $PREV_REV to $SNAP_REVISION)." >&2
-			echo "This large jump is unsupported. See: https://immich-distribution.nsg.cc/install/upgrade-from-old-releases" >&2
-			exit 1
-		fi
+CUR_REV="$SNAP_REVISION"
+
+case "$PREV_REV" in ''|*[!0-9]*) PREV_REV='' ;; esac
+case "$CUR_REV" in ''|*[!0-9]*) CUR_REV='' ;; esac
+
+if [ -n "$CUR_REV" ] && [ -n "$PREV_REV" ]; then
+	if [ "$CUR_REV" -lt "$PREV_REV" ]; then
+		echo "ERROR: Downgrades are not supported (from $PREV_REV to $CUR_REV)." >&2
+		exit 1
 	fi
 fi
 
