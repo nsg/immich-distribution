@@ -139,5 +139,5 @@ snapstore_version() {
 }
 
 version_to_int() {
-    echo $1 | awk -F'.' '{ print $1*10000 + $2*100 + $3 }'
+    echo $1 | sed 's/^v//' | awk -F'.' '{ print $1*1000000 + $2*1000 + $3 }'
 }
