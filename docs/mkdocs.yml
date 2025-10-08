@@ -24,6 +24,9 @@ nav:
     - Immich Admin Extensions: configuration/cli-administration.md
     - Notifications: configuration/notifications.md
     - configuration/metrics.md
+  - Guides:
+    - guides/index.md
+    - Migrate from Docker: guides/migrate-from-docker.md
   - Contribute:
     - Upgrade: build/upgrade.md
     - Tests: build/tests.md
