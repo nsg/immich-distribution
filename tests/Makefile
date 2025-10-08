@@ -14,9 +14,12 @@ else
     PYTEST_LOCALTEST_DEPENDENCIES =
 endif
 
-test: test-prep
+test: test-validate test-prep
 	make test-assets
 	make test-selenium
+
+test-validate:
+	./test_vips_version.sh
 
 test-prep: ${PYTEST} ${PYTEST_LOCALTEST_DEPENDENCIES} wait
 	${PYTEST} tests_prep.py --server=127.0.0.1 --port=4444 ${PYTEST_EXTRA_ARGS} --dashboard --html=report/index.html

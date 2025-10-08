@@ -39,8 +39,8 @@ layout:
     symlink: $SNAP_COMMON/upload
   /usr/lib/x86_64-linux-gnu/libheif:
     symlink: $SNAP/usr/lib/x86_64-linux-gnu/libheif
-  /usr/lib/vips-modules-8.16:
-    symlink: $SNAP/usr/lib/vips-modules-8.16
+  /usr/lib/vips-modules-8.17:
+    symlink: $SNAP/usr/lib/vips-modules-8.17
   /usr/etc/ImageMagick-7:
     symlink: $SNAP/usr/etc/ImageMagick-7
   /usr/lib/ImageMagick-7.1.1:
