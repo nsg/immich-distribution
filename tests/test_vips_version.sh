@@ -3,7 +3,7 @@ set -euo pipefail
 
 echo "🔍 Testing vips-modules symlink version consistency"
 
-SNAPCRAFT_YAML="${SNAPCRAFT_YAML:-snap/snapcraft.yaml}"
+SNAPCRAFT_YAML="${SNAPCRAFT_YAML:-../snap/snapcraft.yaml}"
 APTLY_REPO="https://nsg.github.io/aptly/"
 
 if [ ! -f "$SNAPCRAFT_YAML" ]; then
