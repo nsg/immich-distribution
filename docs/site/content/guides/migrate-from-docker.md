@@ -1,5 +1,6 @@
 +++
 title = "Migrate from Immich Docker to Immich Distribution (snap)"
+draft = true
 +++
 
 # Migrate from Immich Docker to Immich Distribution (snap)
