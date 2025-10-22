@@ -524,8 +524,8 @@ table {
 }
 
 table thead {
-    background-color: var(--primary-color);
-    color: white;
+    background-color: #fff;
+        color: var(--text-color);
 }
 
 table th {
@@ -533,6 +533,7 @@ table th {
     text-align: left;
     font-weight: 600;
     border-bottom: 2px solid var(--primary-dark);
+    white-space: nowrap;
 }
 
 table td {
