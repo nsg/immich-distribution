@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{{ config.title }}{% endblock title %}</title>
+    <meta name="description" content="{{ config.description }}">
+    <link rel="icon" href="{{ get_url(path='immich-dist.png') }}">
+    <link rel="stylesheet" href="{{ get_url(path='style.css') }}">
+    {% if config.generate_feed %}
+    <link rel="alternate" type="application/atom+xml" title="RSS" href="{{ get_url(path='atom.xml') }}">
+    {% endif %}
+</head>
+<body>
+    <input type="checkbox" id="mobile-menu-toggle" class="mobile-menu-toggle" aria-label="Toggle mobile menu">
+    
+    <header class="site-header">
+        <div class="container">
+            <div class="header-content">
+                <div class="header-left">
+                    <label for="mobile-menu-toggle" class="hamburger-menu" aria-label="Toggle menu">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </label>
+                    <a href="{{ get_url(path='/') }}" class="logo">
+                        <img src="{{ get_url(path=config.extra.logo) }}" alt="{{ config.title }}">
+                        <span>{{ config.title }}</span>
+                    </a>
+                </div>
+                <nav class="main-nav">
+                    {% for item in config.extra.menu.main %}
+                    <a href="{{ get_url(path=item.url) }}" class="nav-link">{{ item.name }}</a>
+                    {% endfor %}
+                    <a href="{{ config.extra.repo_url }}" class="nav-link github-link" target="_blank">
+                        <svg viewBox="0 0 16 16" width="20" height="20">
+                            <path fill="currentColor" d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.777.416L8 13.101l-5.223 2.815A.5.5 0 0 1 2 15.5V2zm2-1a1 1 0 0 0-1 1v12.566l4.723-2.482a.5.5 0 0 1 .554 0L13 14.566V2a1 1 0 0 0-1-1H4z"/>
+                        </svg>
+                    </a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <aside class="mobile-menu">
+        {% block mobile_sidebar %}
+        <nav class="mobile-main-nav">
+            <h3 class="mobile-nav-title">Main Menu</h3>
+            {% for item in config.extra.menu.main %}
+            <a href="{{ get_url(path=item.url) }}" class="mobile-nav-link">
+                <svg viewBox="0 0 16 16" width="20" height="20" style="flex-shrink: 0;">
+                    <path fill="currentColor" d="M14 4.5V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h5.5L14 4.5zm-3 0A1.5 1.5 0 0 1 9.5 3V1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V4.5h-2zM4.5 7h7v1h-7V7zm0 2h7v1h-7V9zm0 2h5v1h-5v-1z"/>
+                </svg>
+                <span>{{ item.name }}</span>
+            </a>
+            {% endfor %}
+            <a href="{{ config.extra.repo_url }}" class="mobile-nav-link mobile-github-link" target="_blank">
+                <svg viewBox="0 0 16 16" width="20" height="20" style="flex-shrink: 0;">
+                    <path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path>
+                </svg>
+                <span>GitHub</span>
+            </a>
+        </nav>
+        {% endblock mobile_sidebar %}
+    </aside>
+
+    <label for="mobile-menu-toggle" class="mobile-menu-overlay"></label>
+
+    <main class="main-content">
+        <div class="container">
+            <div class="content-wrapper">
+                {% block sidebar %}{% endblock sidebar %}
+                <div class="main-column">
+                    {% block content %}{% endblock content %}
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <p>
+                Immich Distribution is an independent community project that packages the software in a snap package.
+                This project is not affiliated with the upstream <a href="https://immich.app">Immich project</a>,
+                its developers, or <a href="https://futo.org">FUTO</a>.
+                For more information, please refer to the <a href="/">about page</a>.
+                Website made with <a href="https://www.getzola.org">Zola</a>.
+                Also check out the projects <a href="{{ config.extra.repo_url }}">GitHub repository</a>.
+            </p>
+        </div>
+    </footer>
+    <script src="{{ get_url(path='js/mermaid.min.js') }}"></script>
+    <script type="module">
+        mermaid.initialize({ 
+            startOnLoad: false,
+            theme: 'default'
+        });
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('pre code.language-mermaid').forEach(function(code) {
+                const pre = code.parentElement;
+                const div = document.createElement('div');
+                div.className = 'mermaid';
+                div.textContent = code.textContent;
+                pre.replaceWith(div);
+            });
+            mermaid.run();
+        });
+    </script>
+</body>
+</html>

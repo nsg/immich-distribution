@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% import "macros.html" as macros %}
+
+{% block title %}{{ section.title }} | {{ config.title }}{% endblock title %}
+
+{% block sidebar %}
+<aside class="sidebar">
+    {{ macros::news_sidebar(section_obj=section, current_path="") }}
+</aside>
+{% endblock sidebar %}
+
+{% block mobile_sidebar %}
+{{ macros::mobile_menu_with_subsections(menu_items=config.extra.menu.main, repo_url=config.extra.repo_url, current_section_obj=section, current_path=section.path) }}
+{% endblock mobile_sidebar %}
+
+{% block content %}
+<div class="section-content">
+    {{ section.content | safe }}
+    
+    <div class="blog-posts">
+        {% for year_path in section.subsections | sort | reverse %}
+            {% set year_section = get_section(path=year_path) %}
+            {% for month_path in year_section.subsections | sort | reverse %}
+                {% set month_section = get_section(path=month_path) %}
+                {% for post in month_section.pages | sort(attribute="date") | reverse %}
+                    <article class="blog-post-preview">
+                        <h2><a href="{{ post.permalink }}">{{ post.title }}</a></h2>
+                        <div class="post-meta">
+                            <time datetime="{{ post.date }}">{{ post.date | date(format="%B %d, %Y") }}</time>
+                            {% if post.extra.author %}
+                            <span class="author">by {{ post.extra.author | join(sep=", ") }}</span>
+                            {% endif %}
+                        </div>
+                        <div class="post-summary">
+                            {% if post.summary %}
+                                {{ post.summary | striptags | truncate(length=250) }}
+                            {% else %}
+                                {{ post.content | striptags | truncate(length=250) }}
+                            {% endif %}
+                            <a href="{{ post.permalink }}">Read more →</a>
+                        </div>
+                    </article>
+                {% endfor %}
+            {% endfor %}
+        {% endfor %}
+    </div>
+</div>
+{% endblock content %}

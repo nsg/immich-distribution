@@ -3,9 +3,13 @@
 __pycache__
 *.bkp
 *.dtmp
-/docs/.cache
-/docs/.venv
-/docs/site
+/docs_old
+/docs/.env
+/docs/site/build-out
+/docs/site/static/js/mermaid.min.js
+/docs/site/snapstore-data.json
+/docs/site/snapstore-metrics.json
+/docs/site/snapstore-metrics-chart.json
 /tests/secret.txt
 /tests/latest_logs
 /tests/report/

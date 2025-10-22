@@ -1,0 +1,19 @@
+{% set type = type | default(value="note") | lower %}
+{% set title = title | default(value=type | capitalize) %}
+{% set collapsible = collapsible | default(value=false) %}
+
+<div class="admonition {{ type }}">
+{% if collapsible %}
+<details>
+<summary>{{ title }}</summary>
+
+{{ body | markdown | safe }}
+
+</details>
+{% else %}
+<div class="admonition-title">{{ title }}</div>
+
+{{ body | markdown | safe }}
+
+{% endif %}
+</div>

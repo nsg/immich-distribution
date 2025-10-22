@@ -1,0 +1,46 @@
+title = "Immich Distribution"
+base_url = "https://immich-distribution.nsg.cc"
+description = "Documentation for Immich Distribution - A snap package for self-hosted photo and video management"
+
+compile_sass = true
+build_search_index = true
+generate_feeds = true
+
+[markdown]
+highlight_code = true
+highlight_theme = "monokai"
+
+[extra]
+logo = "immich-dist.png"
+repo_url = "https://github.com/nsg/immich-distribution"
+primary_color = "#d40000"
+
+[[extra.menu.main]]
+name = "About"
+url = "/about"
+weight = 1
+
+[[extra.menu.main]]
+name = "News"
+url = "/news"
+weight = 2
+
+[[extra.menu.main]]
+name = "Installation"
+url = "/installation"
+weight = 3
+
+[[extra.menu.main]]
+name = "Configuration"
+url = "/configuration"
+weight = 4
+
+[[extra.menu.main]]
+name = "Guides"
+url = "/guides"
+weight = 5
+
+[[extra.menu.main]]
+name = "Contribute"
+url = "/contribute"
+weight = 6

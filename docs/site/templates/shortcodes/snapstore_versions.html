@@ -1,0 +1,17 @@
+<table class="snapstore-versions">
+    <tr>
+        <th>Channel</th>
+        <th>Revision</th>
+        <th>Version</th>
+        <th>Released</th>
+    </tr>
+    {% set data = load_data(path="snapstore-data.json") %}
+    {% for channel in data.channels %}
+    <tr>
+        <td>{{ channel.channel }}</td>
+        <td>{{ channel.revision }}</td>
+        <td>{{ channel.version }}</td>
+        <td>{{ channel.released }}</td>
+    </tr>
+    {% endfor %}
+</table>

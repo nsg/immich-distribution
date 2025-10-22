@@ -60,12 +60,12 @@ selenium:
 	make -C tests/ selenium
 
 #
-# Run the documentation site locally with poetry.
+# Run the documentation site locally.
 #
 
 .PHONY: docs
 docs:
-	cd docs && bash -c '[ -f .env ] && source .env; poetry run mkdocs serve'
+	cd docs && make run
 
 #
 # Incus based build environment, can be used if you have Incus installed, and not

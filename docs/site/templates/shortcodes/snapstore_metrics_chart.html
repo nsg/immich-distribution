@@ -1,0 +1,30 @@
+{% set chart = load_data(path="snapstore-metrics-chart.json") %}
+{% if chart.error %}
+<p>Metrics data not available{% if chart.error != "no credentials" %}: {{ chart.error }}{% endif %}</p>
+{% elif chart.chart_data %}
+<div class="metrics-chart">
+    <h3>Snap Installs by Version Over Time</h3>
+    <div class="chart-container">
+        <div class="chart-legend">
+            {% for item in chart.legend %}
+            <div class="legend-item">
+                <span class="legend-color" style="background-color: {{ item.color }};"></span>{{ item.version }}
+            </div>
+            {% endfor %}
+        </div>
+        <div class="chart-grid">
+            {% for day in chart.chart_data %}
+            <div class="time-column" data-date="{{ day.date }}">
+                {% for bar in day.bars %}
+                <div class="bar" style="height: {{ bar.height }}%; background-color: {{ bar.color }};" 
+                     title="{{ bar.version }}: {{ bar.percentage }}% on {{ day.date }}"></div>
+                {% endfor %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% else %}
+<p>No metrics data available</p>
+{% endif %}
+

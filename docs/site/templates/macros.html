@@ -1,0 +1,171 @@
+{% macro sidebar_nav(section_obj, current_path="") %}
+<nav class="sidebar-nav">
+    {% if section_obj.title %}
+    <h3 class="sidebar-title"><a href="{{ section_obj.permalink }}">{{ section_obj.title }}</a></h3>
+    {% endif %}
+    
+    <ul class="sidebar-menu">
+        {% if section_obj.pages %}
+        {% for page in section_obj.pages %}
+        <li class="sidebar-item {% if page.path == current_path %}active{% endif %}">
+            <a href="{{ page.permalink }}">{{ page.title }}</a>
+        </li>
+        {% endfor %}
+        {% endif %}
+        
+        {% if section_obj.subsections %}
+        {% for subsection_path in section_obj.subsections %}
+        {% set subsection = get_section(path=subsection_path) %}
+        <li class="sidebar-subsection">
+            <span class="subsection-title">{{ subsection.title }}</span>
+            <ul class="subsection-menu">
+                {% for subpage in subsection.pages %}
+                <li class="sidebar-item {% if subpage.path == current_path %}active{% endif %}">
+                    <a href="{{ subpage.permalink }}">{{ subpage.title }}</a>
+                </li>
+                {% endfor %}
+            </ul>
+        </li>
+        {% endfor %}
+        {% endif %}
+    </ul>
+</nav>
+{% endmacro %}
+
+{% macro news_sidebar(section_obj, current_path="") %}
+<nav class="sidebar-nav">
+    <h3 class="sidebar-title">{{ section_obj.title }}</h3>
+    <ul class="sidebar-menu">
+        {% for year_path in section_obj.subsections | sort | reverse %}
+            {% set year_section = get_section(path=year_path) %}
+            <li class="sidebar-subsection">
+                <span class="subsection-title">{{ year_section.title }}</span>
+                <ul class="subsection-menu">
+                    {% for month_path in year_section.subsections | sort | reverse %}
+                        {% set month_section = get_section(path=month_path) %}
+                        {% for post in month_section.pages | sort(attribute="date") | reverse %}
+                            <li class="sidebar-item {% if post.permalink == current_path %}active{% endif %}">
+                                <a href="{{ post.permalink }}">{{ post.title }}</a>
+                            </li>
+                        {% endfor %}
+                    {% endfor %}
+                </ul>
+            </li>
+        {% endfor %}
+    </ul>
+</nav>
+{% endmacro %}
+
+{% macro mobile_menu_with_subsections(menu_items, repo_url, current_section_obj=false, current_path="", current_page_permalink="") %}
+<nav class="mobile-main-nav">
+    <h3 class="mobile-nav-title">Menu</h3>
+    {% for item in menu_items %}
+    {% set item_url = get_url(path=item.url) %}
+    {% set item_url_normalized = item_url | trim_end_matches(pat="/") %}
+    {% if current_section_obj %}
+    {% set section_url = current_section_obj.permalink | trim_end_matches(pat="/") %}
+    {% set is_current_section = section_url == item_url_normalized %}
+    {% set has_direct_pages = current_section_obj.pages | length > 0 %}
+    {% set has_simple_subsections = false %}
+    {% if current_section_obj.subsections %}
+        {% for subsection_path in current_section_obj.subsections %}
+            {% set subsection = get_section(path=subsection_path) %}
+            {% if subsection.pages | length > 0 %}
+                {% set_global has_simple_subsections = true %}
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+    {% set has_content = is_current_section and (has_direct_pages or has_simple_subsections) %}
+    {% elif current_page_permalink %}
+    {% set page_url_normalized = current_page_permalink | trim_end_matches(pat="/") %}
+    {% set is_current_section = page_url_normalized == item_url_normalized %}
+    {% set has_content = false %}
+    {% else %}
+    {% set is_current_section = false %}
+    {% set has_content = false %}
+    {% endif %}
+    <div class="mobile-nav-item {% if has_content %}has-subsections{% elif is_current_section %}is-current{% endif %}">
+        <a href="{{ item_url }}" class="mobile-nav-link">
+            <svg viewBox="0 0 16 16" width="20" height="20" style="flex-shrink: 0;">
+                <path fill="currentColor" d="M14 4.5V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h5.5L14 4.5zm-3 0A1.5 1.5 0 0 1 9.5 3V1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V4.5h-2zM4.5 7h7v1h-7V7zm0 2h7v1h-7V9zm0 2h5v1h-5v-1z"/>
+            </svg>
+            <span>{{ item.name }}</span>
+        </a>
+        {% if has_content %}
+        <ul class="mobile-nav-subsections">
+            {% if item.url is starting_with("/news") %}
+                {% set all_posts = [] %}
+                {% for year_path in current_section_obj.subsections | sort | reverse %}
+                    {% set year_section = get_section(path=year_path) %}
+                    {% for month_path in year_section.subsections | sort | reverse %}
+                        {% set month_section = get_section(path=month_path) %}
+                        {% for post in month_section.pages %}
+                            {% set_global all_posts = all_posts | concat(with=post) %}
+                        {% endfor %}
+                    {% endfor %}
+                {% endfor %}
+                {% set recent_posts = all_posts | sort(attribute="date") | reverse | slice(end=5) %}
+                {% for post in recent_posts %}
+                <li class="mobile-nav-subitem {% if post.path == current_path %}active{% endif %}">
+                    <a href="{{ post.permalink }}">
+                        <svg viewBox="0 0 16 16" width="16" height="16" style="flex-shrink: 0;">
+                            <path fill="currentColor" d="M4 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.707A1 1 0 0 0 13.707 4L10 .293A1 1 0 0 0 9.293 0H4zm0 1h4.5v2A1.5 1.5 0 0 0 10 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1z"/>
+                        </svg>
+                        <span>{{ post.title }}</span>
+                    </a>
+                </li>
+                {% endfor %}
+                {% for year_path in current_section_obj.subsections | sort | reverse %}
+                    {% set year_section = get_section(path=year_path) %}
+                    {% set year_path_prefix = "/news/" ~ year_section.title ~ "/" %}
+                    {% set is_year_active = current_path is starting_with(year_path_prefix) or year_section.path == current_path %}
+                    <li class="mobile-nav-subitem {% if is_year_active %}active{% endif %}">
+                        <a href="{{ year_section.permalink }}">
+                            <svg viewBox="0 0 16 16" width="16" height="16" style="flex-shrink: 0;">
+                                <path fill="currentColor" d="M1 2.5A1.5 1.5 0 0 1 2.5 1h3.797a1.5 1.5 0 0 1 1.06.44l.707.707A.5.5 0 0 0 8.418 2.5H11.5A1.5 1.5 0 0 1 13 4v7a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 1 11V2.5z"/>
+                            </svg>
+                            <span>{{ year_section.title }} Archive</span>
+                        </a>
+                    </li>
+                {% endfor %}
+            {% else %}
+                {% if current_section_obj.pages %}
+                {% for page in current_section_obj.pages %}
+                <li class="mobile-nav-subitem {% if page.path == current_path %}active{% endif %}">
+                    <a href="{{ page.permalink }}">
+                        <svg viewBox="0 0 16 16" width="16" height="16" style="flex-shrink: 0;">
+                            <path fill="currentColor" d="M4 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.707A1 1 0 0 0 13.707 4L10 .293A1 1 0 0 0 9.293 0H4zm0 1h4.5v2A1.5 1.5 0 0 0 10 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1z"/>
+                        </svg>
+                        <span>{{ page.title }}</span>
+                    </a>
+                </li>
+                {% endfor %}
+                {% endif %}
+                {% if current_section_obj.subsections %}
+                {% for subsection_path in current_section_obj.subsections %}
+                {% set subsection = get_section(path=subsection_path) %}
+                {% for subpage in subsection.pages %}
+                <li class="mobile-nav-subitem {% if subpage.path == current_path %}active{% endif %}">
+                    <a href="{{ subpage.permalink }}">
+                        <svg viewBox="0 0 16 16" width="16" height="16" style="flex-shrink: 0;">
+                            <path fill="currentColor" d="M4 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.707A1 1 0 0 0 13.707 4L10 .293A1 1 0 0 0 9.293 0H4zm0 1h4.5v2A1.5 1.5 0 0 0 10 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1z"/>
+                        </svg>
+                        <span>{{ subpage.title }}</span>
+                    </a>
+                </li>
+                {% endfor %}
+                {% endfor %}
+                {% endif %}
+            {% endif %}
+        </ul>
+        {% endif %}
+    </div>
+    {% endfor %}
+    <a href="{{ repo_url }}" class="mobile-nav-link mobile-github-link" target="_blank">
+        <svg viewBox="0 0 16 16" width="20" height="20" style="flex-shrink: 0;">
+            <path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path>
+        </svg>
+        <span>GitHub</span>
+    </a>
+</nav>
+{% endmacro %}

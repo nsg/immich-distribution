@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% import "macros.html" as macros %}
+
+{% block title %}{{ section.title }} | {{ config.title }}{% endblock title %}
+
+{% block sidebar %}
+{% if section.pages or section.subsections %}
+{% set is_subsection = section.ancestors | length > 1 %}
+{% if is_subsection %}
+{% set root_section = section.ancestors[1] %}
+{% set section_obj = get_section(path=root_section) %}
+{% else %}
+{% set section_obj = section %}
+{% endif %}
+<aside class="sidebar">
+    {{ macros::sidebar_nav(section_obj=section_obj, current_path=section.path) }}
+</aside>
+{% endif %}
+{% endblock sidebar %}
+
+{% block mobile_sidebar %}
+{% set is_subsection = section.ancestors | length > 1 %}
+{% if is_subsection %}
+{% set root_section = section.ancestors[1] %}
+{% set section_obj = get_section(path=root_section) %}
+{% else %}
+{% set section_obj = section %}
+{% endif %}
+{{ macros::mobile_menu_with_subsections(menu_items=config.extra.menu.main, repo_url=config.extra.repo_url, current_section_obj=section_obj, current_path=section.path) }}
+{% endblock mobile_sidebar %}
+
+{% block content %}
+<div class="section-content">
+    {{ section.content | safe }}
+</div>
+{% endblock content %}

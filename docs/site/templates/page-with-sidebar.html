@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% import "macros.html" as macros %}
+
+{% block title %}{{ page.title }} | {{ config.title }}{% endblock title %}
+
+{% block sidebar %}
+{% set current_section = page.ancestors | last %}
+{% if current_section %}
+{% set section_obj = get_section(path=current_section) %}
+<aside class="sidebar">
+    {{ macros::sidebar_nav(section_obj=section_obj, current_path=page.path) }}
+</aside>
+{% endif %}
+{% endblock sidebar %}
+
+{% block content %}
+<article class="page-content">
+    <h1>{{ page.title }}</h1>
+    {{ page.content | safe }}
+</article>
+{% endblock content %}

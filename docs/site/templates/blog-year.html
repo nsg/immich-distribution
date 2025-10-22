@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% import "macros.html" as macros %}
+
+{% block title %}{{ section.title }} Posts | {{ config.title }}{% endblock title %}
+
+{% block sidebar %}
+{% set news_section = get_section(path="news/_index.md") %}
+<aside class="sidebar">
+    <nav class="sidebar-nav">
+        <h3 class="sidebar-title">{{ news_section.title }}</h3>
+        <ul class="sidebar-menu">
+            {% for year_path in news_section.subsections | sort | reverse %}
+                {% set year_section = get_section(path=year_path) %}
+                <li class="sidebar-subsection">
+                    <span class="subsection-title">{{ year_section.title }}</span>
+                    <ul class="subsection-menu">
+                        {% for month_path in year_section.subsections | sort | reverse %}
+                            {% set month_section = get_section(path=month_path) %}
+                            {% for post in month_section.pages | sort(attribute="date") | reverse %}
+                                <li class="sidebar-item">
+                                    <a href="{{ post.permalink }}">{{ post.title }}</a>
+                                </li>
+                            {% endfor %}
+                        {% endfor %}
+                    </ul>
+                </li>
+            {% endfor %}
+        </ul>
+    </nav>
+</aside>
+{% endblock sidebar %}
+
+{% block mobile_sidebar %}
+{% set news_section = get_section(path="news/_index.md") %}
+{{ macros::mobile_menu_with_subsections(menu_items=config.extra.menu.main, repo_url=config.extra.repo_url, current_section_obj=news_section, current_path=section.path) }}
+{% endblock mobile_sidebar %}
+
+{% block content %}
+<div class="section-content">
+    <h1>{{ section.title }} Posts</h1>
+    
+    <div class="blog-posts">
+        {% for month_path in section.subsections | sort | reverse %}
+            {% set month_section = get_section(path=month_path) %}
+            {% for post in month_section.pages | sort(attribute="date") | reverse %}
+                    <article class="blog-post-preview">
+                        <h2><a href="{{ post.permalink }}">{{ post.title }}</a></h2>
+                        <div class="post-meta">
+                            <time datetime="{{ post.date }}">{{ post.date | date(format="%B %d, %Y") }}</time>
+                            {% if post.extra.author %}
+                            <span class="author">by {{ post.extra.author | join(sep=", ") }}</span>
+                            {% endif %}
+                        </div>
+                        <div class="post-summary">
+                            {% if post.summary %}
+                                {{ post.summary | striptags | truncate(length=250) }}
+                            {% else %}
+                                {{ post.content | striptags | truncate(length=250) }}
+                            {% endif %}
+                            <a href="{{ post.permalink }}">Read more →</a>
+                        </div>
+                    </article>
+                {% endfor %}
+            {% endfor %}
+    </div>
+</div>
+{% endblock content %}

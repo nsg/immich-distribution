@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% import "macros.html" as macros %}
+
+{% block title %}{{ page.title }} | {{ config.title }}{% endblock title %}
+
+{% block sidebar %}
+{% if page.ancestors and page.ancestors | length > 1 %}
+{% set root_section = page.ancestors[1] %}
+{% set section_obj = get_section(path=root_section) %}
+<aside class="sidebar">
+    {{ macros::sidebar_nav(section_obj=section_obj, current_path=page.path) }}
+</aside>
+{% endif %}
+{% endblock sidebar %}
+
+{% block mobile_sidebar %}
+{% if page.ancestors and page.ancestors | length > 1 %}
+{% set root_section = page.ancestors[1] %}
+{% set section_obj = get_section(path=root_section) %}
+{{ macros::mobile_menu_with_subsections(menu_items=config.extra.menu.main, repo_url=config.extra.repo_url, current_section_obj=section_obj, current_path=page.path, current_page_permalink=page.permalink) }}
+{% else %}
+{{ macros::mobile_menu_with_subsections(menu_items=config.extra.menu.main, repo_url=config.extra.repo_url, current_page_permalink=page.permalink) }}
+{% endif %}
+{% endblock mobile_sidebar %}
+
+{% block content %}
+<article class="page-content">
+    {% if page.extra.show_title | default(value=false) %}
+    <h1>{{ page.title }}</h1>
+    {% endif %}
+    {{ page.content | safe }}
+</article>
+{% endblock content %}

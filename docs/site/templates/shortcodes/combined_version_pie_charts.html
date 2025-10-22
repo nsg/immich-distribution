@@ -1,0 +1,114 @@
+{% set metrics = load_data(path="snapstore-metrics.json") %}
+{% set versions_data = load_data(path="snapstore-data.json") %}
+
+{% if metrics.error %}
+<p>Metrics data not available{% if metrics.error != "no credentials" %}: {{ metrics.error }}{% endif %}</p>
+{% elif metrics.status == "OK" %}
+{% set series = metrics.series %}
+
+{# Get latest stable version from versions data #}
+{% set latest_stable_version = versions_data.latest_stable_version %}
+
+{# Find latest version by highest version number #}
+{% set_global latest_version = "" %}
+{% set_global latest_major = 0 %}
+{% set_global latest_minor = 0 %}
+{% set_global latest_patch = 0 %}
+
+{% for s in series %}
+    {% set version_str = s.name | trim_start_matches(pat="v") %}
+    {% set parts = version_str | split(pat=".") %}
+    {% if parts | length >= 3 %}
+        {% set major = parts[0] | int(default=0) %}
+        {% set minor = parts[1] | int(default=0) %}
+        {% set patch = parts[2] | int(default=0) %}
+        {% set_global is_newer = false %}
+        {% if major > latest_major %}
+            {% set_global is_newer = true %}
+        {% elif major == latest_major and minor > latest_minor %}
+            {% set_global is_newer = true %}
+        {% elif major == latest_major and minor == latest_minor and patch > latest_patch %}
+            {% set_global is_newer = true %}
+        {% endif %}
+        {% if is_newer %}
+            {% set_global latest_major = major %}
+            {% set_global latest_minor = minor %}
+            {% set_global latest_patch = patch %}
+            {% set_global latest_version = s.name %}
+        {% endif %}
+    {% endif %}
+{% endfor %}
+
+{# Get latest day values #}
+{% set_global latest_day_total = 0 %}
+{% set_global latest_version_installs = 0 %}
+{% set_global stable_version_installs = 0 %}
+
+{% for s in series %}
+    {% set_global latest_value = 0 %}
+    {% set values_len = s.values | length %}
+    {% for i in range(end=values_len) %}
+        {% set idx = values_len - 1 - i %}
+        {% set val = s.values | nth(n=idx) %}
+        {% if val %}
+            {% set_global latest_value = val %}
+            {% break %}
+        {% endif %}
+    {% endfor %}
+    
+    {% if latest_value > 0 %}
+        {% set_global latest_day_total = latest_day_total + latest_value %}
+        {% if s.name == latest_version %}
+            {% set_global latest_version_installs = latest_value %}
+        {% endif %}
+        {% if s.name == latest_stable_version %}
+            {% set_global stable_version_installs = latest_value %}
+        {% endif %}
+    {% endif %}
+{% endfor %}
+
+{% if latest_day_total > 0 %}
+{% set latest_version_percentage = latest_version_installs / latest_day_total * 100 %}
+{% set latest_other_percentage = 100 - latest_version_percentage %}
+{% set stable_version_percentage = stable_version_installs / latest_day_total * 100 %}
+{% set stable_other_percentage = 100 - stable_version_percentage %}
+
+<div class="combined-pie-charts">
+    <div class="pie-chart-container">
+        <h3>Latest Version Adoption ({{ latest_version }})</h3>
+        <div class="pie-chart latest-version" data-percentage="{{ latest_version_percentage | round(precision=1) }}%" style="--percentage: {{ latest_version_percentage }}">
+        </div>
+        <div class="pie-legend">
+            <div class="pie-legend-item">
+                <span class="pie-legend-color latest-version-color"></span>
+                {{ latest_version }}: {{ latest_version_percentage | round(precision=1) }}%
+            </div>
+            <div class="pie-legend-item">
+                <span class="pie-legend-color other-versions-color"></span>
+                Other versions: {{ latest_other_percentage | round(precision=1) }}%
+            </div>
+        </div>
+    </div>
+    
+    <div class="pie-chart-container">
+        <h3>Latest Stable Version Adoption ({{ latest_stable_version }})</h3>
+        <div class="pie-chart stable-version" data-percentage="{{ stable_version_percentage | round(precision=1) }}%" style="--percentage: {{ stable_version_percentage }}">
+        </div>
+        <div class="pie-legend">
+            <div class="pie-legend-item">
+                <span class="pie-legend-color stable-version-color"></span>
+                {{ latest_stable_version }}: {{ stable_version_percentage | round(precision=1) }}%
+            </div>
+            <div class="pie-legend-item">
+                <span class="pie-legend-color other-versions-color"></span>
+                Other versions: {{ stable_other_percentage | round(precision=1) }}%
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
+<p>No data available for latest day</p>
+{% endif %}
+{% else %}
+<p>No metrics data available</p>
+{% endif %}
