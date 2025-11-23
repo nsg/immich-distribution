@@ -196,7 +196,6 @@ parts:
       git apply -p1 $CRAFT_STAGE/commands__index.ts.patch
       git apply -p1 $CRAFT_STAGE/commands__media-location.command.ts.patch
       git apply -p1 $CRAFT_STAGE/services__cli.service.ts.patch
-      git apply -p1 $CRAFT_STAGE/services__notification-admin.service.ts.patch
 
       mkdir -p ${CRAFT_PART_INSTALL}/usr/src/app
 
