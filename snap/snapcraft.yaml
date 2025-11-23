@@ -302,6 +302,8 @@ parts:
       - nsg-mimalloc
       - libgl1
       - libglib2.0-0
+    stage:
+      - -usr/share/drirc.d/00-mesa-defaults.conf
     after: [uv-deps]
 
   uv-deps:
