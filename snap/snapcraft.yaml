@@ -300,6 +300,8 @@ parts:
 
     stage-packages:
       - nsg-mimalloc
+      - libgl1
+      - libglib2.0-0
     after: [uv-deps]
 
   uv-deps:
