@@ -62,6 +62,7 @@ jobs:
   prep-backup:
     name: Prepare installation and backup state
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     needs: build-snap
 
@@ -85,6 +86,7 @@ jobs:
         run: sudo snap install --dangerous *.snap
 
       - name: TEST | Run Prepare Tests
+        timeout-minutes: 10
         run: make test-prep -C tests
 
       - name: Backup database and assets
@@ -105,6 +107,7 @@ jobs:
   prep-backup-store:
     name: Prepare backup state from store package
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     services:
       selenium:
@@ -123,6 +126,7 @@ jobs:
         run: sudo snap install immich-distribution
 
       - name: TEST | Run Prepare Tests
+        timeout-minutes: 10
         run: make test-prep -C tests
 
       - name: Backup database and assets
@@ -143,6 +147,7 @@ jobs:
   upgrade:
     name: Upgrade from Store to Development
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     needs: [build-snap, prep-backup-store]
 
@@ -209,6 +214,7 @@ jobs:
   prep:
     name: Prepare & Asset Tests
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     needs: build-snap
 
@@ -232,6 +238,7 @@ jobs:
         run: sudo snap install --dangerous *.snap
 
       - name: TEST | Run Prepare Tests
+        timeout-minutes: 10
         run: make test-prep -C tests
 
       - name: TEST | Run Selenium Tests
@@ -240,6 +247,7 @@ jobs:
   backup:
     name: Built-in Immich Backup Functionality Tests
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     needs: prep-backup
 
@@ -285,6 +293,7 @@ jobs:
   assets:
     name: Test Assets - ${{ matrix.backup-type }}
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     needs: [prep-backup, upgrade]
 
@@ -354,6 +363,7 @@ jobs:
   sync:
     name: Test Sync Service - ${{ matrix.backup-type }}
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     needs: [prep-backup, upgrade]
 
@@ -409,6 +419,7 @@ jobs:
   cli:
     name: Test CLI - ${{ matrix.backup-type }}
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     needs: [prep-backup, upgrade]
 
@@ -457,6 +468,7 @@ jobs:
   certificate-management:
     name: Test Manual Certificate Management
     runs-on: ubuntu-latest
+    timeout-minutes: 5
 
     needs: build-snap
 
