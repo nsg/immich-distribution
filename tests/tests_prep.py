@@ -7,9 +7,8 @@ Register a new user, generate API keys, and some simple validations.
 
 import socket
 import os
+from playwright.sync_api import Page, expect
 
-from seleniumbase import BaseCase
-BaseCase.main(__name__, __file__)
 
 def get_ip_address():
     immich_ip = os.getenv('IMMICH_IP')
@@ -20,92 +19,96 @@ def get_ip_address():
     s.connect(("8.8.8.8", 80))
     return s.getsockname()[0]
 
-class TestImmichPrep(BaseCase):
 
-    def immich(self, path=None, login=True):
-        self.open(f"http://{get_ip_address()}")
-        if login:
-            self.login()
-            self.sleep(2)
-            if self.is_element_present("button:contains('Acknowledge')"):
-                self.click("button:contains('Acknowledge')")
+def immich_goto(page: Page, path=None, login=True):
+    """Navigate to Immich and optionally login."""
+    page.goto(f"http://{get_ip_address()}")
+    
+    if login:
+        immich_login(page)
+        page.wait_for_timeout(2000)
+        
+        acknowledge_button = page.locator("button:has-text('Acknowledge')")
+        if acknowledge_button.is_visible():
+            acknowledge_button.click()
+    
+    if path:
+        page.goto(f"http://{get_ip_address()}/{path}")
 
-        if path:
-            self.open(f"http://{get_ip_address()}/{path}")
 
-    def login(self):
-        self.type("input[id='email']", "foo@example.com")
-        self.type("input[id='password']", "secret")
-        self.click("button:contains('Login')")
+def immich_login(page: Page):
+    """Login to Immich."""
+    page.locator("input[id='email']").fill("foo@example.com")
+    page.locator("input[id='password']").fill("secret")
+    page.locator("button:has-text('Login')").click()
 
-    def write_message(self, message):
-        self.open("about:blank")
-        self.execute_script("document.body.style = 'font-family: sans-serif; padding: 40px 20px; font-size: 2em;'")
-        self.execute_script(f'document.body.innerHTML="{message}";')
 
-    def get_input_by_label(self, label_text, text=None):
-        element = self.find_element(f"//label[contains(text(), '{label_text}')]/..//input")
-        if text:
-            element.send_keys(text)
-        return element
+def write_message(page: Page, message: str):
+    """Display a message on a blank page."""
+    page.goto("about:blank")
+    page.evaluate("document.body.style = 'font-family: sans-serif; padding: 40px 20px; font-size: 2em;'")
+    page.evaluate(f'document.body.innerHTML="{message}";')
 
-    def test_prep_001_register(self):
-        """
-        Register a new user
-        """
 
-        self.immich(login=False)
+def get_input_by_label(page: Page, label_text: str, text=None):
+    """Find input element by its label text and optionally fill it."""
+    element = page.locator(f"//label[contains(text(), '{label_text}')]/..//input")
+    if text:
+        element.fill(text)
+    return element
 
-        # Welcome page, click button
-        if "Welcome" in self.get_title():
-            self.click("span:contains('Getting Started')")
 
-        # Register a new user
-        self.get_input_by_label("Admin Email", "foo@example.com")
-        self.get_input_by_label("Admin Password", "secret")
-        self.get_input_by_label("Confirm Admin Password", "secret")
-        self.get_input_by_label("Name", "Ture Test")
-        self.click("button:contains('Sign up')")
+def test_prep_001_register(page: Page):
+    """Register a new user"""
+    immich_goto(page, login=False)
+    
+    # Welcome page, click button
+    if "Welcome" in page.title():
+        page.locator("span:has-text('Getting Started')").click()
+    
+    # Register a new user
+    get_input_by_label(page, "Admin Email", "foo@example.com")
+    get_input_by_label(page, "Admin Password", "secret")
+    get_input_by_label(page, "Confirm Admin Password", "secret")
+    get_input_by_label(page, "Name", "Ture Test")
+    page.locator("button:has-text('Sign up')").click()
+    
+    expect(page).to_have_title("Login - Immich")
 
-        self.assert_title("Login - Immich")
 
-    def test_prep_002_first_login(self):
-        """
-        Login, follow the welcome flow and make sure we end up on the photos page.
-        """
+def test_prep_002_first_login(page: Page):
+    """Login, follow the welcome flow and make sure we end up on the photos page."""
+    immich_goto(page)
+    
+    expect(page).to_have_title("Onboarding - Immich")
+    page.locator("button:has-text('Theme')").click()
+    page.locator("button:has-text('Language')").click()
+    page.locator("button:has-text('Server Privacy')").click()
+    page.locator("button:has-text('User Privacy')").click()
+    page.locator("button:has-text('Storage Template')").click()
+    page.locator("button:has-text('Backups')").click()
+    page.locator("button:has-text('Done')").click()
+    expect(page).to_have_title("Photos - Immich")
 
-        self.immich()
 
-        self.assert_title("Onboarding - Immich")
-        self.click("button:contains('Theme')")
-        self.click("button:contains('Language')")
-        self.click("button:contains('Server Privacy')")
-        self.click("button:contains('User Privacy')")
-        self.click("button:contains('Storage Template')")
-        self.click("button:contains('Backups')")
-        self.click("button:contains('Done')")
-        self.assert_title("Photos - Immich")
+def test_prep_003_empty_timeline(page: Page):
+    """Make sure the timeline is empty and we get a message to upload photos."""
+    immich_goto(page)
+    expect(page.locator("p:has-text('CLICK TO UPLOAD YOUR FIRST PHOTO')")).to_be_visible()
 
-    def test_prep_003_empty_timeline(self):
-        """
-        Make sure the timeline is empty and we get a message to upload photos.
-        """
 
-        self.immich()
-        self.assert_element("p:contains('CLICK TO UPLOAD YOUR FIRST PHOTO')")
-
-    def test_prep_004_generate_api_keys(self):
-        """
-        Generate API keys and save them to a file called secret.txt.
-        The API keys will be used by other tests to query the API and upload assets.
-        """
-        self.immich(login=True)
-        self.immich(login=False, path="user-settings")
-        self.wait_for_element("h2")
-        self.click("button:contains('API Keys')")
-        self.click("button:contains('New API Key')")
-        self.click("button[id='input-select-all']")
-        self.click("button:contains('Create')")
-        secret = self.get_text("textarea[id='secret']")
-        with open("secret.txt", "w") as f:
-            f.write(secret)
+def test_prep_004_generate_api_keys(page: Page):
+    """
+    Generate API keys and save them to a file called secret.txt.
+    The API keys will be used by other tests to query the API and upload assets.
+    """
+    immich_goto(page, login=True)
+    immich_goto(page, path="user-settings", login=False)
+    page.locator("h2").wait_for()
+    page.locator("button:has-text('API Keys')").click()
+    page.locator("button:has-text('New API Key')").click()
+    page.locator("button[id='input-select-all']").click()
+    page.locator("button:has-text('Create')").click()
+    secret = page.locator("textarea[id='secret']").text_content()
+    with open("secret.txt", "w") as f:
+        f.write(secret)

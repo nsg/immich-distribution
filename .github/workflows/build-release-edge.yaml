@@ -37,13 +37,6 @@ jobs:
     runs-on: ubuntu-latest
     needs: build-snap
 
-    services:
-      selenium:
-        image: selenium/standalone-chrome:latest
-        options: --shm-size=2gb
-        ports:
-          - 4444:4444
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -56,17 +49,32 @@ jobs:
       - name: TEST | Install package
         run: sudo snap install --dangerous *.snap
 
+      - name: Start Playwright server
+        run: make playwright-ci -C tests
+
       - name: TEST | Run Prepare Tests
         run: make test-prep -C tests
 
-      - name: TEST | Run Selenium Tests
-        run: make test-selenium -C tests
+      - name: TEST | Run Photo Tests
+        run: make test-photos -C tests
+
+      - name: Stop Playwright server
+        if: always()
+        run: make playwright-ci-stop -C tests
+
+      - name: Upload test videos on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-videos-edge
+          retention-days: 7
+          path: tests/test-results/videos/
 
       - name: Upload test report
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: selenium-test-report
+          name: playwright-test-report
           path: |
             tests/latest_logs
             tests/report/
