@@ -86,13 +86,11 @@ jobs:
         timeout-minutes: 10
         run: make test-assets -C tests
 
-      - name: Upload test videos on failure
+      - name: Upload test report to StatHost
         if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-videos-prep
-          retention-days: 7
-          path: tests/test-results/videos/
+        env:
+          STATHOST_TOKEN: ${{ secrets.STATHOST_TOKEN }}
+        run: ./tests/upload-report.sh
 
       - name: Backup database and assets
         run: |
@@ -166,13 +164,11 @@ jobs:
             backups
             tests/secret.txt
 
-      - name: Upload test videos on failure
+      - name: Upload test report to StatHost
         if: failure() && steps.check-playwright.outputs.has-playwright == 'true'
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-videos-prep-backup-store
-          retention-days: 7
-          path: tests/test-results/videos/
+        env:
+          STATHOST_TOKEN: ${{ secrets.STATHOST_TOKEN }}
+        run: ./tests/upload-report.sh
 
   upgrade:
     name: Upgrade from Store to Development
@@ -261,13 +257,11 @@ jobs:
       - name: TEST | Run Photo Tests
         run: make test-photos -C tests
 
-      - name: Upload test videos on failure
+      - name: Upload test report to StatHost
         if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-videos-prep-standalone
-          retention-days: 7
-          path: tests/test-results/videos/
+        env:
+          STATHOST_TOKEN: ${{ secrets.STATHOST_TOKEN }}
+        run: ./tests/upload-report.sh
 
   backup:
     name: Built-in Immich Backup Functionality Tests
@@ -363,13 +357,11 @@ jobs:
       - name: TEST | Run Photo Tests
         run: make test-photos -C tests
 
-      - name: Upload test videos on failure
+      - name: Upload test report to StatHost
         if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-videos-assets-${{ matrix.backup-type }}
-          retention-days: 7
-          path: tests/test-results/videos/
+        env:
+          STATHOST_TOKEN: ${{ secrets.STATHOST_TOKEN }}
+        run: ./tests/upload-report.sh
 
       - name: Backup database and assets after photo tests
         run: |
@@ -435,13 +427,11 @@ jobs:
       - name: TEST | Run Sync Tests
         run: EXPECTED_INITIAL_IMAGE_COUNT=0 make test-sync -C tests
 
-      - name: Upload test videos on failure
+      - name: Upload test report to StatHost
         if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-videos-sync-${{ matrix.backup-type }}
-          retention-days: 7
-          path: tests/test-results/videos/
+        env:
+          STATHOST_TOKEN: ${{ secrets.STATHOST_TOKEN }}
+        run: ./tests/upload-report.sh
 
   cli:
     name: Test CLI - ${{ matrix.backup-type }}

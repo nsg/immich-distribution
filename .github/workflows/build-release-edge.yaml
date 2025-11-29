@@ -62,13 +62,11 @@ jobs:
         if: always()
         run: make playwright-ci-stop -C tests
 
-      - name: Upload test videos on failure
+      - name: Upload test report to StatHost
         if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-videos-edge
-          retention-days: 7
-          path: tests/test-results/videos/
+        env:
+          STATHOST_TOKEN: ${{ secrets.STATHOST_TOKEN }}
+        run: ./tests/upload-report.sh
 
       - name: Upload test report
         uses: actions/upload-artifact@v4
