@@ -63,7 +63,7 @@ jobs:
         run: make playwright-ci-stop -C tests
 
       - name: Upload test report to StatHost
-        if: failure()
+        if: failure() || cancelled()
         env:
           STATHOST_TOKEN: ${{ secrets.STATHOST_TOKEN }}
         run: ./tests/upload-report.sh

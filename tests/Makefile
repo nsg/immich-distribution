@@ -10,7 +10,8 @@ ifndef CI
     PYTEST_EXTRA_ARGS = --headed
     PYTEST_LOCALTEST_DEPENDENCIES =
 else
-    PYTEST_EXTRA_ARGS =
+    # --timeout=580: 10 min per test, uses signal method (allows teardown/video save)
+    PYTEST_EXTRA_ARGS = -v -s --tb=short --timeout=580
     PYTEST_LOCALTEST_DEPENDENCIES =
 endif
 

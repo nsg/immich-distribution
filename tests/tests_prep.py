@@ -10,6 +10,11 @@ import os
 from playwright.sync_api import Page, expect
 
 
+def debug(message: str):
+    """Print debug message with immediate flush for real-time output."""
+    print(f"[DEBUG] {message}", flush=True)
+
+
 def get_ip_address():
     immich_ip = os.getenv('IMMICH_IP')
     if immich_ip:
@@ -22,25 +27,37 @@ def get_ip_address():
 
 def immich_goto(page: Page, path=None, login=True):
     """Navigate to Immich and optionally login."""
-    page.goto(f"http://{get_ip_address()}")
+    url = f"http://{get_ip_address()}"
+    debug(f"Navigating to {url}")
+    page.goto(url)
     
     if login:
         immich_login(page)
-        page.wait_for_timeout(2000)
         
         acknowledge_button = page.locator("button:has-text('Acknowledge')")
         if acknowledge_button.is_visible():
+            debug("Clicking 'Acknowledge' button")
             acknowledge_button.click()
     
     if path:
-        page.goto(f"http://{get_ip_address()}/{path}")
+        full_url = f"http://{get_ip_address()}/{path}"
+        debug(f"Navigating to {full_url}")
+        page.goto(full_url)
 
 
 def immich_login(page: Page):
     """Login to Immich."""
+    debug("Filling email field")
     page.locator("input[id='email']").fill("foo@example.com")
+
+    debug("Filling password field")
     page.locator("input[id='password']").fill("secret")
+
+    debug("Clicking 'Login' button")
     page.locator("button:has-text('Login')").click()
+    
+    debug("Waiting for navigation after login")
+    page.wait_for_url(lambda url: "/auth/login" not in url, timeout=60000)
 
 
 def write_message(page: Page, message: str):
@@ -50,29 +67,29 @@ def write_message(page: Page, message: str):
     page.evaluate(f'document.body.innerHTML="{message}";')
 
 
-def get_input_by_label(page: Page, label_text: str, text=None):
-    """Find input element by its label text and optionally fill it."""
-    element = page.locator(f"//label[contains(text(), '{label_text}')]/..//input")
-    if text:
-        element.fill(text)
-    return element
-
-
 def test_prep_001_register(page: Page):
     """Register a new user"""
     immich_goto(page, login=False)
     
-    # Welcome page, click button
-    if "Welcome" in page.title():
-        page.locator("span:has-text('Getting Started')").click()
+    debug("Clicking 'Getting Started' button")
+    page.locator("span:has-text('Getting Started')").click()
     
-    # Register a new user
-    get_input_by_label(page, "Admin Email", "foo@example.com")
-    get_input_by_label(page, "Admin Password", "secret")
-    get_input_by_label(page, "Confirm Admin Password", "secret")
-    get_input_by_label(page, "Name", "Ture Test")
+    debug("Filling email field")
+    page.locator("input[type='email']").fill("foo@example.com")
+
+    debug("Filling password field")
+    page.locator("input[type='password']").nth(0).fill("secret")
+
+    debug("Filling confirm password field")
+    page.locator("input[type='password']").nth(1).fill("secret")
+
+    debug("Filling name field")
+    page.locator("input[type='text']").fill("Ture Test")
+    
+    debug("Clicking 'Sign up' button")
     page.locator("button:has-text('Sign up')").click()
     
+    debug("Verifying redirect to login page")
     expect(page).to_have_title("Login - Immich")
 
 
@@ -80,20 +97,42 @@ def test_prep_002_first_login(page: Page):
     """Login, follow the welcome flow and make sure we end up on the photos page."""
     immich_goto(page)
     
+    debug("Verifying onboarding page title")
     expect(page).to_have_title("Onboarding - Immich")
-    page.locator("button:has-text('Theme')").click()
-    page.locator("button:has-text('Language')").click()
-    page.locator("button:has-text('Server Privacy')").click()
-    page.locator("button:has-text('User Privacy')").click()
-    page.locator("button:has-text('Storage Template')").click()
-    page.locator("button:has-text('Backups')").click()
-    page.locator("button:has-text('Done')").click()
+    
+    debug("Clicking 'Theme' button")
+    page.get_by_role("button", name="Theme").click()
+
+    debug("Clicking 'Language' button")
+    page.get_by_role("button", name="Language").click()
+
+    debug("Clicking 'Server Privacy' button")
+    page.get_by_role("button", name="Server Privacy").click()
+
+    debug("Clicking 'User Privacy' button")
+    page.get_by_role("button", name="User Privacy").click()
+
+    debug("Clicking 'Storage Template' button")
+    page.get_by_role("button", name="Storage Template").click()
+
+    debug("Clicking 'Backups' button")
+    page.get_by_role("button", name="Backups").click()
+
+    debug("Clicking 'Mobile App' button")
+    page.get_by_role("button", name="Mobile App").click()
+
+    debug("Clicking 'Done' button")
+    page.get_by_role("button", name="Done").click()
+    
+    debug("Verifying photos page title")
     expect(page).to_have_title("Photos - Immich")
 
 
 def test_prep_003_empty_timeline(page: Page):
     """Make sure the timeline is empty and we get a message to upload photos."""
     immich_goto(page)
+    
+    debug("Verifying empty timeline message is visible")
     expect(page.locator("p:has-text('CLICK TO UPLOAD YOUR FIRST PHOTO')")).to_be_visible()
 
 
@@ -103,12 +142,35 @@ def test_prep_004_generate_api_keys(page: Page):
     The API keys will be used by other tests to query the API and upload assets.
     """
     immich_goto(page, login=True)
+    
+    debug("Navigating to user-settings")
     immich_goto(page, path="user-settings", login=False)
-    page.locator("h2").wait_for()
-    page.locator("button:has-text('API Keys')").click()
-    page.locator("button:has-text('New API Key')").click()
+
+    debug("Waiting for API Keys section to be visible")
+    page.get_by_role("button", name="API Keys").wait_for()
+    
+    debug("Clicking 'API Keys' button")
+    page.get_by_role("button", name="API Keys").click()
+    
+    debug("Clicking 'New API Key' button")
+    page.get_by_role("button", name="New API Key").click()
+
+    debug("Clicking 'Select All' button")
     page.locator("button[id='input-select-all']").click()
-    page.locator("button:has-text('Create')").click()
-    secret = page.locator("textarea[id='secret']").text_content()
+
+    debug("Clicking 'Create' button")
+    page.get_by_role("button", name="Create").click()
+    
+    debug("Waiting for secret textarea to appear")
+    page.locator("textarea").wait_for()
+    
+    debug("Reading API key from textarea")
+    secret = page.locator("textarea").input_value()
+
+    debug("Validating API key")
+    assert secret and len(secret) > 20, f"API key should be a non-empty string, got: '{secret}'"
+
+    debug("Saving API key to secret.txt")
     with open("secret.txt", "w") as f:
         f.write(secret)
+    debug(f"API key saved ({len(secret)} chars)")

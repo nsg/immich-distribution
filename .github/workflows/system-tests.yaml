@@ -87,7 +87,7 @@ jobs:
         run: make test-assets -C tests
 
       - name: Upload test report to StatHost
-        if: failure()
+        if: failure() || cancelled()
         env:
           STATHOST_TOKEN: ${{ secrets.STATHOST_TOKEN }}
         run: ./tests/upload-report.sh
@@ -165,7 +165,7 @@ jobs:
             tests/secret.txt
 
       - name: Upload test report to StatHost
-        if: failure() && steps.check-playwright.outputs.has-playwright == 'true'
+        if: (failure() || cancelled()) && steps.check-playwright.outputs.has-playwright == 'true'
         env:
           STATHOST_TOKEN: ${{ secrets.STATHOST_TOKEN }}
         run: ./tests/upload-report.sh
@@ -258,7 +258,7 @@ jobs:
         run: make test-photos -C tests
 
       - name: Upload test report to StatHost
-        if: failure()
+        if: failure() || cancelled()
         env:
           STATHOST_TOKEN: ${{ secrets.STATHOST_TOKEN }}
         run: ./tests/upload-report.sh
@@ -304,7 +304,7 @@ jobs:
         run: make test-backup -C tests
 
       - name: Print journal on backup test failure
-        if: failure()
+        if: failure() || cancelled()
         run: |
           echo "Backup test failed. Printing journal logs..."
           sudo journalctl -u snap.immich-distribution.* --no-pager -n 500
@@ -358,7 +358,7 @@ jobs:
         run: make test-photos -C tests
 
       - name: Upload test report to StatHost
-        if: failure()
+        if: failure() || cancelled()
         env:
           STATHOST_TOKEN: ${{ secrets.STATHOST_TOKEN }}
         run: ./tests/upload-report.sh
@@ -428,7 +428,7 @@ jobs:
         run: EXPECTED_INITIAL_IMAGE_COUNT=0 make test-sync -C tests
 
       - name: Upload test report to StatHost
-        if: failure()
+        if: failure() || cancelled()
         env:
           STATHOST_TOKEN: ${{ secrets.STATHOST_TOKEN }}
         run: ./tests/upload-report.sh
