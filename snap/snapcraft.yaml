@@ -13,6 +13,9 @@ website: https://immich-distribution.nsg.cc
 contact: https://github.com/nsg/immich-distribution/issues
 source-code: https://github.com/nsg/immich-distribution
 issues: https://github.com/nsg/immich-distribution/issues
+license: MIT
+donation:
+  - https://github.com/sponsors/nsg
 summary: Community-packaged Immich for easy self-hosted photo and video management.
 description: |
   This is a community-packaged Immich distribution, conveniently bundled as a snap package.
@@ -275,12 +278,20 @@ parts:
 
       cd web
 
+      # Apply v2.2.x specific patch to disable update check (causes infinite rendering loop)
+      if [[ "$SNAPCRAFT_PROJECT_VERSION" == v2.2.* ]]; then
+        echo "Applying v2.2.x update check disable patch..."
+        git apply -p2 $CRAFT_STAGE/v2.2-disable-update-check.patch
+      fi
+
       pnpm --filter @immich/sdk --filter immich-web --frozen-lockfile --force install
       pnpm --filter @immich/sdk --filter immich-web build
 
       # Install the resulting web application
       mkdir -p ${CRAFT_PART_INSTALL}/var/lib/immich/build
       cp -r build ${CRAFT_PART_INSTALL}/var/lib/immich/build/www
+    after:
+      - parts-server-patches
     build-snaps:
       - node/20/stable
 
