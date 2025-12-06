@@ -1,6 +1,0 @@
-playwright==1.55.0
-pytest-playwright==0.7.0
-pytest-timeout
-pyyaml
-opencv-python
-pytest-html

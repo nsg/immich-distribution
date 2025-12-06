@@ -3,15 +3,14 @@
 # The tests are written in Python and use Playwright for browser automation.
 #
 
-PYTEST = .env/bin/pytest
-PYTHON = .env/bin/python
+PYTEST = uv run pytest
 
 ifndef CI
-    PYTEST_EXTRA_ARGS = --headed
+    PYTEST_EXTRA_ARGS = -v -s --tb=short --headed -x
     PYTEST_LOCALTEST_DEPENDENCIES =
 else
     # --timeout=580: 10 min per test, uses signal method (allows teardown/video save)
-    PYTEST_EXTRA_ARGS = -v -s --tb=short --timeout=580
+    PYTEST_EXTRA_ARGS = -v -s --tb=short --timeout=580 -x
     PYTEST_LOCALTEST_DEPENDENCIES =
 endif
 
@@ -21,10 +20,10 @@ test: test-validate test-prep
 test-validate:
 	./test_vips_version.sh
 
-test-prep: ${PYTEST} ${PYTEST_LOCALTEST_DEPENDENCIES} wait
+test-prep: .venv ${PYTEST_LOCALTEST_DEPENDENCIES} wait
 	${PYTEST} tests_prep.py ${PYTEST_EXTRA_ARGS} --html=report/index.html
 
-test-photos: ${PYTEST} ${PYTEST_LOCALTEST_DEPENDENCIES} test-assets wait
+test-photos: .venv ${PYTEST_LOCALTEST_DEPENDENCIES} test-assets wait
 	${PYTEST} tests_assets.py ${PYTEST_EXTRA_ARGS} --html=report/index.html
 
 test-sync: test-assets wait
@@ -36,10 +35,10 @@ test-cli: wait
 test-backup: wait
 	./test_backup.sh
 
-test_prep_%: ${PYTEST} ${PYTEST_LOCALTEST_DEPENDENCIES}
+test_prep_%: .venv ${PYTEST_LOCALTEST_DEPENDENCIES}
 	${PYTEST} tests_prep.py ${PYTEST_EXTRA_ARGS} -k $* --html=report/index.html
 
-test_photos_%: ${PYTEST} ${PYTEST_LOCALTEST_DEPENDENCIES} test-assets
+test_photos_%: .venv ${PYTEST_LOCALTEST_DEPENDENCIES} test-assets
 	${PYTEST} tests_assets.py ${PYTEST_EXTRA_ARGS} -k $* --html=report/index.html
 
 test-assets:
@@ -52,9 +51,6 @@ cleantest:
 wait:
 	./test_haproxy.sh
 
-.env:
-	python3 -m venv .env
-
-${PYTEST}: .env
-	.env/bin/pip install -r requirements.txt
-	.env/bin/playwright install chromium
+.venv: uv.lock
+	uv sync
+	uv run playwright install chromium

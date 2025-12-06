@@ -1,0 +1,13 @@
+[project]
+name = "immich-distribution-tests"
+version = "0.1.0"
+description = "Tests for Immich Distribution"
+requires-python = ">=3.10"
+dependencies = [
+    "playwright==1.55.0",
+    "pytest-playwright==0.7.0",
+    "pytest-timeout",
+    "pyyaml",
+    "opencv-python",
+    "pytest-html",
+]
