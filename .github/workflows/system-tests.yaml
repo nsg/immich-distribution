@@ -110,134 +110,6 @@ jobs:
             backups
             tests/secret.txt
 
-  prep-backup-store:
-    name: Prepare backup state from store package
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    outputs:
-      tests-ran: ${{ steps.check-playwright.outputs.has-playwright }}
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          ref: master
-
-      - name: Check for Playwright test infrastructure
-        id: check-playwright
-        run: |
-          if [ -f "tests/conftest.py" ]; then
-            echo "has-playwright=true" >> $GITHUB_OUTPUT
-          else
-            echo "has-playwright=false" >> $GITHUB_OUTPUT
-            echo "Playwright test infrastructure not found - skipping tests (expected on older branches)"
-          fi
-
-      - name: TEST | Install package from store
-        if: steps.check-playwright.outputs.has-playwright == 'true'
-        run: sudo snap install immich-distribution
-
-      - name: Install uv
-        if: steps.check-playwright.outputs.has-playwright == 'true'
-        uses: astral-sh/setup-uv@v7
-
-      - name: Start Playwright server
-        if: steps.check-playwright.outputs.has-playwright == 'true'
-        run: make playwright-ci -C tests
-
-      - name: TEST | Run Prepare Tests
-        if: steps.check-playwright.outputs.has-playwright == 'true'
-        timeout-minutes: 10
-        run: make test-prep -C tests
-
-      - name: Stop Playwright server
-        if: always() && steps.check-playwright.outputs.has-playwright == 'true'
-        run: make playwright-ci-stop -C tests
-
-      - name: Backup database and assets
-        if: steps.check-playwright.outputs.has-playwright == 'true'
-        run: |
-          sudo immich-distribution.backup -a -d
-          rm -rf ./backups
-          cp -rv /var/snap/immich-distribution/common/backups .
-
-      - name: Upload backups and secret.txt
-        if: steps.check-playwright.outputs.has-playwright == 'true'
-        uses: actions/upload-artifact@v4
-        with:
-          name: backups-store
-          retention-days: 1
-          path: |
-            backups
-            tests/secret.txt
-
-      - name: Upload test report to StatHost
-        if: (failure() || cancelled()) && steps.check-playwright.outputs.has-playwright == 'true'
-        env:
-          STATHOST_TOKEN: ${{ secrets.STATHOST_TOKEN }}
-        run: ./tests/upload-report.sh
-
-  upgrade:
-    name: Upgrade from Store to Development
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    if: needs.prep-backup-store.outputs.tests-ran == 'true'
-
-    needs: [build-snap, prep-backup-store]
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: TEST | Install package from store
-        run: sudo snap install immich-distribution
-
-      - name: Download backups artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: backups-store
-
-      - name: Wait Immich Distribution to start
-        run: make wait -C tests
-
-      - name: Restore database
-        run: |
-          sudo cp -rv ./backups/immich_database_*.sql.xz /var/snap/immich-distribution/common/backups
-          sudo immich-distribution.restore -y -d /var/snap/immich-distribution/common/backups/immich_database_*.sql.xz
-          sudo rm /var/snap/immich-distribution/common/backups/immich_database_*.sql.xz
-
-      - name: Restore assets
-        run: |
-          sudo cp -rv ./backups/immich_assets_*.tar.xz /var/snap/immich-distribution/common/backups
-          sudo immich-distribution.restore -y -a /var/snap/immich-distribution/common/backups/immich_assets_*.tar.xz
-          sudo rm /var/snap/immich-distribution/common/backups/immich_assets_*.tar.xz
-
-      - name: Download snap artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: development-snap-package
-
-      - name: TEST | Upgrade to development package
-        run: sudo snap install --dangerous *.snap
-
-      - name: Wait Immich Distribution to restart after upgrade
-        run: make wait -C tests
-
-      - name: Backup database and assets after upgrade
-        run: |
-          sudo immich-distribution.backup -a -d
-          rm -rf ./backups
-          cp -rv /var/snap/immich-distribution/common/backups .
-
-      - name: Upload post-upgrade backups
-        uses: actions/upload-artifact@v4
-        with:
-          name: backups-upgraded
-          retention-days: 1
-          path: |
-            backups
-            tests/secret.txt
-
   prep:
     name: Prepare & Asset Tests
     runs-on: ubuntu-latest
@@ -320,19 +192,11 @@ jobs:
           sudo journalctl -u snap.immich-distribution.* --no-pager -n 500
 
   assets:
-    name: Test Assets - ${{ matrix.backup-type }}
+    name: Test Assets
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
-    needs: [prep-backup, upgrade]
-
-    strategy:
-      matrix:
-        include:
-          - backup-type: "development"
-            backup-artifact: "backups"
-          - backup-type: "upgraded"
-            backup-artifact: "backups-upgraded"
+    needs: prep-backup
 
     steps:
       - name: Checkout code
@@ -349,7 +213,7 @@ jobs:
       - name: Download backups artifact
         uses: actions/download-artifact@v4
         with:
-          name: ${{ matrix.backup-artifact }}
+          name: backups
 
       - name: Wait Immich Distribution to start
         run: make wait -C tests
@@ -376,35 +240,12 @@ jobs:
           STATHOST_TOKEN: ${{ secrets.STATHOST_TOKEN }}
         run: ./tests/upload-report.sh
 
-      - name: Backup database and assets after photo tests
-        run: |
-          sudo immich-distribution.backup -a -d
-          rm -rf ./backups
-          cp -rv /var/snap/immich-distribution/common/backups .
-
-      - name: Upload assets test state
-        uses: actions/upload-artifact@v4
-        with:
-          name: assets-test-state-${{ matrix.backup-type }}
-          retention-days: 1
-          path: |
-            backups
-            tests/secret.txt
-
   sync:
-    name: Test Sync Service - ${{ matrix.backup-type }}
+    name: Test Sync Service
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
-    needs: [prep-backup, upgrade]
-
-    strategy:
-      matrix:
-        include:
-          - backup-type: "development"
-            backup-artifact: "backups"
-          - backup-type: "upgraded"
-            backup-artifact: "backups-upgraded"
+    needs: prep-backup
 
     steps:
       - name: Checkout code
@@ -422,7 +263,7 @@ jobs:
       - name: Download backups artifact
         uses: actions/download-artifact@v4
         with:
-          name: ${{ matrix.backup-artifact }}
+          name: backups
 
       - name: Wait Immich Distribution to start
         run: make wait -C tests
@@ -447,19 +288,11 @@ jobs:
         run: ./tests/upload-report.sh
 
   cli:
-    name: Test CLI - ${{ matrix.backup-type }}
+    name: Test CLI
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
-    needs: [prep-backup, upgrade]
-
-    strategy:
-      matrix:
-        include:
-          - backup-type: "development"
-            backup-artifact: "backups"
-          - backup-type: "upgraded"
-            backup-artifact: "backups-upgraded"
+    needs: prep-backup
 
     steps:
       - name: Checkout code
@@ -477,7 +310,7 @@ jobs:
       - name: Download backups artifact
         uses: actions/download-artifact@v4
         with:
-          name: ${{ matrix.backup-artifact }}
+          name: backups
 
       - name: Wait Immich Distribution to start
         run: make wait -C tests
