@@ -78,6 +78,9 @@ jobs:
       - name: TEST | Install package
         run: sudo snap install --dangerous *.snap
 
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+
       - name: TEST | Run Prepare Tests
         timeout-minutes: 10
         run: make test-prep -C tests
@@ -133,6 +136,10 @@ jobs:
       - name: TEST | Install package from store
         if: steps.check-playwright.outputs.has-playwright == 'true'
         run: sudo snap install immich-distribution
+
+      - name: Install uv
+        if: steps.check-playwright.outputs.has-playwright == 'true'
+        uses: astral-sh/setup-uv@v7
 
       - name: Start Playwright server
         if: steps.check-playwright.outputs.has-playwright == 'true'
@@ -250,6 +257,9 @@ jobs:
       - name: TEST | Install package
         run: sudo snap install --dangerous *.snap
 
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+
       - name: TEST | Run Prepare Tests
         timeout-minutes: 10
         run: make test-prep -C tests
@@ -353,6 +363,9 @@ jobs:
         run: |
           sudo cp -rv ./backups/immich_assets_*.tar.xz /var/snap/immich-distribution/common/backups
           sudo immich-distribution.restore -y -a /var/snap/immich-distribution/common/backups/immich_assets_*.tar.xz
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
 
       - name: TEST | Run Photo Tests
         run: make test-photos -C tests

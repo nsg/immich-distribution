@@ -49,6 +49,9 @@ jobs:
       - name: TEST | Install package
         run: sudo snap install --dangerous *.snap
 
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+
       - name: Start Playwright server
         run: make playwright-ci -C tests
 
