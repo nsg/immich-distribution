@@ -1,6 +1,6 @@
 name: immich-distribution
 title: Immich Distribution
-version: "v2.1.0"
+version: "v2.2.0"
 base: core22
 grade: stable
 confinement: strict
@@ -13,6 +13,9 @@ website: https://immich-distribution.nsg.cc
 contact: https://github.com/nsg/immich-distribution/issues
 source-code: https://github.com/nsg/immich-distribution
 issues: https://github.com/nsg/immich-distribution/issues
+license: MIT
+donation:
+  - https://github.com/sponsors/nsg
 summary: Community-packaged Immich for easy self-hosted photo and video management.
 description: |
   This is a community-packaged Immich distribution, conveniently bundled as a snap package.
@@ -177,7 +180,7 @@ parts:
   server:
     plugin: nil
     source: https://github.com/immich-app/immich.git
-    source-tag: v2.1.0
+    source-tag: v2.2.0
     build-environment:
       - SHARP_FORCE_GLOBAL_LIBVIPS: "true"
       - COREPACK_ENABLE_DOWNLOAD_PROMPT: "0"
@@ -196,7 +199,6 @@ parts:
       git apply -p1 $CRAFT_STAGE/commands__index.ts.patch
       git apply -p1 $CRAFT_STAGE/commands__media-location.command.ts.patch
       git apply -p1 $CRAFT_STAGE/services__cli.service.ts.patch
-      git apply -p1 $CRAFT_STAGE/services__notification-admin.service.ts.patch
 
       mkdir -p ${CRAFT_PART_INSTALL}/usr/src/app
 
@@ -265,7 +267,7 @@ parts:
   web:
     plugin: nil
     source: https://github.com/immich-app/immich.git
-    source-tag: v2.1.0
+    source-tag: v2.2.0
     build-environment:
       - COREPACK_ENABLE_DOWNLOAD_PROMPT: "0"
       - CI: "1"
@@ -276,23 +278,37 @@ parts:
 
       cd web
 
+      # Apply v2.2.x specific patch to disable update check (causes infinite rendering loop)
+      if [[ "$SNAPCRAFT_PROJECT_VERSION" == v2.2.* ]]; then
+        echo "Applying v2.2.x update check disable patch..."
+        git apply -p2 $CRAFT_STAGE/v2.2-disable-update-check.patch
+      fi
+
       pnpm --filter @immich/sdk --filter immich-web --frozen-lockfile --force install
       pnpm --filter @immich/sdk --filter immich-web build
 
       # Install the resulting web application
       mkdir -p ${CRAFT_PART_INSTALL}/var/lib/immich/build
       cp -r build ${CRAFT_PART_INSTALL}/var/lib/immich/build/www
+    after:
+      - parts-server-patches
     build-snaps:
       - node/20/stable
 
   machine-learning:
     plugin: uv
     source: https://github.com/immich-app/immich.git
-    source-tag: v2.1.0
+    source-tag: v2.2.0
     source-subdir: machine-learning
     uv-extras:
       - cpu
     override-build: |
+      # Apply v2.2.0 patch to disable OCR font download (causes read-only filesystem error)
+      if [[ "$SNAPCRAFT_PROJECT_VERSION" == "v2.2.0" ]]; then
+        echo "Applying v2.2.0 OCR font download fix patch..."
+        git apply -p1 $CRAFT_STAGE/v2.2.0-ocr-font-download.patch
+      fi
+
       craftctl default
 
       cd machine-learning
@@ -301,7 +317,17 @@ parts:
 
     stage-packages:
       - nsg-mimalloc
-    after: [uv-deps]
+      - libgl1
+      - libglib2.0-0
+    stage:
+      - -usr/share/drirc.d/00-mesa-defaults.conf
+    after: [uv-deps, parts-patches]
+
+  parts-patches:
+    plugin: dump
+    source: parts/patches
+    prime:
+      - -*
 
   uv-deps:
     plugin: nil

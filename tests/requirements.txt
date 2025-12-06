@@ -1,3 +1,0 @@
-seleniumbase
-pyyaml
-opencv-python

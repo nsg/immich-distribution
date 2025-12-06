@@ -14,7 +14,7 @@ all: build install
 
 .PHONY: build
 build:
-	snapcraft
+	snapcraft pack
 
 .PHONY: try
 try:

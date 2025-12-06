@@ -1,31 +1,30 @@
 #
 # This Makefile is used to run tests for Immich Distribution.
-# The tests are written in Python and use the SeleniumBase framework.
+# The tests are written in Python and use Playwright for browser automation.
 #
 
-PYTEST = .env/bin/pytest
-PYTHON = .env/bin/python
+PYTEST = uv run pytest
 
 ifndef CI
-    PYTEST_EXTRA_ARGS = --headed
-    PYTEST_LOCALTEST_DEPENDENCIES = .env/bin/seleniumbase check-selenium
+    PYTEST_EXTRA_ARGS = -v -s --tb=short --headed -x
+    PYTEST_LOCALTEST_DEPENDENCIES =
 else
-    PYTEST_EXTRA_ARGS =
+    # --timeout=580: 10 min per test, uses signal method (allows teardown/video save)
+    PYTEST_EXTRA_ARGS = -v -s --tb=short --timeout=580 -x
     PYTEST_LOCALTEST_DEPENDENCIES =
 endif
 
 test: test-validate test-prep
-	make test-assets
-	make test-selenium
+	make test-photos
 
 test-validate:
 	./test_vips_version.sh
 
-test-prep: ${PYTEST} ${PYTEST_LOCALTEST_DEPENDENCIES} wait
-	${PYTEST} tests_prep.py --server=127.0.0.1 --port=4444 ${PYTEST_EXTRA_ARGS} --dashboard --html=report/index.html
+test-prep: .venv ${PYTEST_LOCALTEST_DEPENDENCIES} wait
+	${PYTEST} tests_prep.py ${PYTEST_EXTRA_ARGS} --html=report/index.html
 
-test-selenium: ${PYTEST} ${PYTEST_LOCALTEST_DEPENDENCIES} test-assets wait
-	${PYTEST} tests_selenium.py --server=127.0.0.1 --port=4444 ${PYTEST_EXTRA_ARGS} --dashboard --html=report/index.html
+test-photos: .venv ${PYTEST_LOCALTEST_DEPENDENCIES} test-assets wait
+	${PYTEST} tests_assets.py ${PYTEST_EXTRA_ARGS} --html=report/index.html
 
 test-sync: test-assets wait
 	./test_sync.sh
@@ -36,11 +35,11 @@ test-cli: wait
 test-backup: wait
 	./test_backup.sh
 
-test_prep_%: ${PYTEST} ${PYTEST_LOCALTEST_DEPENDENCIES}
-	${PYTEST} tests_prep.py --server=127.0.0.1 --port=4444 --headed -k $* --html=report/index.html
+test_prep_%: .venv ${PYTEST_LOCALTEST_DEPENDENCIES}
+	${PYTEST} tests_prep.py ${PYTEST_EXTRA_ARGS} -k $* --html=report/index.html
 
-test_selenium_%: ${PYTEST} ${PYTEST_LOCALTEST_DEPENDENCIES} test-assets
-	${PYTEST} tests_selenium.py --server=127.0.0.1 --port=4444 --headed -k $* --html=report/index.html
+test_photos_%: .venv ${PYTEST_LOCALTEST_DEPENDENCIES} test-assets
+	${PYTEST} tests_assets.py ${PYTEST_EXTRA_ARGS} -k $* --html=report/index.html
 
 test-assets:
 	git clone https://github.com/immich-app/test-assets.git
@@ -52,26 +51,6 @@ cleantest:
 wait:
 	./test_haproxy.sh
 
-check-selenium:
-	nc -v -w1 127.0.0.1 4444 || (echo "Selenium is not running"; exit 1)
-
-selenium:
-	@echo "Starting Selenium with Chrome in a Podman container..."
-	@echo "Access it via http://127.0.0.1:7900?autoconnect=true&password=secret"
-	podman run \
-		-p 4444:4444 \
-		-p 0.0.0.0:7900:7900 \
-		--shm-size="2g" \
-		docker.io/selenium/standalone-chrome:latest
-
-movie:
-	${PYTHON} movie.py
-
-.env:
-	python3 -m venv .env
-
-${PYTEST}: .env
-	.env/bin/pip install -r requirements.txt
-
-.env/bin/seleniumbase: .env
-	.env/bin/pip install -r requirements.txt
+.venv: uv.lock
+	uv sync
+	uv run playwright install chromium
