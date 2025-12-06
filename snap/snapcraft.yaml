@@ -1,6 +1,6 @@
 name: immich-distribution
 title: Immich Distribution
-version: "v2.2.0"
+version: "v2.2.3"
 base: core22
 grade: stable
 confinement: strict
@@ -180,7 +180,7 @@ parts:
   server:
     plugin: nil
     source: https://github.com/immich-app/immich.git
-    source-tag: v2.2.0
+    source-tag: v2.2.3
     build-environment:
       - SHARP_FORCE_GLOBAL_LIBVIPS: "true"
       - COREPACK_ENABLE_DOWNLOAD_PROMPT: "0"
@@ -267,7 +267,7 @@ parts:
   web:
     plugin: nil
     source: https://github.com/immich-app/immich.git
-    source-tag: v2.2.0
+    source-tag: v2.2.3
     build-environment:
       - COREPACK_ENABLE_DOWNLOAD_PROMPT: "0"
       - CI: "1"
@@ -298,15 +298,15 @@ parts:
   machine-learning:
     plugin: uv
     source: https://github.com/immich-app/immich.git
-    source-tag: v2.2.0
+    source-tag: v2.2.3
     source-subdir: machine-learning
     uv-extras:
       - cpu
     override-build: |
-      # Apply v2.2.0 patch to disable OCR font download (causes read-only filesystem error)
-      if [[ "$SNAPCRAFT_PROJECT_VERSION" == "v2.2.0" ]]; then
-        echo "Applying v2.2.0 OCR font download fix patch..."
-        git apply -p1 $CRAFT_STAGE/v2.2.0-ocr-font-download.patch
+      # Apply v2.2.3 patch to disable OCR font download (causes read-only filesystem error)
+      if [[ "$SNAPCRAFT_PROJECT_VERSION" == "v2.2.3" ]]; then
+        echo "Applying v2.2.3 OCR font download fix patch..."
+        git apply -p1 $CRAFT_STAGE/v2.2.3-ocr-font-download.patch
       fi
 
       craftctl default
