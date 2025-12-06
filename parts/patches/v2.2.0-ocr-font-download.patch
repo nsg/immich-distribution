@@ -1,0 +1,33 @@
+From 4abaad548a1b95392986c95e75cef2b25549dfc9 Mon Sep 17 00:00:00 2001
+From: Mert <101130780+mertalev@users.noreply.github.com>
+Date: Fri, 31 Oct 2025 02:41:49 -0400
+Subject: [PATCH] fix(ml): ocr failing with rootless docker (#23402)
+
+don't download font
+---
+ machine-learning/immich_ml/models/ocr/recognition.py | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/machine-learning/immich_ml/models/ocr/recognition.py b/machine-learning/immich_ml/models/ocr/recognition.py
+index 0138ff9bd..c3d39b0d7 100644
+--- a/machine-learning/immich_ml/models/ocr/recognition.py
++++ b/machine-learning/immich_ml/models/ocr/recognition.py
+@@ -10,6 +10,7 @@ from rapidocr.inference_engine.base import FileInfo, InferSession
+ from rapidocr.utils import DownloadFile, DownloadFileInput
+ from rapidocr.utils.typings import EngineType, LangRec, OCRVersion, TaskType
+ from rapidocr.utils.typings import ModelType as RapidModelType
++from rapidocr.utils.vis_res import VisRes
+ 
+ from immich_ml.config import log, settings
+ from immich_ml.models.base import InferenceModel
+@@ -31,6 +32,7 @@ class TextRecognizer(InferenceModel):
+             "text": [],
+             "textScore": np.empty(0, dtype=np.float32),
+         }
++        VisRes.__init__ = lambda self, **kwargs: None  # pyright: ignore[reportAttributeAccessIssue]
+         super().__init__(model_name, **model_kwargs, model_format=ModelFormat.ONNX)
+ 
+     def _download(self) -> None:
+-- 
+2.43.0
+
