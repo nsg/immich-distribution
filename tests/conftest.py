@@ -5,6 +5,7 @@ Handles browser setup, video recording, and timeouts.
 
 import pytest
 import re
+import shutil
 from pathlib import Path
 
 
@@ -34,18 +35,16 @@ def browser_context_args(browser_context_args, video_path: Path):
 
 
 @pytest.fixture(autouse=True)
-def set_timeouts_and_save_video(page, request, video_path):
+def set_timeouts_and_save_video(page, context, request, video_path):
     """Set timeouts and save video with test name after test."""
     page.set_default_timeout(ACTION_TIMEOUT)
     page.set_default_navigation_timeout(NAVIGATION_TIMEOUT)
     yield
-    # Close page first (required by Playwright before save_as)
-    page.close()
-    # Sanitize test name: keep only alphanumeric, dash, underscore
     test_name = re.sub(r'[^a-zA-Z0-9_-]', '-', request.node.name)
     video_file = video_path / f"{test_name}.webm"
-    page.video.save_as(video_file)
-    page.video.delete()
+    video_src = page.video.path()
+    context.close()
+    shutil.move(str(video_src), str(video_file))
 
 
 def pytest_configure(config):
