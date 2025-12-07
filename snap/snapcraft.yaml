@@ -278,12 +278,6 @@ parts:
 
       cd web
 
-      # Apply v2.2.x specific patch to disable update check (causes infinite rendering loop)
-      if [[ "$SNAPCRAFT_PROJECT_VERSION" == v2.2.* ]]; then
-        echo "Applying v2.2.x update check disable patch..."
-        git apply -p2 $CRAFT_STAGE/v2.2-disable-update-check.patch
-      fi
-
       pnpm --filter @immich/sdk --filter immich-web --frozen-lockfile --force install
       pnpm --filter @immich/sdk --filter immich-web build
 
