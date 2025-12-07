@@ -289,6 +289,41 @@ parts:
     build-snaps:
       - node/20/stable
 
+  plugins:
+    plugin: nil
+    source: https://github.com/immich-app/immich.git
+    source-tag: v2.3.1
+    build-environment:
+      - COREPACK_ENABLE_DOWNLOAD_PROMPT: "0"
+      - CI: "1"
+      - MISE_DATA_DIR: "${CRAFT_PART_BUILD}/mise-data"
+      - MISE_TRUSTED_CONFIG_PATHS: "${CRAFT_PART_SRC}/plugins/mise.toml"
+    override-build: |
+      # Install mise
+      curl -sSL https://mise.run | sh
+      export PATH="$HOME/.local/bin:$PATH"
+
+      # Remove root mise.toml to prevent monorepo inheritance (installs flutter, etc.)
+      rm -f mise.toml
+
+      npm install --global corepack@latest
+      corepack enable pnpm
+
+      cd plugins
+
+      # Override extism-js version to 1.3.0 (last version compatible with GLIBC 2.35/Ubuntu 22.04)
+      sed -i 's/"github:extism\/js-pdk" = "1.5.1"/"github:extism\/js-pdk" = "1.3.0"/' mise.toml
+
+      mise install
+      mise run build
+
+      # Install the built plugin
+      mkdir -p ${CRAFT_PART_INSTALL}/var/lib/immich/build/corePlugin
+      cp -r dist ${CRAFT_PART_INSTALL}/var/lib/immich/build/corePlugin/
+      cp manifest.json ${CRAFT_PART_INSTALL}/var/lib/immich/build/corePlugin/
+    build-snaps:
+      - node/20/stable
+
   machine-learning:
     plugin: uv
     source: https://github.com/immich-app/immich.git
