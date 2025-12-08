@@ -1,0 +1,16 @@
+diff --git a/server/src/decorators.ts b/server/src/decorators.ts
+index 054bbf8fe..1234567ab 100644
+--- a/server/src/decorators.ts
++++ b/server/src/decorators.ts
+@@ -156,10 +156,6 @@ type EndpointOptions = ApiOperationOptions & { history?: HistoryBuilder };
+ export const Endpoint = ({ history, ...options }: EndpointOptions) => {
+   const decorators: MethodDecorator[] = [];
+   const extensions = history?.getExtensions() ?? {};
+ 
+-  if (!extensions[ApiCustomExtension.History]) {
+-    console.log(`Missing history for endpoint: ${options.summary}`);
+-  }
+-
+   if (history?.isDeprecated()) {
+     options.deprecated = true;
+     decorators.push(ApiTags(ApiTag.Deprecated));
