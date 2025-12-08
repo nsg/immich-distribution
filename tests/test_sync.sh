@@ -1,7 +1,7 @@
 #!/bin/bash
 
 CGROUP_NAME="snap.immich-distribution.sync-service.service"
-INITIAL_NUMBER_OF_ASSETS=${EXPECTED_INITIAL_IMAGE_COUNT:-25}
+INITIAL_NUMBER_OF_ASSETS=${EXPECTED_INITIAL_IMAGE_COUNT:-26}
 
 log() {
     echo -e "🎲 $@"

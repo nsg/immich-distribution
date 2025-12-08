@@ -184,6 +184,7 @@ def test_selenium_005_upload_assets_via_api(page: Page):
         "assets/plane.jpg",
         "assets/ship.mp4",
         "assets/ship-vp9.webm",
+        "assets/PXL_20250712_111801796.jpg",
         "test-assets/formats/heic/IMG_2682.heic",
         "test-assets/formats/webp/denali.webp",
         "test-assets/formats/raw/Nikon/D80/glarus.nef",
@@ -215,7 +216,7 @@ def test_selenium_006_wait_for_job_queue(page: Page):
 def test_selenium_100_verify_uploaded_assets_number_of_files(page: Page):
     """Use the API to verify that the assets were uploaded correctly."""
     write_message(page, "API: Query the API and verify that the number of assets is correct")
-    assert get_number_of_assets() == 25
+    assert get_number_of_assets() == 26
 
 
 def test_selenium_100_verify_exif_location_extraction(page: Page):
@@ -281,3 +282,44 @@ def test_selenium_100_verify_people_detected(page: Page):
 
         assert people['total'] > 1
         break
+
+
+def get_asset_ocr(asset_id: str) -> list:
+    """Get OCR data for an asset."""
+    r = requests.get(
+        f"http://{get_ip_address()}/api/assets/{asset_id}/ocr",
+        headers=get_headers()
+    )
+    return r.json()
+
+
+def test_selenium_100_verify_ocr_extraction(page: Page):
+    """
+    Verify that OCR (Optical Character Recognition) works correctly.
+    This tests that:
+      * The OCR processing job runs
+      * Text is extracted from images containing text
+    """
+    write_message(page, "API: Verify that OCR extracts text from images")
+    wait_for_empty_job_queue()
+
+    # Get the test image that contains text
+    assets = get_assets(["PXL_20250712_111801796.jpg"])
+    ocr_test_asset = assets["PXL_20250712_111801796.jpg"]
+
+    # Get OCR data for the asset
+    ocr_data = get_asset_ocr(ocr_test_asset['id'])
+
+    # Verify OCR data was extracted
+    assert len(ocr_data) > 0, "Expected OCR data to be extracted from image with text"
+
+    # Verify the OCR response structure
+    first_ocr = ocr_data[0]
+    assert 'text' in first_ocr, "OCR response should contain 'text' field"
+    assert 'textScore' in first_ocr, "OCR response should contain 'textScore' field"
+    assert len(first_ocr['text']) > 0, "OCR text should not be empty"
+
+    # Combine all OCR text and verify expected content is found
+    all_text = " ".join([item['text'].upper() for item in ocr_data])
+    assert "WORLD" in all_text or "UNDERGROUND" in all_text, \
+        f"Expected to find 'WORLD' or 'UNDERGROUND' in OCR text, got: {all_text}"
