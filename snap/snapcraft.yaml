@@ -314,6 +314,7 @@ parts:
 
       # Override extism-js version to 1.3.0 (last version compatible with GLIBC 2.35/Ubuntu 22.04)
       sed -i 's/"github:extism\/js-pdk" = "1.5.1"/"github:extism\/js-pdk" = "1.3.0"/' mise.toml
+      grep -q '"github:extism/js-pdk" = "1.3.0"' mise.toml || { echo "ERROR: extism-js version override failed, upstream may have changed the version"; exit 1; }
 
       mise install
       mise run build
