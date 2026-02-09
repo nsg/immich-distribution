@@ -30,3 +30,5 @@ __pycache__
 /parts/sync/.venv/
 /tests/test-results/
 /tests/.venv/
+/.claude-sandbox/
+/.mcp.json
