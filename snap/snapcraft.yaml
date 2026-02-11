@@ -326,6 +326,18 @@ parts:
     build-snaps:
       - node/20/stable
 
+  uv-python312:
+    plugin: nil
+    after: [uv-deps]
+    build-environment:
+      - UV_PYTHON_DOWNLOADS: automatic
+      - UV_PYTHON_PREFERENCE: only-managed
+    override-build: |
+      uv python install 3.12
+      PYTHON_SRC=$(ls -d $(uv python dir)/cpython-3.12.*)
+      mkdir -p ${CRAFT_PART_INSTALL}/opt/python/python3.12
+      cp -r ${PYTHON_SRC}/* ${CRAFT_PART_INSTALL}/opt/python/python3.12/
+
   machine-learning:
     plugin: uv
     source: https://github.com/immich-app/immich.git
@@ -333,9 +345,12 @@ parts:
     source-subdir: machine-learning
     uv-extras:
       - cpu
+    build-environment:
+      - UV_PYTHON: "${CRAFT_STAGE}/opt/python/python3.12/bin/python3.12"
+      - UV_PYTHON_PREFERENCE: only-system
+      - UV_PYTHON_DOWNLOADS: never
     override-build: |
       craftctl default
-
       cd machine-learning
       mkdir -p ${CRAFT_PART_INSTALL}/etc
       cp immich_ml/log_conf.json ${CRAFT_PART_INSTALL}/etc
@@ -346,7 +361,7 @@ parts:
       - libglib2.0-0
     stage:
       - -usr/share/drirc.d/00-mesa-defaults.conf
-    after: [uv-deps]
+    after: [uv-python312, uv-deps]
 
   uv-deps:
     plugin: nil
