@@ -22,4 +22,5 @@ $SNAP/bin/lego $(lego_staging_string) \
     --domains="$ACME_DOMAIN" \
     $CHALLENGE_ARGS \
     renew \
-    --renew-hook="$SNAP/bin/renew-hook"
+    --renew-hook="$SNAP/bin/renew-hook" \
+    || echo "ACME renewal failed, will retry at next timer interval"
