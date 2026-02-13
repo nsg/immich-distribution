@@ -423,15 +423,6 @@ parts:
     plugin: dump
     source: parts/manager
 
-  pgvecto-rs:
-    source: https://github.com/tensorchord/pgvecto.rs/releases/download/v0.2.0/vectors-pg15_0.2.0_amd64.deb
-    plugin: dump
-    organize:
-      usr/share/postgresql/15/extension: usr/local/pgsql/share/extension
-      usr/lib/postgresql/15/lib: usr/local/pgsql/lib
-    stage:
-      - -usr/share/doc
-
   jellyfin-ffmpeg:
     source: https://github.com/jellyfin/jellyfin-ffmpeg/releases/download/v7.0.2-7/jellyfin-ffmpeg7_7.0.2-7-jammy_amd64.deb
     plugin: dump

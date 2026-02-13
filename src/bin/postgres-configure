@@ -3,7 +3,7 @@
 . $SNAP/bin/load-env
 
 # Always update shared_preload_libraries
-sed -i "s/^#\?shared_preload_libraries.*/shared_preload_libraries = 'vchord.so, vectors.so'/" $PGDATA/postgresql.conf
+sed -i "s/^#\?shared_preload_libraries.*/shared_preload_libraries = 'vchord.so'/" $PGDATA/postgresql.conf
 
-# NOTE: This the leading #, this will only match once per installation
-sed -i "s/^#search_path.*/search_path = '\"\$\$user\", public, vectors' # include vectors schema in search_path for immich queries/" $PGDATA/postgresql.conf
+# Always update search_path
+sed -i "s/^#\?search_path.*/search_path = '\"\$\$user\", public'/" $PGDATA/postgresql.conf

@@ -45,10 +45,10 @@ The plugins build (`snap/snapcraft.yaml`) uses `sed` to downgrade `extism-js` fr
 Machine learning is built with `cpu` extras only (no CUDA/GPU). `libmimalloc.so.2` is preloaded via `LD_PRELOAD` - version in path must match the `nsg-mimalloc` package.
 
 ### Pinned External Dependencies
-Several deps are pinned with checksums and break if removed/republished: `jellyfin-ffmpeg7` deb (tied to `jammy`), `uv` (Python installer, version + SHA256), `pgvecto.rs` deb (pinned to PG15), test assets (pinned git commit). Node.js comes from `node/20/stable` snap channel (EOL April 2026).
+Several deps are pinned with checksums and break if removed/republished: `jellyfin-ffmpeg7` deb (tied to `jammy`), `uv` (Python installer, version + SHA256), test assets (pinned git commit). Node.js comes from `node/20/stable` snap channel (EOL April 2026).
 
 ### Era-Based Upgrade Protection
-`snap/hooks/post-refresh` blocks skipping eras (currently era `1` in `src/bin/load-env`). Users cannot skip intermediate era versions. Escape hatches: touching `$SNAP_COMMON/no-pre-refresh-hook` or `$SNAP_COMMON/no-post-refresh-hook` disables hooks entirely.
+`snap/hooks/post-refresh` blocks skipping eras (currently era `2` in `src/bin/load-env`). Users cannot skip intermediate era versions. Escape hatches: touching `$SNAP_COMMON/no-pre-refresh-hook` or `$SNAP_COMMON/no-post-refresh-hook` disables hooks entirely.
 
 ### Privilege Dropping (snap_daemon)
 Snap services run as root by default. Postgres and other services must run as unprivileged user `snap_daemon` (declared as `system-usernames: snap_daemon: shared`). All data-touching operations use `drop_privileges` (`src/bin/load-env`) which calls `setpriv` to switch to `snap_daemon`. File ownership on `$SNAP_COMMON/pgsql` must be correct or postgres refuses to start. The configure hook `chown`s it on every run.
