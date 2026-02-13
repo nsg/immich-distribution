@@ -30,6 +30,24 @@ shell:
 install:
 	sudo snap install --dangerous ${SNAP_FILE}
 
+# Only evaluate CI variables when needed ($(shell) runs otherwise at parse time)
+ifneq ($(filter download-ci install-ci,$(MAKECMDGOALS)),)
+CI_RUN_ID := $(shell gh run list --branch "$$(git branch --show-current)" --limit 1 --json databaseId --jq '.[0].databaseId')
+CI_SNAP_FILE := immich-distribution_$(shell cat VERSION | tr -d '[:space:]')_amd64_$(CI_RUN_ID).snap
+
+$(CI_SNAP_FILE):
+	gh run download "$(CI_RUN_ID)" -n development-snap-package -D /tmp/install-ci
+	mv /tmp/install-ci/*.snap $@
+	rm -rf /tmp/install-ci
+endif
+
+.PHONY: download-ci
+download-ci: $(CI_SNAP_FILE)
+
+.PHONY: install-ci
+install-ci: $(CI_SNAP_FILE)
+	sudo snap install --dangerous $<
+
 .PHONY: remove
 remove:
 	sudo snap remove --purge immich-distribution
