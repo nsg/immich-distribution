@@ -21,6 +21,7 @@ on:
 jobs:
   validate-config:
     name: Validate Configuration
+    if: github.event_name != 'pull_request' || !startsWith(github.head_ref, 'bump/')
     runs-on: ubuntu-latest
 
     steps:
