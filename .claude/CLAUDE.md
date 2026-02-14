@@ -99,5 +99,6 @@ gh ext run-logs $RUN_ID  # outputs a file path to a zip, unpack that and read th
 On `bump/*` branches: CI runs extensive tests. One issue per minor (1.x), one PR per patch (1.2.x). The PR matching the branch has test results and monitored file diffs to review. Always check upstream `immich-app/immich` release notes. Docker breaking changes may not affect us - be critical. On failures, also check deps: base image, other `immich-app` org repos we depend on.
 
 ## AI Behavior
-- Gather context before changes. Be concise. Discuss before committing.
+- Gather context before changes. Be concise.
+- **NEVER commit without the user explicitly asking to commit.** Do not commit after making changes, do not commit as part of a workflow, do not commit "while you're at it". Wait for the user to say "commit this" or similar.
 - Minimal code comments, no extra files unless requested.
