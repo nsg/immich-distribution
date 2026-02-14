@@ -1,6 +1,6 @@
 name: immich-distribution
 title: Immich Distribution
-version: "v2.5.0"
+version: "v2.5.6"
 base: core22
 grade: stable
 confinement: strict
@@ -180,7 +180,7 @@ parts:
   server:
     plugin: nil
     source: https://github.com/immich-app/immich.git
-    source-tag: v2.5.0
+    source-tag: v2.5.6
     build-environment:
       - SHARP_FORCE_GLOBAL_LIBVIPS: "true"
       - COREPACK_ENABLE_DOWNLOAD_PROMPT: "0"
@@ -267,7 +267,7 @@ parts:
   web:
     plugin: nil
     source: https://github.com/immich-app/immich.git
-    source-tag: v2.5.0
+    source-tag: v2.5.6
     build-environment:
       - COREPACK_ENABLE_DOWNLOAD_PROMPT: "0"
       - CI: "1"
@@ -292,7 +292,7 @@ parts:
   plugins:
     plugin: nil
     source: https://github.com/immich-app/immich.git
-    source-tag: v2.5.0
+    source-tag: v2.5.6
     build-environment:
       - COREPACK_ENABLE_DOWNLOAD_PROMPT: "0"
       - CI: "1"
@@ -340,7 +340,7 @@ parts:
   machine-learning:
     plugin: uv
     source: https://github.com/immich-app/immich.git
-    source-tag: v2.5.0
+    source-tag: v2.5.6
     source-subdir: machine-learning
     uv-extras:
       - cpu
