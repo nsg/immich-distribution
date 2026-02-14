@@ -1,6 +1,6 @@
 name: immich-distribution
 title: Immich Distribution
-version: "v2.4.1"
+version: "v2.5.0"
 base: core22
 grade: stable
 confinement: strict
@@ -180,7 +180,7 @@ parts:
   server:
     plugin: nil
     source: https://github.com/immich-app/immich.git
-    source-tag: v2.4.1
+    source-tag: v2.5.0
     build-environment:
       - SHARP_FORCE_GLOBAL_LIBVIPS: "true"
       - COREPACK_ENABLE_DOWNLOAD_PROMPT: "0"
@@ -194,10 +194,9 @@ parts:
       cd server
 
       # Apply patches
-      patch -p0 < $CRAFT_STAGE/pg_dumpall-path.path
+      git apply -p1 $CRAFT_STAGE/pg_dumpall-path.patch
       git apply -p1 $CRAFT_STAGE/commands__create-admin-api-key.command.ts.patch
       git apply -p1 $CRAFT_STAGE/commands__index.ts.patch
-      git apply -p1 $CRAFT_STAGE/commands__media-location.command.ts.patch
       git apply -p1 $CRAFT_STAGE/services__cli.service.ts.patch
       git apply -p1 $CRAFT_STAGE/decorators.ts.patch
 
@@ -268,7 +267,7 @@ parts:
   web:
     plugin: nil
     source: https://github.com/immich-app/immich.git
-    source-tag: v2.4.1
+    source-tag: v2.5.0
     build-environment:
       - COREPACK_ENABLE_DOWNLOAD_PROMPT: "0"
       - CI: "1"
@@ -293,7 +292,7 @@ parts:
   plugins:
     plugin: nil
     source: https://github.com/immich-app/immich.git
-    source-tag: v2.4.1
+    source-tag: v2.5.0
     build-environment:
       - COREPACK_ENABLE_DOWNLOAD_PROMPT: "0"
       - CI: "1"
@@ -314,6 +313,7 @@ parts:
 
       # Override extism-js version to 1.3.0 (last version compatible with GLIBC 2.35/Ubuntu 22.04)
       sed -i 's/"github:extism\/js-pdk" = "1.5.1"/"github:extism\/js-pdk" = "1.3.0"/' mise.toml
+      grep -q '"github:extism/js-pdk" = "1.3.0"' mise.toml || { echo "ERROR: extism-js version override failed, upstream may have changed the version"; exit 1; }
 
       mise install
       mise run build
@@ -325,16 +325,31 @@ parts:
     build-snaps:
       - node/20/stable
 
+  uv-python312:
+    plugin: nil
+    after: [uv-deps]
+    build-environment:
+      - UV_PYTHON_DOWNLOADS: automatic
+      - UV_PYTHON_PREFERENCE: only-managed
+    override-build: |
+      uv python install 3.12
+      PYTHON_SRC=$(ls -d $(uv python dir)/cpython-3.12.*)
+      mkdir -p ${CRAFT_PART_INSTALL}/opt/python/python3.12
+      cp -r ${PYTHON_SRC}/* ${CRAFT_PART_INSTALL}/opt/python/python3.12/
+
   machine-learning:
     plugin: uv
     source: https://github.com/immich-app/immich.git
-    source-tag: v2.4.1
+    source-tag: v2.5.0
     source-subdir: machine-learning
     uv-extras:
       - cpu
+    build-environment:
+      - UV_PYTHON: "${CRAFT_STAGE}/opt/python/python3.12/bin/python3.12"
+      - UV_PYTHON_PREFERENCE: only-system
+      - UV_PYTHON_DOWNLOADS: never
     override-build: |
       craftctl default
-
       cd machine-learning
       mkdir -p ${CRAFT_PART_INSTALL}/etc
       cp immich_ml/log_conf.json ${CRAFT_PART_INSTALL}/etc
@@ -345,13 +360,13 @@ parts:
       - libglib2.0-0
     stage:
       - -usr/share/drirc.d/00-mesa-defaults.conf
-    after: [uv-deps]
+    after: [uv-python312, uv-deps]
 
   uv-deps:
     plugin: nil
     override-build: |
-      curl -sL https://github.com/astral-sh/uv/releases/download/0.6.11/uv-x86_64-unknown-linux-gnu.tar.gz -o uv.tar.gz
-      echo "c19b3be7ac26f8b211f7a5f07f01a77fd4d2b6205ff257790770a585f7f5bda4  uv.tar.gz" | sha256sum -c
+      curl -sL https://github.com/astral-sh/uv/releases/download/0.10.2/uv-x86_64-unknown-linux-gnu.tar.gz -o uv.tar.gz
+      echo "6aa4576c31f791c0b9d4739e256d07358d45e7535695287fec03cf6839e25512  uv.tar.gz" | sha256sum -c
       tar -xf uv.tar.gz
       mkdir -p $CRAFT_PART_INSTALL/usr/bin
       mv uv-x86_64-unknown-linux-gnu/* $CRAFT_PART_INSTALL/usr/bin
@@ -407,15 +422,6 @@ parts:
   manager:
     plugin: dump
     source: parts/manager
-
-  pgvecto-rs:
-    source: https://github.com/tensorchord/pgvecto.rs/releases/download/v0.2.0/vectors-pg15_0.2.0_amd64.deb
-    plugin: dump
-    organize:
-      usr/share/postgresql/15/extension: usr/local/pgsql/share/extension
-      usr/lib/postgresql/15/lib: usr/local/pgsql/lib
-    stage:
-      - -usr/share/doc
 
   jellyfin-ffmpeg:
     source: https://github.com/jellyfin/jellyfin-ffmpeg/releases/download/v7.0.2-7/jellyfin-ffmpeg7_7.0.2-7-jammy_amd64.deb

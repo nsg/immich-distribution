@@ -21,4 +21,10 @@ export PGDATA="$SNAP_COMMON/pgsql/data"
 export LC_ALL="C"
 export LC_CTYPE="C"
 
-exec $SNAP/usr/local/pgsql/bin/pg_dumpall $@
+BIN=$(basename $0)
+case "$BIN" in
+    pg_dump|pg_dumpall) ;;
+    *) echo "Error: unexpected invocation as $BIN" >&2; exit 1 ;;
+esac
+
+exec $SNAP/usr/local/pgsql/bin/$BIN $@

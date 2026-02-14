@@ -1,0 +1,12 @@
+diff --git a/server/src/utils/database-backups.ts b/server/src/utils/database-backups.ts
+--- a/server/src/utils/database-backups.ts
++++ b/server/src/utils/database-backups.ts
+@@ -149,7 +149,7 @@ export async function buildPostgresLaunchArguments(
+   }
+
+   return {
+-    bin: `/usr/lib/postgresql/${databaseMajorVersion}/bin/${bin}`,
++    bin: `${process.env.SNAP}/bin/${bin}`,
+     args,
+     databasePassword: isUrlConnection ? new URL(databaseConfig.url).password : databaseConfig.password,
+     databaseVersion,

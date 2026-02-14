@@ -87,13 +87,13 @@ else
     failed_count=0
     success_count=0
     
-    echo "$admin_users" | while read -r uid; do
+    while read -r uid; do
         if send_notification "$uid"; then
             success_count=$((success_count + 1))
         else
             failed_count=$((failed_count + 1))
         fi
-    done
+    done <<< "$admin_users"
     
     if [ $failed_count -eq 0 ]; then
         echo "All notifications sent successfully"

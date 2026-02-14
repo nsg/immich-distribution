@@ -44,14 +44,21 @@ while is_backend_down; do
 
     if [ "$N" -ge "$MAX" ]; then
         echo "ERROR: Backends are still DOWN after $MAX seconds"
-        log "Failed units"
+        log "Unit status summary"
+        failed_units=""
         for unit in $(systemd_units); do
-            echo "Unit: $unit"
-            systemd_status_success "$unit" || systemctl status "$unit"
-
+            if systemd_status_success "$unit"; then
+                echo "  OK:   $unit"
+            else
+                echo "  FAIL: $unit"
+                failed_units="$failed_units $unit"
+            fi
         done
-        log "Last 100 lines of log"
-        journalctl -n 100 -eu snap.immich-distribution.*
+
+        for unit in $failed_units; do
+            log "Journal for $unit"
+            journalctl -n 100 -eu "$unit" --no-pager
+        done
         exit 1
     fi
 

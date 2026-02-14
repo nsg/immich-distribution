@@ -4,4 +4,9 @@
 
 export PGDATA="$SNAP_COMMON/pgsql/data"
 
-drop_privileges $SNAP/usr/local/pgsql/bin/psql -U postgres $@
+# Default to postgres user if no username is specified
+if ! echo "$@" | grep -qE '(^| )(-U |--username[ =])'; then
+    set -- -U postgres "$@"
+fi
+
+drop_privileges $SNAP/usr/local/pgsql/bin/psql $@
