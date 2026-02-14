@@ -60,6 +60,22 @@ jobs:
           if-no-files-found: error
           path: "*.snap"
 
+  validate-snap:
+    name: Validate Snap Package
+    runs-on: ubuntu-latest
+    needs: build-snap
+
+    steps:
+      - name: Download snap artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: development-snap-package
+
+      - name: Run snap-review
+        run: |
+          sudo snap install review-tools
+          snap-review *.snap
+
   prep-backup:
     name: Prepare installation and backup state
     runs-on: ubuntu-latest
