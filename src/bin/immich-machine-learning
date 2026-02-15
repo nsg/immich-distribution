@@ -3,7 +3,7 @@
 . $SNAP/bin/load-env
 
 export LD_PRELOAD="$SNAP/usr/local/lib/libmimalloc.so.2"
-export PYTHONPATH="$SNAP/lib/python3.12/site-packages"
+export PYTHONPATH="$SNAP/opt/python-venv/ml/lib/python3.12/site-packages"
 
 exec $SNAP/opt/python/python3.12/bin/python3.12 -m gunicorn immich_ml.main:app \
 	-k immich_ml.config.CustomUvicornWorker \

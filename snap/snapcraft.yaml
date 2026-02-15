@@ -336,6 +336,8 @@ parts:
       PYTHON_SRC=$(ls -d $(uv python dir)/cpython-3.12.*)
       mkdir -p ${CRAFT_PART_INSTALL}/opt/python/python3.12
       cp -r ${PYTHON_SRC}/* ${CRAFT_PART_INSTALL}/opt/python/python3.12/
+    stage:
+      - opt/python/python3.12
 
   machine-learning:
     plugin: uv
@@ -346,10 +348,17 @@ parts:
       - cpu
     build-environment:
       - UV_PYTHON: "${CRAFT_STAGE}/opt/python/python3.12/bin/python3.12"
-      - UV_PYTHON_PREFERENCE: only-system
+      - UV_PYTHON_PREFERENCE: only-managed
       - UV_PYTHON_DOWNLOADS: never
+      - UV_PROJECT_ENVIRONMENT: "${CRAFT_PART_INSTALL}/opt/python-venv/ml"
     override-build: |
       craftctl default
+
+      # Remove broken python symlinks from the venv bin/ — they point to
+      # absolute build staging paths and the wrapper script invokes the
+      # interpreter directly.
+      rm -f ${CRAFT_PART_INSTALL}/opt/python-venv/ml/bin/python*
+
       cd machine-learning
       mkdir -p ${CRAFT_PART_INSTALL}/etc
       cp immich_ml/log_conf.json ${CRAFT_PART_INSTALL}/etc
@@ -372,6 +381,9 @@ parts:
       mv uv-x86_64-unknown-linux-gnu/* $CRAFT_PART_INSTALL/usr/bin
     build-packages:
       - coreutils
+    stage:
+      - usr/bin/uv
+      - usr/bin/uvx
 
   debug:
     plugin: dump
