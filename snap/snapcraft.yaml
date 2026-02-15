@@ -1,6 +1,6 @@
 name: immich-distribution
 title: Immich Distribution
-version: "v2.5.0"
+version: "v2.5.6"
 base: core22
 grade: stable
 confinement: strict
@@ -180,7 +180,7 @@ parts:
   server:
     plugin: nil
     source: https://github.com/immich-app/immich.git
-    source-tag: v2.5.0
+    source-tag: v2.5.6
     build-environment:
       - SHARP_FORCE_GLOBAL_LIBVIPS: "true"
       - COREPACK_ENABLE_DOWNLOAD_PROMPT: "0"
@@ -267,7 +267,7 @@ parts:
   web:
     plugin: nil
     source: https://github.com/immich-app/immich.git
-    source-tag: v2.5.0
+    source-tag: v2.5.6
     build-environment:
       - COREPACK_ENABLE_DOWNLOAD_PROMPT: "0"
       - CI: "1"
@@ -292,7 +292,7 @@ parts:
   plugins:
     plugin: nil
     source: https://github.com/immich-app/immich.git
-    source-tag: v2.5.0
+    source-tag: v2.5.6
     build-environment:
       - COREPACK_ENABLE_DOWNLOAD_PROMPT: "0"
       - CI: "1"
@@ -336,20 +336,29 @@ parts:
       PYTHON_SRC=$(ls -d $(uv python dir)/cpython-3.12.*)
       mkdir -p ${CRAFT_PART_INSTALL}/opt/python/python3.12
       cp -r ${PYTHON_SRC}/* ${CRAFT_PART_INSTALL}/opt/python/python3.12/
+    stage:
+      - opt/python/python3.12
 
   machine-learning:
     plugin: uv
     source: https://github.com/immich-app/immich.git
-    source-tag: v2.5.0
+    source-tag: v2.5.6
     source-subdir: machine-learning
     uv-extras:
       - cpu
     build-environment:
       - UV_PYTHON: "${CRAFT_STAGE}/opt/python/python3.12/bin/python3.12"
-      - UV_PYTHON_PREFERENCE: only-system
+      - UV_PYTHON_PREFERENCE: only-managed
       - UV_PYTHON_DOWNLOADS: never
+      - UV_PROJECT_ENVIRONMENT: "${CRAFT_PART_INSTALL}/opt/python-venv/ml"
     override-build: |
       craftctl default
+
+      # Remove broken python symlinks from the venv bin/ — they point to
+      # absolute build staging paths and the wrapper script invokes the
+      # interpreter directly.
+      rm -f ${CRAFT_PART_INSTALL}/opt/python-venv/ml/bin/python*
+
       cd machine-learning
       mkdir -p ${CRAFT_PART_INSTALL}/etc
       cp immich_ml/log_conf.json ${CRAFT_PART_INSTALL}/etc
@@ -372,6 +381,9 @@ parts:
       mv uv-x86_64-unknown-linux-gnu/* $CRAFT_PART_INSTALL/usr/bin
     build-packages:
       - coreutils
+    stage:
+      - usr/bin/uv
+      - usr/bin/uvx
 
   debug:
     plugin: dump
