@@ -61,8 +61,6 @@ All commands are available as `immich-distribution.<command>`:
 | `psql` | PostgreSQL client |
 | `lets-encrypt` | Initialize Let's Encrypt certificate setup |
 
-See the [CLI documentation](https://immich-distribution.nsg.cc/configuration/cli-administration/) for full usage details.
-
 ## Documentation
 
 Full documentation at [immich-distribution.nsg.cc](https://immich-distribution.nsg.cc).
