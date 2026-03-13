@@ -20,7 +20,7 @@ This project is not affiliated with the upstream [Immich project](https://immich
 sudo snap install immich-distribution
 ```
 
-Open `http://<your-server-ip>` in your browser to complete setup. For detailed installation instructions, including hardware requirements and configuration, see the [installation guide](https://immich-distribution.nsg.cc/install/).
+Open `http://<your-server-ip>` in your browser to complete setup. For detailed installation instructions, including hardware requirements and configuration, see the [installation guide](https://immich-distribution.nsg.cc/installation/).
 
 ## Included Software
 
