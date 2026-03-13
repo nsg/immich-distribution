@@ -6,7 +6,7 @@ Immich Distribution is an independent community project that packages the softwa
 - Please only report bugs upstream if they also occur in the official images.
 
 <p align="center">
-  <img src="docs/docs/assets/immich-dist.png">
+  <img src="docs/site/static/assets/immich-dist.png">
 </p>
 
 ## About
@@ -16,7 +16,7 @@ In short, this is an [Immich](https://immich.app/) Distribution packaged inside 
 <strong>For more information see the project page at https://immich-distribution.nsg.cc</strong>
 
 <p align="center">
-  <a href="https://immich-distribution.nsg.cc"><img src="docs/docs/assets/button.png"></a>
+  <a href="https://immich-distribution.nsg.cc"><img src="docs/site/static/assets/button.png"></a>
 </p>
 
 ## Installation
