@@ -4,6 +4,10 @@ title = "Sync Feature"
 
 # Sync Feature
 
+{% admonition(type="warning") %}
+This built-in sync service is being replaced by [Immich Sync Service](https://github.com/nsg/immich-sync), a standalone rewrite in Rust that works with any Immich installation. The built-in Python version will be deprecated once the new project reaches 1.0. Read more in the [blog post](@/news/2026/03/13-immich-sync.md).
+{% end %}
+
 {% admonition(type="note") %}
 This page describes a custom sync feature, distinct from Immich's built-in sync functionalities like the Immich CLI or import tool. I maintain this feature because it better suits my workflow compared to the built-in options Immich offers. I will continue to support and use this feature myself until Immich implements a similar solution, or if it becomes unfixably broken.
 {% end %}
