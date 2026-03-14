@@ -28,7 +28,7 @@ for issue_number in $TRACKING_ISSUES; do
     if grep -qE "https.*releases\/tag\/$NEW_VERSION" /tmp/ISSUE-BODY.md; then
         echo "Release link for $NEW_VERSION already exists."
     else
-        sed -i "/https.*releases\/tag\/v.*/a * https://github.com/immich-app/immich/releases/tag/$NEW_VERSION" /tmp/ISSUE-BODY.md
+        sed -i "/https.*releases$/i * https://github.com/immich-app/immich/releases/tag/$NEW_VERSION" /tmp/ISSUE-BODY.md
     fi
 
     #
@@ -46,17 +46,17 @@ for issue_number in $TRACKING_ISSUES; do
         sed -i "s/^| Edge |[^|]*|[^|]*|/| Edge | $EDGE_VERSION | $CURRENT_DATE |/" /tmp/ISSUE-BODY.md
     fi
 
-    if [[ $BETA_VERSION == $NEW_VERSION_MAJOR_MINOR* ]] && ! grep -q "| Beta | $EDGE_VERSION" /tmp/ISSUE-BODY.md; then
+    if [[ $BETA_VERSION == $NEW_VERSION_MAJOR_MINOR* ]] && ! grep -q "| Beta | $BETA_VERSION" /tmp/ISSUE-BODY.md; then
         echo "Beta version $BETA_VERSION is a release under the $NEW_VERSION_MAJOR_MINOR release, update the table."
         sed -i "s/^| Beta |[^|]*|[^|]*|/| Beta | $BETA_VERSION | $CURRENT_DATE |/" /tmp/ISSUE-BODY.md
     fi
 
-    if [[ $CANDIDATE_VERSION == $NEW_VERSION_MAJOR_MINOR* ]] && ! grep -q "| Candidate | $EDGE_VERSION" /tmp/ISSUE-BODY.md; then
+    if [[ $CANDIDATE_VERSION == $NEW_VERSION_MAJOR_MINOR* ]] && ! grep -q "| Candidate | $CANDIDATE_VERSION" /tmp/ISSUE-BODY.md; then
         echo "Candidate version $CANDIDATE_VERSION is a release under the $NEW_VERSION_MAJOR_MINOR release, update the table."
         sed -i "s/^| Candidate |[^|]*|[^|]*|/| Candidate | $CANDIDATE_VERSION | $CURRENT_DATE |/" /tmp/ISSUE-BODY.md
     fi
 
-    if [[ $STABLE_VERSION == $NEW_VERSION_MAJOR_MINOR* ]] && ! grep -q "| Stable | $EDGE_VERSION" /tmp/ISSUE-BODY.md; then
+    if [[ $STABLE_VERSION == $NEW_VERSION_MAJOR_MINOR* ]] && ! grep -q "| Stable | $STABLE_VERSION" /tmp/ISSUE-BODY.md; then
         echo "Stable version $STABLE_VERSION is a release under the $NEW_VERSION_MAJOR_MINOR release, update the table."
         sed -i "s/^| Stable |[^|]*|[^|]*|/| Stable | $STABLE_VERSION | $CURRENT_DATE |/" /tmp/ISSUE-BODY.md
     fi
