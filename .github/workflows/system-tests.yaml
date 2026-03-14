@@ -202,6 +202,18 @@ jobs:
       - name: TEST | Run Backup Tests
         run: make test-backup -C tests
 
+      - name: Collect built-in backup for Docker restore test
+        run: |
+          mkdir -p builtin-backup
+          sudo cp -v /var/snap/immich-distribution/common/upload/backups/immich-db-backup-*.sql.gz builtin-backup/
+
+      - name: Upload built-in backup for Docker restore test
+        uses: actions/upload-artifact@v4
+        with:
+          name: immich-builtin-backup
+          retention-days: 1
+          path: builtin-backup/
+
       - name: Print journal on backup test failure
         if: failure() || cancelled()
         run: |
@@ -344,6 +356,52 @@ jobs:
 
       - name: TEST | Run CLI Tests
         run: make test-cli -C tests
+
+  docker-restore:
+    name: Test Docker Restore Compatibility
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    needs:
+      - prep-backup
+      - backup
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download backups artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: backups
+
+      - name: Download built-in backup artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: immich-builtin-backup
+
+      - name: Create Docker .env
+        run: |
+          IMMICH_VERSION="v$(cat VERSION | tr -d '[:space:]')"
+          printf 'DB_PASSWORD=postgres\nDB_USERNAME=postgres\nDB_DATABASE_NAME=immich\nIMMICH_VERSION=%s\n' "$IMMICH_VERSION" > tests/.env
+
+      - name: Start Docker Immich stack
+        run: docker compose -f tests/docker-compose.restore-test.yml up -d
+
+      - name: TEST | Restore snap backup into Docker Immich
+        run: |
+          export API_KEY=$(cat tests/secret.txt)
+          export BACKUP_FILE=$(ls builtin-backup/immich-db-backup-*.sql.gz | head -n1)
+          pip install requests
+          python3 tests/test_docker_restore.py
+
+      - name: Print Docker logs on failure
+        if: failure() || cancelled()
+        run: docker compose -f tests/docker-compose.restore-test.yml logs
+
+      - name: Stop Docker Immich stack
+        if: always()
+        run: docker compose -f tests/docker-compose.restore-test.yml down -v
 
   certificate-management:
     name: Test Manual Certificate Management

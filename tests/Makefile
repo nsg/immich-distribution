@@ -35,6 +35,9 @@ test-cli: wait
 test-backup: wait
 	./test_backup.sh
 
+test-docker-restore:
+	python3 test_docker_restore.py
+
 test_prep_%: .venv ${PYTEST_LOCALTEST_DEPENDENCIES}
 	${PYTEST} tests_prep.py ${PYTEST_EXTRA_ARGS} -k $* --html=report/index.html
 
