@@ -62,7 +62,7 @@ def main():
 
     # Step 1: Start restore flow
     log("Starting restore flow...")
-    r = session.post(f"{IMMICH_URL}/admin/database-backups/start-restore")
+    r = session.post(f"{IMMICH_URL}/api/admin/database-backups/start-restore")
     if r.status_code not in (200, 201):
         die(f"start-restore failed (HTTP {r.status_code}): {r.text}")
 
@@ -71,7 +71,7 @@ def main():
     time.sleep(5)
 
     def in_maintenance():
-        r = session.get(f"{IMMICH_URL}/admin/maintenance/status", timeout=5)
+        r = session.get(f"{IMMICH_URL}/api/admin/maintenance/status", timeout=5)
         return r.ok and r.json().get("active") is True
 
     wait_for("maintenance mode", in_maintenance)
@@ -79,7 +79,7 @@ def main():
     # Step 3: Login with maintenance token
     log("Logging in with maintenance token...")
     r = session.post(
-        f"{IMMICH_URL}/admin/maintenance/login",
+        f"{IMMICH_URL}/api/admin/maintenance/login",
         json={},
     )
     if r.status_code not in (200, 201):
@@ -89,7 +89,7 @@ def main():
     log("Uploading backup file...")
     with open(BACKUP_FILE, "rb") as f:
         r = session.post(
-            f"{IMMICH_URL}/admin/database-backups/upload",
+            f"{IMMICH_URL}/api/admin/database-backups/upload",
             files={"file": (os.path.basename(BACKUP_FILE), f)},
         )
     if r.status_code not in (200, 201):
@@ -97,7 +97,7 @@ def main():
 
     # Step 5: List backups to get the uploaded filename
     log("Listing backups...")
-    r = session.get(f"{IMMICH_URL}/admin/database-backups")
+    r = session.get(f"{IMMICH_URL}/api/admin/database-backups")
     r.raise_for_status()
     backups = r.json().get("backups", [])
     uploaded = [b["filename"] for b in backups if b["filename"].startswith("uploaded-")]
@@ -109,7 +109,7 @@ def main():
     # Step 6: Trigger restore
     log("Triggering database restore...")
     r = session.post(
-        f"{IMMICH_URL}/admin/maintenance",
+        f"{IMMICH_URL}/api/admin/maintenance",
         json={"action": "restore_database", "restoreBackupFilename": filename},
     )
     if r.status_code not in (200, 201):
@@ -119,7 +119,7 @@ def main():
     log("Polling restore progress...")
     for _ in range(120):
         try:
-            r = session.get(f"{IMMICH_URL}/admin/maintenance/status", timeout=5)
+            r = session.get(f"{IMMICH_URL}/api/admin/maintenance/status", timeout=5)
             status = r.json()
         except Exception:
             log("Connection lost, server is restarting after restore...")
