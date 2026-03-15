@@ -162,16 +162,28 @@ def main():
 
     # Step 10: Verify assets exist
     log("Verifying asset count...")
+    for vis in [None, "timeline", "archive", "hidden"]:
+        body = {} if vis is None else {"visibility": vis}
+        r = requests.post(
+            f"{IMMICH_URL}/api/search/metadata",
+            headers=headers,
+            json=body,
+        )
+        label = vis or "default"
+        if r.status_code != 200:
+            log(f"Search ({label}): HTTP {r.status_code} - {r.text}")
+            continue
+        items = r.json().get("assets", {}).get("items", [])
+        log(f"Search ({label}): {len(items)} assets")
+
+    # Use default (timeline) for the actual check
     r = requests.post(
         f"{IMMICH_URL}/api/search/metadata",
         headers=headers,
         json={},
     )
-    if r.status_code != 200:
-        die(f"Failed to search assets (HTTP {r.status_code}): {r.text}")
     items = r.json().get("assets", {}).get("items", [])
     total = len(items)
-    log(f"Asset count: {total}")
     if total == 0:
         die("No assets found after restore")
 
