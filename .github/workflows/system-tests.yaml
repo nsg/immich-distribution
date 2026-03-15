@@ -202,6 +202,18 @@ jobs:
       - name: TEST | Run Backup Tests
         run: make test-backup -C tests
 
+      - name: Collect built-in backup for Docker restore test
+        run: |
+          mkdir -p builtin-backup
+          sudo cp -v /var/snap/immich-distribution/common/upload/backups/immich-db-backup-*.sql.gz builtin-backup/
+
+      - name: Upload built-in backup for Docker restore test
+        uses: actions/upload-artifact@v4
+        with:
+          name: immich-builtin-backup
+          retention-days: 1
+          path: builtin-backup/
+
       - name: Print journal on backup test failure
         if: failure() || cancelled()
         run: |
@@ -344,6 +356,69 @@ jobs:
 
       - name: TEST | Run CLI Tests
         run: make test-cli -C tests
+
+  docker-restore:
+    name: Test Docker Restore Compatibility
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    needs:
+      - prep-backup
+      - backup
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download backups artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: backups
+
+      - name: Download built-in backup artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: immich-builtin-backup
+
+      - name: Create Docker .env
+        run: |
+          mkdir -p /tmp/immich-upload /tmp/immich-db
+          cat > tests/.env <<'EOF'
+          UPLOAD_LOCATION=/tmp/immich-upload
+          DB_DATA_LOCATION=/tmp/immich-db
+          DB_PASSWORD=postgres
+          DB_USERNAME=postgres
+          DB_DATABASE_NAME=immich
+          IMMICH_VERSION=release
+          EOF
+          sed -i 's/^          //' tests/.env
+
+      - name: Restore snap assets into Docker upload volume
+        run: |
+          tar xJf backups/immich_assets_*.tar.xz
+          cp -a var/snap/immich-distribution/common/upload/* /tmp/immich-upload/
+          rm -rf var
+
+      - name: Start Docker Immich stack
+        run: docker compose -f tests/docker-compose.restore-test.yml up -d
+
+      - name: List downloaded artifacts
+        run: find . -name "immich-db-backup-*" -o -name "*.sql.gz" | head -20
+
+      - name: TEST | Restore snap backup into Docker Immich
+        run: |
+          export API_KEY=$(cat tests/secret.txt)
+          export BACKUP_FILE=$(find . -name "immich-db-backup-*.sql.gz" -type f | head -n1)
+          export ASSET_DIR=tests/assets
+          python3 tests/test_docker_restore.py
+
+      - name: Print Docker logs on failure
+        if: failure() || cancelled()
+        run: docker compose -f tests/docker-compose.restore-test.yml logs
+
+      - name: Stop Docker Immich stack
+        if: always()
+        run: docker compose -f tests/docker-compose.restore-test.yml down -v
 
   certificate-management:
     name: Test Manual Certificate Management
