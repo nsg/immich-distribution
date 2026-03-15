@@ -396,11 +396,13 @@ jobs:
       - name: Start Docker Immich stack
         run: docker compose -f tests/docker-compose.restore-test.yml up -d
 
+      - name: List downloaded artifacts
+        run: find . -name "immich-db-backup-*" -o -name "*.sql.gz" | head -20
+
       - name: TEST | Restore snap backup into Docker Immich
         run: |
           export API_KEY=$(cat tests/secret.txt)
-          export BACKUP_FILE=$(ls builtin-backup/immich-db-backup-*.sql.gz | head -n1)
-          pip install requests
+          export BACKUP_FILE=$(find . -name "immich-db-backup-*.sql.gz" -type f | head -n1)
           python3 tests/test_docker_restore.py
 
       - name: Print Docker logs on failure
