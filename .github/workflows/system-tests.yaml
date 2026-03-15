@@ -393,6 +393,12 @@ jobs:
           EOF
           sed -i 's/^          //' tests/.env
 
+      - name: Restore snap assets into Docker upload volume
+        run: |
+          tar xJf backups/immich_assets_*.tar.xz
+          cp -a var/snap/immich-distribution/common/upload/* /tmp/immich-upload/
+          rm -rf var
+
       - name: Start Docker Immich stack
         run: docker compose -f tests/docker-compose.restore-test.yml up -d
 
@@ -403,6 +409,7 @@ jobs:
         run: |
           export API_KEY=$(cat tests/secret.txt)
           export BACKUP_FILE=$(find . -name "immich-db-backup-*.sql.gz" -type f | head -n1)
+          export ASSET_DIR=tests/assets
           python3 tests/test_docker_restore.py
 
       - name: Print Docker logs on failure

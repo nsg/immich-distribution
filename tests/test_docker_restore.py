@@ -6,8 +6,10 @@ Expects env vars:
   BACKUP_FILE: path to .sql.gz backup
   API_KEY: snap API key to verify after restore
   IMMICH_URL: base URL (default http://localhost:2283)
+  ASSET_DIR: path to test assets directory (for hash verification)
 """
 
+import hashlib
 import os
 import sys
 import time
@@ -17,6 +19,7 @@ import requests
 IMMICH_URL = os.environ.get("IMMICH_URL", "http://localhost:2283")
 BACKUP_FILE = os.environ.get("BACKUP_FILE", "")
 API_KEY = os.environ.get("API_KEY", "")
+ASSET_DIR = os.environ.get("ASSET_DIR", "tests/assets")
 
 
 def log(msg):
@@ -154,6 +157,74 @@ def main():
 
     email = r.json().get("email", "unknown")
     log(f"Authenticated as: {email}")
+
+    headers = {"X-API-KEY": API_KEY, "Accept": "application/json"}
+
+    # Step 10: Verify assets exist
+    log("Verifying asset count...")
+    r = requests.get(f"{IMMICH_URL}/api/server/statistics", headers=headers)
+    if r.status_code != 200:
+        die(f"Failed to get server statistics (HTTP {r.status_code}): {r.text}")
+    stats = r.json()
+    total = stats.get("photos", 0) + stats.get("videos", 0)
+    log(f"Asset count: {total}")
+    if total == 0:
+        die("No assets found after restore")
+
+    # Step 11: Download a specific asset and verify its hash
+    verify_asset = "field.jpg"
+    local_path = os.path.join(ASSET_DIR, verify_asset)
+    if os.path.isfile(local_path):
+        log(f"Verifying asset file integrity for {verify_asset}...")
+        local_hash = hashlib.sha256(open(local_path, "rb").read()).hexdigest()
+
+        # Search for the asset by filename
+        r = requests.post(
+            f"{IMMICH_URL}/api/search/metadata",
+            headers=headers,
+            json={"originalFileName": verify_asset},
+        )
+        if r.status_code != 200:
+            die(f"Metadata search failed (HTTP {r.status_code}): {r.text}")
+        items = r.json().get("assets", {}).get("items", [])
+        if len(items) != 1:
+            die(f"Expected 1 result for {verify_asset}, got {len(items)}")
+        asset_id = items[0]["id"]
+
+        # Download the original file
+        r = requests.get(
+            f"{IMMICH_URL}/api/assets/{asset_id}/original",
+            headers=headers,
+        )
+        if r.status_code != 200:
+            die(f"Asset download failed (HTTP {r.status_code})")
+        remote_hash = hashlib.sha256(r.content).hexdigest()
+
+        log(f"Local hash:  {local_hash}")
+        log(f"Remote hash: {remote_hash}")
+        if local_hash != remote_hash:
+            die(f"Hash mismatch for {verify_asset}")
+        log(f"Asset {verify_asset} hash verified")
+    else:
+        log(f"Skipping asset hash check ({local_path} not found)")
+
+    # Step 12: Smart search to verify ML embeddings restored
+    log("Verifying smart search (ML embeddings)...")
+    r = requests.post(
+        f"{IMMICH_URL}/api/search/smart",
+        headers=headers,
+        json={"query": "person"},
+    )
+    if r.status_code != 200:
+        log(f"Smart search failed (HTTP {r.status_code}): {r.text}")
+        log("ML embeddings may not have been restored (non-fatal)")
+    else:
+        items = r.json().get("assets", {}).get("items", [])
+        log(f"Smart search for 'person' returned {len(items)} results")
+        if len(items) > 0:
+            log("ML embeddings are functional")
+        else:
+            log("Smart search returned no results (ML may need reprocessing)")
 
     log("Docker restore test completed successfully!")
 
