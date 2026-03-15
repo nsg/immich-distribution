@@ -382,8 +382,16 @@ jobs:
 
       - name: Create Docker .env
         run: |
-          IMMICH_VERSION="v$(cat VERSION | tr -d '[:space:]')"
-          printf 'DB_PASSWORD=postgres\nDB_USERNAME=postgres\nDB_DATABASE_NAME=immich\nIMMICH_VERSION=%s\n' "$IMMICH_VERSION" > tests/.env
+          mkdir -p /tmp/immich-upload /tmp/immich-db
+          cat > tests/.env <<'EOF'
+          UPLOAD_LOCATION=/tmp/immich-upload
+          DB_DATA_LOCATION=/tmp/immich-db
+          DB_PASSWORD=postgres
+          DB_USERNAME=postgres
+          DB_DATABASE_NAME=immich
+          IMMICH_VERSION=release
+          EOF
+          sed -i 's/^          //' tests/.env
 
       - name: Start Docker Immich stack
         run: docker compose -f tests/docker-compose.restore-test.yml up -d
