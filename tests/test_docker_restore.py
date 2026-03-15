@@ -162,11 +162,15 @@ def main():
 
     # Step 10: Verify assets exist
     log("Verifying asset count...")
-    r = requests.get(f"{IMMICH_URL}/api/server/statistics", headers=headers)
+    r = requests.post(
+        f"{IMMICH_URL}/api/search/metadata",
+        headers=headers,
+        json={},
+    )
     if r.status_code != 200:
-        die(f"Failed to get server statistics (HTTP {r.status_code}): {r.text}")
-    stats = r.json()
-    total = stats.get("photos", 0) + stats.get("videos", 0)
+        die(f"Failed to search assets (HTTP {r.status_code}): {r.text}")
+    items = r.json().get("assets", {}).get("items", [])
+    total = len(items)
     log(f"Asset count: {total}")
     if total == 0:
         die("No assets found after restore")
