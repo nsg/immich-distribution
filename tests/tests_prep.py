@@ -35,9 +35,12 @@ def immich_goto(page: Page, path=None, login=True):
         immich_login(page)
         
         acknowledge_button = page.locator("button:has-text('Acknowledge')")
-        if acknowledge_button.is_visible():
-            debug("Clicking 'Acknowledge' button")
+        try:
+            acknowledge_button.wait_for(state="visible", timeout=3000)
+            debug("Clicking 'Acknowledge' button (new version dialog)")
             acknowledge_button.click()
+        except Exception:
+            pass
     
     if path:
         full_url = f"http://{get_ip_address()}/{path}"
