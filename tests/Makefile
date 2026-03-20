@@ -51,8 +51,13 @@ test-assets:
 cleantest:
 	make -C .. remove install tests
 
+ifdef WAIT_SKIP
+wait:
+	@echo "Skipping wait (WAIT_SKIP set)"
+else
 wait:
 	./test_haproxy.sh
+endif
 
 .venv: uv.lock
 	uv sync

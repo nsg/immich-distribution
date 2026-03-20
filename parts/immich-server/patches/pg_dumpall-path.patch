@@ -6,7 +6,7 @@ diff --git a/server/src/services/database-backup.service.ts b/server/src/service
 
      return {
 -      bin: `/usr/lib/postgresql/${databaseMajorVersion}/bin/${bin}`,
-+      bin: `${process.env.SNAP}/bin/${bin}`,
++      bin: `${process.env.SNAP}/pg-server/${bin}`,
        args,
        databaseUsername,
        databasePassword: isUrlConnection ? new URL(databaseConfig.url).password : databaseConfig.password,
