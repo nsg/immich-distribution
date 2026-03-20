@@ -1,6 +1,6 @@
 name: immich-distribution
 title: Immich Distribution
-version: "v2.5.6"
+version: "v2.6.0"
 base: core22
 grade: stable
 confinement: strict
@@ -180,7 +180,7 @@ parts:
   server:
     plugin: nil
     source: https://github.com/immich-app/immich.git
-    source-tag: v2.5.6
+    source-tag: v2.6.0
     build-environment:
       - SHARP_FORCE_GLOBAL_LIBVIPS: "true"
       - COREPACK_ENABLE_DOWNLOAD_PROMPT: "0"
@@ -267,7 +267,7 @@ parts:
   web:
     plugin: nil
     source: https://github.com/immich-app/immich.git
-    source-tag: v2.5.6
+    source-tag: v2.6.0
     build-environment:
       - COREPACK_ENABLE_DOWNLOAD_PROMPT: "0"
       - CI: "1"
@@ -292,7 +292,7 @@ parts:
   plugins:
     plugin: nil
     source: https://github.com/immich-app/immich.git
-    source-tag: v2.5.6
+    source-tag: v2.6.0
     build-environment:
       - COREPACK_ENABLE_DOWNLOAD_PROMPT: "0"
       - CI: "1"
@@ -311,8 +311,11 @@ parts:
 
       cd plugins
 
-      # Override extism-js version to 1.3.0 (last version compatible with GLIBC 2.35/Ubuntu 22.04)
-      sed -i 's/"github:extism\/js-pdk" = "1.5.1"/"github:extism\/js-pdk" = "1.3.0"/' mise.toml
+      # Override extism-js version to 1.3.0 (last confirmed GLIBC 2.35/Ubuntu 22.04 compatible version).
+      # Versions 1.4.0-1.5.x require GLIBC 2.39 (see extism/js-pdk#129). v1.6.0 reverted CI back to
+      # ubuntu-22.04 so it _may_ be GLIBC 2.35 compatible again, but the fix has regressed before.
+      # Immich's plugin uses only basic PDK APIs stable since v1.0, so 1.3.0 works fine.
+      sed -i 's/"github:extism\/js-pdk" = "1.6.0"/"github:extism\/js-pdk" = "1.3.0"/' mise.toml
       grep -q '"github:extism/js-pdk" = "1.3.0"' mise.toml || { echo "ERROR: extism-js version override failed, upstream may have changed the version"; exit 1; }
 
       mise install
@@ -342,7 +345,7 @@ parts:
   machine-learning:
     plugin: uv
     source: https://github.com/immich-app/immich.git
-    source-tag: v2.5.6
+    source-tag: v2.6.0
     source-subdir: machine-learning
     uv-extras:
       - cpu
