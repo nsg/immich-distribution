@@ -257,6 +257,31 @@ jobs:
           STATHOST_TOKEN: ${{ secrets.STATHOST_TOKEN }}
         run: ./tests/upload-report.sh
 
+      - name: Trigger built-in Immich backup
+        run: |
+          ip=$(ip route get 8.8.8.8 | grep -oP 'src \K[^ ]+')
+          api_key=$(cat tests/secret.txt)
+          curl -s -f -X POST "http://${ip}/api/jobs" \
+            -H "Content-Type: application/json" \
+            -H "X-API-KEY: $api_key" \
+            -d '{"name": "backup-database"}'
+          echo "Waiting for built-in backup to complete..."
+          sleep 30
+
+      - name: Collect Docker restore test data
+        run: |
+          mkdir -p docker-restore-data
+          sudo cp -v /var/snap/immich-distribution/common/upload/backups/immich-db-backup-*.sql.gz docker-restore-data/
+          cp -v tests/secret.txt docker-restore-data/
+          sudo tar cJf docker-restore-data/snap-upload.tar.xz -C /var/snap/immich-distribution/common upload
+
+      - name: Upload Docker restore test data
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-restore-data
+          retention-days: 1
+          path: docker-restore-data/
+
   sync:
     name: Test Sync Service
     runs-on: ubuntu-latest
@@ -344,6 +369,142 @@ jobs:
 
       - name: TEST | Run CLI Tests
         run: make test-cli -C tests
+
+  docker-restore:
+    name: Test Docker Restore Compatibility
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    needs: assets
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download Docker restore test data
+        uses: actions/download-artifact@v4
+        with:
+          name: docker-restore-data
+          path: docker-restore-data
+
+      - name: Create Docker .env
+        run: |
+          mkdir -p /tmp/immich-upload /tmp/immich-db
+          IMMICH_VERSION="$(cat VERSION | tr -d '[:space:]')"
+          printf 'UPLOAD_LOCATION=/tmp/immich-upload\nDB_DATA_LOCATION=/tmp/immich-db\nDB_PASSWORD=postgres\nDB_USERNAME=postgres\nDB_DATABASE_NAME=immich\nIMMICH_VERSION=%s\n' "$IMMICH_VERSION" > tests/.env
+
+      - name: Restore snap assets into Docker upload volume
+        run: |
+          tar xJf docker-restore-data/snap-upload.tar.xz
+          cp -a upload/* /tmp/immich-upload/
+          rm -rf upload
+
+      - name: Start Docker Immich stack
+        run: docker compose -f tests/docker-compose.restore-test.yml up -d
+
+      - name: TEST | Restore snap backup into Docker Immich
+        run: |
+          export API_KEY=$(cat docker-restore-data/secret.txt)
+          export BACKUP_FILE=$(find docker-restore-data -name "immich-db-backup-*.sql.gz" -type f | head -n1)
+          export ASSET_DIR=tests/assets
+          python3 tests/test_docker_restore.py
+
+      - name: Print Docker logs on failure
+        if: failure() || cancelled()
+        run: docker compose -f tests/docker-compose.restore-test.yml logs
+
+      - name: Stop Docker Immich stack
+        if: always()
+        run: docker compose -f tests/docker-compose.restore-test.yml down -v
+
+  snap-restore:
+    name: Test Snap Restore Compatibility
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    needs: build-snap
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download snap artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: development-snap-package
+
+      - name: Create Docker .env
+        run: |
+          mkdir -p /tmp/immich-upload /tmp/immich-db
+          IMMICH_VERSION="$(cat VERSION | tr -d '[:space:]')"
+          printf 'UPLOAD_LOCATION=/tmp/immich-upload\nDB_DATA_LOCATION=/tmp/immich-db\nDB_PASSWORD=postgres\nDB_USERNAME=postgres\nDB_DATABASE_NAME=immich\nIMMICH_VERSION=%s\n' "$IMMICH_VERSION" > tests/.env
+
+      - name: Start Docker Immich stack
+        run: docker compose -f tests/docker-compose.restore-test.yml up -d
+
+      - name: Wait for Docker Immich
+        run: |
+          for i in $(seq 1 60); do
+            curl -s http://localhost:2283/api/server/ping | grep -q pong && break
+            sleep 5
+          done
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+
+      - name: Populate Docker Immich with test data
+        env:
+          IMMICH_IP: localhost:2283
+        run: |
+          make test-prep -C tests WAIT_SKIP=1
+          make test-photos -C tests WAIT_SKIP=1
+
+      - name: Trigger built-in backup in Docker
+        run: |
+          api_key=$(cat tests/secret.txt)
+          curl -s -f -X POST "http://localhost:2283/api/jobs" \
+            -H "Content-Type: application/json" \
+            -H "X-API-KEY: $api_key" \
+            -d '{"name": "backup-database"}'
+          echo "Waiting for backup to complete..."
+          sleep 30
+
+      - name: Extract backup and assets from Docker
+        run: |
+          mkdir -p docker-backup
+          docker compose -f tests/docker-compose.restore-test.yml exec -T immich-server \
+            find /data/backups -name "immich-db-backup-*.sql.gz" -exec cat {} \; > docker-backup/backup.sql.gz
+          cp -a /tmp/immich-upload docker-backup/upload
+
+      - name: Stop Docker Immich stack
+        run: docker compose -f tests/docker-compose.restore-test.yml down -v
+
+      - name: Install snap
+        run: sudo snap install --dangerous *.snap
+
+      - name: Wait for snap to start
+        run: make wait -C tests
+
+      - name: Copy assets to snap upload directory
+        run: sudo rsync -a --exclude backups --chown root:root docker-backup/upload/ /var/snap/immich-distribution/common/upload/
+
+      - name: TEST | Restore Docker backup into snap
+        run: |
+          export API_KEY=$(cat tests/secret.txt)
+          export BACKUP_FILE=docker-backup/backup.sql.gz
+          export IMMICH_URL=http://localhost
+          export ASSET_DIR=tests/assets
+          python3 tests/test_docker_restore.py
+
+      - name: Print snap logs on failure
+        if: failure() || cancelled()
+        run: sudo journalctl -u snap.immich-distribution.* --no-pager -n 500
+
+      - name: Upload test report to StatHost
+        if: failure() || cancelled()
+        env:
+          STATHOST_TOKEN: ${{ secrets.STATHOST_TOKEN }}
+        run: ./tests/upload-report.sh
 
   certificate-management:
     name: Test Manual Certificate Management

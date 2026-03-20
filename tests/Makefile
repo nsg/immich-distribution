@@ -35,6 +35,9 @@ test-cli: wait
 test-backup: wait
 	./test_backup.sh
 
+test-docker-restore:
+	python3 test_docker_restore.py
+
 test_prep_%: .venv ${PYTEST_LOCALTEST_DEPENDENCIES}
 	${PYTEST} tests_prep.py ${PYTEST_EXTRA_ARGS} -k $* --html=report/index.html
 
@@ -48,8 +51,13 @@ test-assets:
 cleantest:
 	make -C .. remove install tests
 
+ifdef WAIT_SKIP
+wait:
+	@echo "Skipping wait (WAIT_SKIP set)"
+else
 wait:
 	./test_haproxy.sh
+endif
 
 .venv: uv.lock
 	uv sync
