@@ -35,6 +35,9 @@ test-cli: wait
 test-backup: wait
 	./test_backup.sh
 
+test-metrics: wait
+	./test_metrics.sh
+
 test-docker-restore:
 	python3 test_docker_restore.py
 
