@@ -370,6 +370,38 @@ jobs:
       - name: TEST | Run CLI Tests
         run: make test-cli -C tests
 
+  metrics:
+    name: Test Metrics
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    needs: build-snap
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download snap artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: development-snap-package
+
+      - name: TEST | Install package
+        run: |
+          sudo snap install --dangerous *.snap
+
+      - name: Wait Immich Distribution to start
+        run: make wait -C tests
+
+      - name: TEST | Run Metrics Tests
+        run: make test-metrics -C tests
+
+      - name: Print journal on metrics test failure
+        if: failure() || cancelled()
+        run: |
+          echo "Metrics test failed. Printing journal logs..."
+          sudo journalctl -n 200 --no-pager -u 'snap.immich-distribution.*'
+
   docker-restore:
     name: Test Docker Restore Compatibility
     runs-on: ubuntu-latest
