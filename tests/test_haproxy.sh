@@ -24,6 +24,16 @@ systemd_status_success() {
     systemctl show -p ExecMainStatus "$1" | grep -q "ExecMainStatus=0"
 }
 
+# manager.service is expected to fail when the system is still initializing
+# (e.g. admin API key not yet available). It's a oneshot notification service,
+# not a backend, so it should not block the wait.
+is_ignorable_unit() {
+    case "$1" in
+        *manager.service) return 0 ;;
+        *) return 1 ;;
+    esac
+}
+
 log() {
     echo
     echo "###"
@@ -44,11 +54,14 @@ while is_backend_down; do
 
     if [ "$N" -ge "$MAX" ]; then
         echo "ERROR: Backends are still DOWN after $MAX seconds"
+
         log "Unit status summary"
         failed_units=""
         for unit in $(systemd_units); do
             if systemd_status_success "$unit"; then
                 echo "  OK:   $unit"
+            elif is_ignorable_unit "$unit"; then
+                echo "  SKIP: $unit (ignorable)"
             else
                 echo "  FAIL: $unit"
                 failed_units="$failed_units $unit"
@@ -59,6 +72,7 @@ while is_backend_down; do
             log "Journal for $unit"
             journalctl -n 100 -eu "$unit" --no-pager
         done
+
         exit 1
     fi
 
