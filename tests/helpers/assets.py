@@ -39,6 +39,7 @@ ALL_TEST_ASSETS = [
     UPSTREAM_TEST_ASSET_DIR / "formats/webp/denali.webp",
     UPSTREAM_TEST_ASSET_DIR / "formats/raw/Nikon/D80/glarus.nef",
     UPSTREAM_TEST_ASSET_DIR / "formats/raw/Nikon/D700/philadelphia.nef",
+    UPSTREAM_TEST_ASSET_DIR / "formats/raw/Fujifilm/X100V_compressed.RAF",
 ]
 
 EXIF_TEST_ASSETS = [

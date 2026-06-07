@@ -5,7 +5,7 @@ inputs:
   revision:
     description: Commit of immich-app/test-assets to check out.
     required: false
-    default: 61131e84ec91d316265aebe375b3155308baaa89
+    default: c2d5f290a2e671fa2106fa8b7146991be27c0515
 
 runs:
   using: composite
