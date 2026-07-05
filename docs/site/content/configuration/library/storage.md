@@ -22,11 +22,16 @@ All relevant folders are under `/var/snap/immich-distribution/common`. For brevi
 
 Immich Server stores all assets here. This includes **all your media**: originals, transcoded videos, and thumbnails. This is likely the most common location to mount to a larger drive or a network share (e.g., from a NAS).
 
-### $C/upload/library
+### $C/upload/upload and $C/upload/library
 
 > "Only move the large original assets, but keep frequently accessed files locally"
 
-If you haven't moved the entire `$C/upload` directory, it might be useful to move just the library folder. This folder contains all your original uploaded media. The exact storage proportions will depend on your media collection. However, expect this to be the largest folder. For example, on my installation, the library accounts for approximately 75% of the total disk space used.
+If you haven't moved the entire `$C/upload` directory, it might be useful to move just the folders containing your original uploaded media. Where the originals are stored depends on the [storage template](https://immich.app/docs/administration/storage-template) setting in Immich (**Administration → Settings → Storage Template**):
+
+- **Storage template disabled (the default):** originals stay in `$C/upload/upload`, and `$C/upload/library` remains empty.
+- **Storage template enabled:** originals are moved into `$C/upload/library`, organized according to the template.
+
+Check which folder holds your data before moving anything. The exact storage proportions will depend on your media collection, but expect the originals to be the largest part. For example, on my installation, the originals account for approximately 75% of the total disk space used.
 
 ### $C/upload/thumbs and $C/upload/encoded-video
 
