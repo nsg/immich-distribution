@@ -30,7 +30,12 @@ jobs:
 
       - name: Install snapcraft
         run: |
-          sudo snap install snapcraft --classic
+          # Pinned to 8.x: snapcraft 9.x crashes on "snapcraft metrics" when the
+          # store returns null data points (MetricsResponse pydantic validation
+          # error). Unpin once snapcraft allows null in Series.values, or the
+          # store stops returning null for days without data:
+          # https://github.com/canonical/snapcraft/blob/main/snapcraft/models/metrics.py
+          sudo snap install snapcraft --classic --channel=8.x/stable
 
       - name: Install jq
         run: |
