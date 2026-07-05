@@ -95,7 +95,7 @@ get_latest_releases() {
     local result
     
     for i in $(seq 1 $retries); do
-        result=$(curl -s https://api.github.com/repos/immich-app/immich/releases | jq -r '.[].tag_name')
+        result=$(curl -s https://api.github.com/repos/immich-app/immich/releases | jq -r '.[] | select(.prerelease == false) | .tag_name')
         
         if [ -n "$result" ] && [ "$result" != "null" ]; then
             echo "$result"
