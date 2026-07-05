@@ -46,8 +46,8 @@ layout:
     symlink: $SNAP/usr/lib/vips-modules-8.17
   /usr/etc/ImageMagick-7:
     symlink: $SNAP/usr/etc/ImageMagick-7
-  /usr/lib/ImageMagick-7.1.1:
-    symlink: $SNAP/usr/lib/ImageMagick-7.1.1
+  /usr/lib/ImageMagick-7.1.2:
+    symlink: $SNAP/usr/lib/ImageMagick-7.1.2
 
 hooks:
   configure:

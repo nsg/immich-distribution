@@ -24,13 +24,13 @@ Upstream `immich-app/immich` is based around Docker, this package is based aroun
 An externally managed APT repo (`https://nsg.github.io/aptly/deb`) provides `nsg-redis`, `nsg-libvips`, `nsg-postgres`, `nsg-pgvector`, `nsg-vectorchord`, `nsg-mimalloc`, `nsg-haproxy`, `nsg-lego`. These mirror deps from upstream Docker images. When upstream bumps deps, the APT repo packages usually need bumping too. If the repo is down or the GPG key (`snap/keys/5C61B36E.asc`) expires, builds fail with no fallback.
 
 ### Hardcoded Library Versions in Snap Layouts
-`snap/snapcraft.yaml` has layout symlinks with hardcoded versions: `vips-modules-8.17`, `ImageMagick-7`, `ImageMagick-7.1.1`. These must stay in sync with the actual `nsg-libvips` and ImageMagick versions. A version mismatch silently breaks image processing. `tests/test_vips_version.sh` validates vips but not ImageMagick.
+`snap/snapcraft.yaml` has layout symlinks with hardcoded versions: `vips-modules-8.17`, `ImageMagick-7`, `ImageMagick-7.1.2`. These must stay in sync with the actual `nsg-libvips` and `nsg-imagemagick` versions. A version mismatch silently breaks image processing (RAW/TIFF thumbnails fail via the vips magick fallback loader). `tests/test_vips_version.py` validates both against the APT repo.
 
 ### Sharp / Libvips HEIC Support
 Sharp (the Node.js libvips wrapper) has historically been a pain point. It tends to use its own bundled libvips binary which lacks HEIC support, breaking photo imports from many phones. Past versions required extensive workarounds to force Sharp to link against the system `nsg-libvips` (which includes HEIC). Sharp has improved and most workarounds have been removed, but watch for regressions on upgrades.
 
 ### Patches Against Upstream
-Patches in `parts/immich-server/patches/` modify upstream server code (pg_dumpall path, CLI command for admin API key, log spam removal). All use `git apply -p1`. Patches break when upstream refactors the patched files. Use `tests/validate-patch.sh <patch_file> <target_file>` to validate a patch applies cleanly against the upstream checkout (requires `upstream/immich/` at the correct tag). The Makefile `test` target also runs `git apply --check` on all patches.
+Patches in `parts/immich-server/patches/` modify upstream server code (pg_dumpall path, CLI command for admin API key, log spam removal). All use `git apply -p1`. Patches break when upstream refactors the patched files. There is no standalone patch check; a patch that no longer applies fails the snap build in CI.
 
 ### extism-js GLIBC Pinning
 The plugins build (`snap/snapcraft.yaml`) uses `sed` to downgrade `extism-js` from the upstream version to 1.3.0 (last GLIBC 2.35/Ubuntu 22.04 compatible version). Both the source and target version strings are hardcoded in the sed. A `grep` check fails the build if the replacement didn't match, so upstream version changes are caught early.
@@ -54,7 +54,7 @@ Several deps are pinned with checksums and break if removed/republished: `jellyf
 Snap services run as root by default. Postgres and other services must run as unprivileged user `snap_daemon` (declared as `system-usernames: snap_daemon: shared`). All data-touching operations use `drop_privileges` (`src/bin/load-env`) which calls `setpriv` to switch to `snap_daemon`. File ownership on `$SNAP_COMMON/pgsql` must be correct or postgres refuses to start. The configure hook `chown`s it on every run.
 
 ### Snap Layouts: Path Redirection
-Snap strict confinement means the filesystem is read-only and restricted. Snap layouts in `snapcraft.yaml` create symlinks so libraries and apps find their files at expected paths. Key redirections: ImageMagick config/modules (`/usr/etc/ImageMagick-7`, `/usr/lib/ImageMagick-7.1.1`), vips modules (`/usr/lib/vips-modules-8.17`), upload directory (`$SNAP/usr/src/app/upload` → `$SNAP_COMMON/upload`). Without these, ImageMagick can't find its delegates/coders and vips can't load format plugins. This is a common snap packaging challenge - libraries with hardcoded paths need layout entries.
+Snap strict confinement means the filesystem is read-only and restricted. Snap layouts in `snapcraft.yaml` create symlinks so libraries and apps find their files at expected paths. Key redirections: ImageMagick config/modules (`/usr/etc/ImageMagick-7`, `/usr/lib/ImageMagick-7.1.2`), vips modules (`/usr/lib/vips-modules-8.17`), upload directory (`$SNAP/usr/src/app/upload` → `$SNAP_COMMON/upload`). Without these, ImageMagick can't find its delegates/coders and vips can't load format plugins. This is a common snap packaging challenge - libraries with hardcoded paths need layout entries.
 
 ### `upstream/` Is Not a Submodule
 `upstream/` is gitignored. It's a local clone for patch development and `update.sh`. Must be manually cloned and checked out at the right tag for patch generation/validation to work.

@@ -1,13 +1,23 @@
 [project]
 name = "immich-distribution-tests"
 version = "0.1.0"
-description = "Tests for Immich Distribution"
-requires-python = ">=3.10"
+description = "API-first tests for Immich Distribution"
+requires-python = ">=3.11"
 dependencies = [
+    "httpx==0.28.1",
     "playwright==1.55.0",
-    "pytest-playwright==0.7.0",
-    "pytest-timeout",
-    "pyyaml",
-    "opencv-python",
-    "pytest-html",
+    "pytest==8.4.1",
+    "pytest-timeout==2.4.0",
 ]
+
+[tool.pytest.ini_options]
+addopts = [
+    "--strict-markers",
+    "--timeout=300",
+]
+markers = [
+    "snap: tests that require a running Immich Distribution snap or compatible server",
+    "migration: tests that verify documented migration paths",
+]
+testpaths = ["."]
+norecursedirs = ["legacy"]

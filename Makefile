@@ -58,24 +58,19 @@ testprod:
 
 #
 # To run the tests:
-#  - Make sure that the selenium container is running.
 #  - Install the package locally (or inside the Incus VM).
 #  - Run "make tests".
 #
 
 .PHONY: tests
 tests:
-	make -C tests test
+	uv run --project tests pytest -s -v --run-snap-tests tests
 
 .PHONY: cleantests
 cleantests:
 	sudo snap remove --purge immich-distribution
 	make install
-	make -C tests test
-
-.PHONY: selenium
-selenium:
-	make -C tests/ selenium
+	uv run --project tests pytest -s -v --run-snap-tests tests
 
 #
 # Run the documentation site locally.

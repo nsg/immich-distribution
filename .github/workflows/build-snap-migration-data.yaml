@@ -1,0 +1,101 @@
+name: Build Snap Migration Data
+
+on:
+  workflow_call:
+    inputs:
+      snap-artifact-name:
+        description: Name of the snap artifact to install when preparing migration data.
+        required: false
+        type: string
+        default: development-snap-package
+      artifact-name:
+        description: Name for the uploaded migration data artifact.
+        required: false
+        type: string
+        default: snap-to-docker-data
+
+permissions:
+  contents: read
+
+jobs:
+  build-snap-migration-data:
+    name: Build Snap Migration Data
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Cache snap migration data
+        id: cache-migration-data
+        uses: actions/cache@v4
+        with:
+          path: snap-to-docker-data
+          key: cache-snap-migration-data-${{ hashFiles('VERSION', 'parts/**', 'snap/**', 'src/**', 'tests/pyproject.toml', 'tests/test_prep.py', 'tests/test_assets_*.py', 'tests/helpers/assets.py', 'tests/helpers/immich.py', 'tests/assets/**') }}
+
+      - name: Install snap
+        if: steps.cache-migration-data.outputs.cache-hit != 'true'
+        uses: ./.github/actions/install-snap
+        with:
+          artifact-name: ${{ inputs.snap-artifact-name }}
+
+      - name: Set up tests
+        if: steps.cache-migration-data.outputs.cache-hit != 'true'
+        uses: ./.github/actions/setup-tests
+
+      - name: Prepare Immich test user
+        if: steps.cache-migration-data.outputs.cache-hit != 'true'
+        working-directory: tests
+        env:
+          API_KEY_FILE: runtime/artifacts/api-key.txt
+          UV_LINK_MODE: copy
+        run: |
+          uv --version
+          uv run pytest -s -v --run-snap-tests test_prep.py
+
+      - name: Fetch upstream test assets
+        if: steps.cache-migration-data.outputs.cache-hit != 'true'
+        uses: ./.github/actions/fetch-test-assets
+
+      - name: Populate snap with test assets
+        if: steps.cache-migration-data.outputs.cache-hit != 'true'
+        working-directory: tests
+        env:
+          API_KEY_FILE: runtime/artifacts/api-key.txt
+          ASSET_DIR: assets
+          UPSTREAM_TEST_ASSET_DIR: runtime/test-assets
+          UV_LINK_MODE: copy
+        run: uv run pytest -s -v --run-snap-tests test_assets_uploads.py
+
+      - name: Trigger built-in Immich backup
+        if: steps.cache-migration-data.outputs.cache-hit != 'true'
+        run: |
+          ip=$(ip route get 8.8.8.8 | grep -oP 'src \K[^ ]+')
+          api_key=$(cat tests/runtime/artifacts/api-key.txt)
+          curl -s -f -X POST "http://${ip}/api/jobs" \
+            -H "Content-Type: application/json" \
+            -H "X-API-KEY: $api_key" \
+            -d '{"name": "backup-database"}'
+          echo "Waiting for built-in backup to complete..."
+          sleep 30
+
+      - name: Collect snap migration data
+        if: steps.cache-migration-data.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p snap-to-docker-data
+          sudo cp -v /var/snap/immich-distribution/common/upload/backups/immich-db-backup-*.sql.gz snap-to-docker-data/
+          cp -v tests/runtime/artifacts/api-key.txt snap-to-docker-data/
+          sudo tar cJf snap-to-docker-data/snap-upload.tar.xz -C /var/snap/immich-distribution/common upload
+
+      - name: Upload snap migration data
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.artifact-name }}
+          retention-days: 1
+          if-no-files-found: error
+          path: snap-to-docker-data/
+
+      - name: Print snap logs on failure
+        if: (failure() || cancelled()) && steps.cache-migration-data.outputs.cache-hit != 'true'
+        run: sudo journalctl -u snap.immich-distribution.* --no-pager -n 500

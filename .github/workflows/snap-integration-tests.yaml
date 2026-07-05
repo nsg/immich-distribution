@@ -1,0 +1,194 @@
+name: Snap Integration Tests
+
+on:
+  pull_request:
+    branches: [ "master" ]
+    paths-ignore:
+      - 'docs/**'
+      - '*.md'
+      - 'LICENSE'
+  push:
+    branches:
+      - 'bump/**'
+    paths-ignore:
+      - 'docs/**'
+      - '*.md'
+      - 'LICENSE'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-snap:
+    name: Build Snap Package
+    if: github.event_name != 'pull_request' || !startsWith(github.head_ref, 'bump/')
+    uses: ./.github/workflows/build-snap.yaml
+    with:
+      artifact-name: tests-snap-package
+
+  fresh-install:
+    name: Fresh Install Web Checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs: build-snap
+    env:
+      STATHOST_TOKEN: ${{ secrets.STATHOST_TOKEN }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install snap
+        uses: ./.github/actions/install-snap
+        with:
+          artifact-name: tests-snap-package
+
+      - name: Set up tests
+        uses: ./.github/actions/setup-tests
+
+      - name: Install browser
+        working-directory: tests
+        env:
+          UV_LINK_MODE: copy
+        run: uv run playwright install --with-deps chromium
+
+      - name: Run fresh install checks
+        working-directory: tests
+        env:
+          API_KEY_FILE: runtime/artifacts/api-key.txt
+          PLAYWRIGHT_VIDEO_DIR: runtime/videos
+          UV_LINK_MODE: copy
+        run: |
+          uv --version
+          uv run pytest -s -v --run-snap-tests test_prep.py
+          uv run pytest -s -v --run-snap-tests test_admin_api_key.py test_haproxy.py test_fresh_install_web.py
+
+      - name: Upload browser video to StatHost
+        if: always() && env.STATHOST_TOKEN != ''
+        run: ./tests/upload-report.sh tests/runtime/videos
+
+      - name: Print snap logs on fresh install check failure
+        if: failure() || cancelled()
+        run: sudo journalctl -u snap.immich-distribution.* --no-pager -n 500
+
+  populated-web:
+    name: Populated Instance Web Checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: build-snap
+    env:
+      STATHOST_TOKEN: ${{ secrets.STATHOST_TOKEN }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install snap
+        uses: ./.github/actions/install-snap
+        with:
+          artifact-name: tests-snap-package
+
+      - name: Set up tests
+        uses: ./.github/actions/setup-tests
+
+      - name: Fetch upstream test assets
+        uses: ./.github/actions/fetch-test-assets
+
+      - name: Install browser
+        working-directory: tests
+        env:
+          UV_LINK_MODE: copy
+        run: uv run playwright install --with-deps chromium
+
+      - name: Run populated instance checks
+        working-directory: tests
+        env:
+          API_KEY_FILE: runtime/artifacts/api-key.txt
+          ASSET_DIR: assets
+          UPSTREAM_TEST_ASSET_DIR: runtime/test-assets
+          PLAYWRIGHT_VIDEO_DIR: runtime/videos
+          UV_LINK_MODE: copy
+        run: |
+          uv --version
+          uv run pytest -s -v --run-snap-tests test_prep.py
+          uv run pytest -s -v --run-snap-tests test_populated_web.py
+
+      - name: Upload browser video to StatHost
+        if: always() && env.STATHOST_TOKEN != ''
+        run: ./tests/upload-report.sh tests/runtime/videos
+
+      - name: Print snap logs on populated web check failure
+        if: failure() || cancelled()
+        run: sudo journalctl -u snap.immich-distribution.* --no-pager -n 500
+
+  assets:
+    name: Asset Processing Tests
+    needs: build-snap
+    uses: ./.github/workflows/snap-asset-processing-tests.yaml
+    with:
+      snap-artifact-name: tests-snap-package
+
+  metrics:
+    name: Metrics Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs: build-snap
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install snap
+        uses: ./.github/actions/install-snap
+        with:
+          artifact-name: tests-snap-package
+
+      - name: Set up tests
+        uses: ./.github/actions/setup-tests
+
+      - name: Run metrics tests
+        working-directory: tests
+        env:
+          UV_LINK_MODE: copy
+        run: |
+          uv --version
+          uv run pytest -s -v --run-snap-tests test_metrics.py
+
+      - name: Print snap logs on metrics failure
+        if: failure() || cancelled()
+        run: sudo journalctl -n 200 --no-pager -u 'snap.immich-distribution.*'
+
+  certificates:
+    name: Certificate Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs: build-snap
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install snap
+        uses: ./.github/actions/install-snap
+        with:
+          artifact-name: tests-snap-package
+
+      - name: Set up tests
+        uses: ./.github/actions/setup-tests
+
+      - name: Run certificate tests
+        working-directory: tests
+        env:
+          UV_LINK_MODE: copy
+        run: |
+          uv --version
+          uv run pytest -s -v --run-snap-tests test_certificate.py
+
+      - name: Print snap logs on certificate failure
+        if: failure() || cancelled()
+        run: sudo journalctl -n 200 --no-pager -u 'snap.immich-distribution.*'
