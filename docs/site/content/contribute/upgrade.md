@@ -80,19 +80,17 @@ Use this if you prefer control, like if you like to rebuild a specific part or s
 
 ### Run tests
 
-#### Selenium
+#### Snap tests
 
-To run the tests, you need to start the selenium container. Currently it assumes that you run podman but feel free to contribute alternatives. Start it with `make selenium`.
-
-Run the tests with a `make tests`, will download a few test files and run them agains you newly installed instance on localhost. These tests requires that the instance if freshly installed. A user called `foo@example.com` with the password `secret` will be created.
+Run the tests with `make tests`, or call pytest directly with `uv run --project tests pytest -s -v --run-snap-tests tests`. The tests run against the newly installed instance on localhost. These tests require that the instance is freshly installed. A user called `foo@example.com` with the password `secret` will be created.
 
 #### Manual
 
-{% admonition(type="warning", title="Selenium") %}
-If you have executed the above selenium tests, you should have a user called `foo@example.com` with the password `secret`. Log in with that!
+{% admonition(type="warning", title="Snap tests") %}
+If you have executed the above snap tests, you should have a user called `foo@example.com` with the password `secret`. Log in with that!
 {% end %}
 
-The selenium tests covers the most common use cases, so I usually only do manual tests to make sure that everyting "looks good", and to troubleshoot problems.
+The snap tests cover the most common use cases, so I usually only do manual tests to make sure that everyting "looks good", and to troubleshoot problems.
 
 To inspect all the logs, run the following command to tail all services:
 

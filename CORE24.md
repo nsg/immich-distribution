@@ -12,7 +12,6 @@ The snap code changes themselves are straightforward, but the **external depende
 | `architectures:` → `platforms:` syntax | `snap/snapcraft.yaml` |
 | `python3.10` → `python3.12` in PYTHONPATH | `src/bin/sync-service.sh` |
 | Remove/update extism-js GLIBC 2.35 pin (2.39 available) | `snap/snapcraft.yaml` |
-| Update test container to 24.04 | `tests/test-in-container.sh` |
 | Update docs referencing core22/22.04 | `docs/` |
 
 ## Medium Changes (require investigation + testing)
