@@ -1,0 +1,68 @@
+name: Snap Asset Processing Tests
+
+on:
+  workflow_call:
+    inputs:
+      snap-artifact-name:
+        description: Name of the snap artifact to install before running asset tests.
+        required: false
+        type: string
+        default: development-snap-package
+
+permissions:
+  contents: read
+
+jobs:
+  asset-processing-tests:
+    name: Asset Processing Tests (${{ matrix.group.name }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        group:
+          - name: Uploads and formats
+            test_file: test_assets_uploads.py
+          - name: EXIF and location
+            test_file: test_assets_exif.py
+          - name: People detection
+            test_file: test_assets_people.py
+          - name: OCR extraction
+            test_file: test_assets_ocr.py
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install snap
+        uses: ./.github/actions/install-snap
+        with:
+          artifact-name: ${{ inputs.snap-artifact-name }}
+
+      - name: Set up tests
+        uses: ./.github/actions/setup-tests
+
+      - name: Prepare Immich test user
+        working-directory: tests
+        env:
+          API_KEY_FILE: runtime/artifacts/api-key.txt
+          UV_LINK_MODE: copy
+        run: |
+          uv --version
+          uv run pytest -s -v --run-snap-tests test_prep.py
+
+      - name: Fetch upstream test assets
+        uses: ./.github/actions/fetch-test-assets
+
+      - name: Run asset processing tests (${{ matrix.group.name }})
+        working-directory: tests
+        env:
+          API_KEY_FILE: runtime/artifacts/api-key.txt
+          ASSET_DIR: assets
+          UPSTREAM_TEST_ASSET_DIR: runtime/test-assets
+          UV_LINK_MODE: copy
+        run: uv run pytest -s -v --run-snap-tests "${{ matrix.group.test_file }}"
+
+      - name: Print snap logs on failure
+        if: failure() || cancelled()
+        run: sudo journalctl -u snap.immich-distribution.* --no-pager -n 500

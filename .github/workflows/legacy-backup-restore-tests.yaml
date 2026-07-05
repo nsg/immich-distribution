@@ -1,0 +1,90 @@
+name: Legacy Backup Restore Tests
+
+on:
+  schedule:
+    - cron: '37 4 * * 2'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-snap:
+    name: Build Snap Package
+    uses: ./.github/workflows/build-snap.yaml
+    with:
+      artifact-name: legacy-backup-restore-snap-package
+
+  backup-restore:
+    name: Legacy Snap Backup Restore
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    needs: build-snap
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install snap
+        uses: ./.github/actions/install-snap
+        with:
+          artifact-name: legacy-backup-restore-snap-package
+
+      - name: Set up tests
+        uses: ./.github/actions/setup-tests
+
+      - name: Prepare Immich test user
+        working-directory: tests
+        env:
+          API_KEY_FILE: runtime/artifacts/api-key.txt
+          UV_LINK_MODE: copy
+        run: |
+          uv --version
+          uv run pytest -s -v --run-snap-tests test_prep.py
+
+      - name: Fetch upstream test assets
+        uses: ./.github/actions/fetch-test-assets
+
+      - name: Populate snap with test assets
+        working-directory: tests
+        env:
+          API_KEY_FILE: runtime/artifacts/api-key.txt
+          ASSET_DIR: assets
+          UPSTREAM_TEST_ASSET_DIR: runtime/test-assets
+          UV_LINK_MODE: copy
+        run: uv run pytest -s -v --run-snap-tests test_assets_uploads.py
+
+      - name: Create legacy snap backup artifacts
+        working-directory: tests
+        env:
+          UV_LINK_MODE: copy
+        run: uv run pytest -s -v --run-snap-tests test_snap_backup_restore.py::test_snap_backup_command_creates_database_and_asset_archives
+
+      - name: Collect legacy snap backup artifacts
+        run: |
+          mkdir -p snap-command-backups
+          sudo cp -v /var/snap/immich-distribution/common/backups/immich_database_*.sql.xz snap-command-backups/
+          sudo cp -v /var/snap/immich-distribution/common/backups/immich_assets_*.tar.xz snap-command-backups/
+          sudo chown -R "$USER:$USER" snap-command-backups
+
+      - name: Reinstall fresh snap
+        run: |
+          sudo snap remove --purge immich-distribution
+          sudo snap install --dangerous *.snap
+
+      - name: Restore legacy snap backup artifacts
+        working-directory: tests
+        env:
+          API_KEY_FILE: runtime/artifacts/api-key.txt
+          ASSET_DIR: assets
+          SNAP_DATABASE_BACKUP: ${{ github.workspace }}/snap-command-backups/immich_database_*.sql.xz
+          SNAP_ASSETS_BACKUP: ${{ github.workspace }}/snap-command-backups/immich_assets_*.tar.xz
+          UV_LINK_MODE: copy
+        run: |
+          export SNAP_DATABASE_BACKUP="$(ls -1 $SNAP_DATABASE_BACKUP | head -n1)"
+          export SNAP_ASSETS_BACKUP="$(ls -1 $SNAP_ASSETS_BACKUP | head -n1)"
+          uv run pytest -s -v --run-snap-tests test_snap_backup_restore.py::test_snap_restore_command_restores_database_and_assets
+
+      - name: Print snap logs on failure
+        if: failure() || cancelled()
+        run: sudo journalctl -u snap.immich-distribution.* --no-pager -n 500

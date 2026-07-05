@@ -1,0 +1,17 @@
+name: Fetch upstream test assets
+description: Clone the pinned immich-app/test-assets revision into tests/runtime/test-assets.
+
+inputs:
+  revision:
+    description: Commit of immich-app/test-assets to check out.
+    required: false
+    default: 61131e84ec91d316265aebe375b3155308baaa89
+
+runs:
+  using: composite
+  steps:
+    - name: Clone test assets
+      shell: bash
+      run: |
+        git clone https://github.com/immich-app/test-assets.git tests/runtime/test-assets
+        git -C tests/runtime/test-assets checkout ${{ inputs.revision }}

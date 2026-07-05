@@ -31,5 +31,5 @@ Open the Immich web UI and click **Restore from backup** on the onboarding scree
 Log in and check that your photos, albums, and metadata are present. Thumbnails and encoded videos will be regenerated automatically if missing. Face recognition and smart search may need time to reprocess.
 
 {% admonition(type="info", title="Tested in CI") %}
-This migration path is automatically tested in CI. On every build, a built-in Immich backup from the snap is restored into a fresh upstream Docker Immich stack through the official onboarding restore flow. The test verifies user authentication, asset metadata, file integrity (SHA-256), and smart search.
+This migration path is automatically tested in CI each week. A built-in Immich backup from the snap is restored into a fresh upstream Docker Immich stack through the official onboarding restore flow. The test verifies user authentication, asset metadata, file integrity (SHA-256), and smart search.
 {% end %}
