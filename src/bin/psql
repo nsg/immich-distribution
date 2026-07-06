@@ -9,4 +9,4 @@ if ! echo "$@" | grep -qE '(^| )(-U |--username[ =])'; then
     set -- -U postgres "$@"
 fi
 
-drop_privileges $SNAP/usr/local/pgsql/bin/psql $@
+drop_privileges $SNAP/usr/local/pgsql/bin/psql "$@"
