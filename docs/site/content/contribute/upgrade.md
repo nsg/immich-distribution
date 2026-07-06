@@ -42,7 +42,6 @@ This script will diff files that I like to keep track on, for example:
 * Dockerfiles - I keep track on then to detect changes to dependencies, changes to startup scripts and various things that _may_ affect the snap. If the base image change, inspect if it contains any relevant changes.
 * Scripts - I do not use these scripts so I need to adapt whatever they to do my startup scripts
 * Env-files and docker-compose-file - Detect relevant changes, like patch or environment changes that are required
-* migrations - I track database changes to see if anything relevant has changed related to [database changes](https://github.com/nsg/immich-distribution/blob/master/src/etc/modify-db.sql) that the sync feature has done.
 
 ## Test it locally
 

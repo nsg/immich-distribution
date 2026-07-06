@@ -19,11 +19,8 @@ Sharp prefers its own bundled libvips, which lacks HEIC — breaking photo impor
 ### extism-js GLIBC Pinning
 The plugins build seds `extism-js` down to 1.3.0, the last GLIBC 2.35 (Ubuntu 22.04) compatible version; newer versions need GLIBC ≥2.39. A grep check fails the build if upstream changed the version string and the sed missed.
 
-### Custom DB Objects on the `asset` Table
-`src/etc/modify-db.sql` creates custom tables (`assets_delete_audits`, `assets_filesync_lookup`) and a trigger on the upstream `asset` table. Upstream migrations that change that table's schema can break them.
-
 ### Tied to core22 (glibc 2.35)
-The `node/24` snap is built on `core24` (needs glibc ≥2.38) and cannot run on our base; the Node channel is pinned in `snap/snapcraft.yaml`. `src/bin/sync-service.sh` hardcodes the core22 system `python3.10` in `PYTHONPATH` — breaks silently on a base change.
+The `node/24` snap is built on `core24` (needs glibc ≥2.38) and cannot run on our base; the Node channel is pinned in `snap/snapcraft.yaml`.
 
 ### ML is CPU-Only, on uv Python 3.12
 Built with `cpu` extras only (no CUDA), running on a uv-installed CPython 3.12 (`uv-python312` part) — not the core22 system Python. `libmimalloc.so.2` is preloaded via `LD_PRELOAD` — the version in the path must match the `nsg-mimalloc` package.

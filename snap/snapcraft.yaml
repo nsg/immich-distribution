@@ -110,15 +110,6 @@ apps:
       - network-bind
       - network
 
-  sync-service:
-    command: bin/sync-service.sh
-    daemon: simple
-    restart-delay: 10s
-    after:
-      - immich-server
-    plugs:
-      - network
-
   manager:
     command: bin/manager
     daemon: simple
@@ -397,15 +388,6 @@ parts:
       - xz-utils
       - nsg-haproxy
       - nsg-lego
-
-  sync:
-    plugin: uv
-    source: parts/sync
-    build-environment:
-      - UV_PROJECT_ENVIRONMENT: "${CRAFT_PART_INSTALL}/sync"
-    after: [uv-deps]
-    stage:
-      - sync
 
   geodata:
     # Geodata from geonames.org, based on Immich Server base image

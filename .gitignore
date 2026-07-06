@@ -27,7 +27,6 @@ __pycache__
 /upstream
 /.env
 /.pytest_cache/
-/parts/sync/.venv/
 /tests/test-results/
 /tests/.venv/
 /tests/runtime/
