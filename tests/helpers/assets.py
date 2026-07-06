@@ -1,7 +1,6 @@
 import os
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
-import uuid
 
 import httpx
 
@@ -89,11 +88,10 @@ def headers() -> dict[str, str]:
 
 def upload_asset(client: httpx.Client, immich_url: str, path: Path) -> dict:
     stats = path.stat()
+    mtime = datetime.fromtimestamp(stats.st_mtime, tz=timezone.utc).isoformat()
     data = {
-        "deviceAssetId": f"{path}-{uuid.uuid4()}",
-        "deviceId": "pytest",
-        "fileCreatedAt": datetime.fromtimestamp(stats.st_mtime).isoformat(),
-        "fileModifiedAt": datetime.fromtimestamp(stats.st_mtime).isoformat(),
+        "fileCreatedAt": mtime,
+        "fileModifiedAt": mtime,
         "isFavorite": "false",
     }
 
