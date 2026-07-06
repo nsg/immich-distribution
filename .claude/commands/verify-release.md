@@ -101,7 +101,7 @@ The coordinator subagent must:
      - Changes to `extism-js` or plugin system
      - PostgreSQL, Redis, or other infrastructure changes
      - Python version requirement changes (we're pinned to 3.10 via core22)
-     - Node.js version requirement changes (we use node/20/stable snap)
+     - Node.js version requirement changes (we use node/22/stable snap)
    - Return: for each commit with relevant findings, the hash, one-line summary, and what specifically is relevant
 5. After all workers complete, **collate findings, discard commits with no findings**, and return a concise aggregated summary grouped by category
 
