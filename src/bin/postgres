@@ -29,6 +29,20 @@ drop_privileges $SNAP/bin/postgres-configure
     # Empty schema left behind by the pgvecto.rs to VectorChord migration (#327)
     drop_privileges $SNAP/usr/local/pgsql/bin/psql --username=postgres -d immich \
         -c "DROP SCHEMA IF EXISTS vectors;"
+
+    # Plugin wasm paths were stored with a revisioned $SNAP path and go stale
+    # on refresh, breaking plugin loading. Re-point them at the current symlink.
+    drop_privileges $SNAP/usr/local/pgsql/bin/psql --username=postgres -d immich <<EOF
+DO \$\$
+BEGIN
+    IF to_regclass('public.plugin') IS NOT NULL THEN
+        UPDATE plugin
+        SET "wasmPath" = regexp_replace("wasmPath", '^${SNAP%/*}/[x0-9]+/', '${SNAP%/*}/current/')
+        WHERE "wasmPath" ~ '^${SNAP%/*}/[x0-9]+/';
+    END IF;
+END
+\$\$;
+EOF
 ) &
 
 drop_privileges $SNAP/usr/local/pgsql/bin/postgres
