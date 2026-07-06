@@ -33,3 +33,4 @@ __pycache__
 /tests/runtime/
 /.claude-sandbox/
 /.mcp.json
+/geodata-cache/
