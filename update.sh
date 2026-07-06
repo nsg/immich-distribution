@@ -52,8 +52,7 @@ CHECK_FILES="
     server/src/services/cli.service.ts
     server/src/commands/index.ts
     web/README.md
-    web/Dockerfile
-    cli/README.md
+    packages/cli/README.md
     machine-learning/README.md
     machine-learning/Dockerfile
     machine-learning/pyproject.toml
