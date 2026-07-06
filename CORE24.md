@@ -95,7 +95,7 @@ Neither is currently used in this project, so no change needed.
 | Redis (system) | 6.0 | **7.0** |
 | Node.js (system) | 12.x | **18.x** |
 
-Note: This snap uses `nsg-*` packages and `node/20/stable` snap channel, not system packages directly.
+Note: This snap uses `nsg-*` packages and `node/24/stable` snap channel, not system packages directly.
 
 ## Recommendation
 

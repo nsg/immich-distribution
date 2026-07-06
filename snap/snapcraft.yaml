@@ -241,9 +241,9 @@ parts:
       - libimagequant-dev
       - liblcms2-dev
     build-snaps:
-      - node/20/stable
+      - node/24/stable
     stage-snaps:
-      - node/20/stable
+      - node/24/stable
     stage-packages:
       - nsg-redis
       - nsg-libvips
@@ -287,7 +287,7 @@ parts:
     after:
       - parts-server-patches
     build-snaps:
-      - node/20/stable
+      - node/24/stable
 
   plugins:
     plugin: nil
@@ -326,7 +326,7 @@ parts:
       cp -r dist ${CRAFT_PART_INSTALL}/var/lib/immich/build/corePlugin/
       cp manifest.json ${CRAFT_PART_INSTALL}/var/lib/immich/build/corePlugin/
     build-snaps:
-      - node/20/stable
+      - node/24/stable
 
   uv-python312:
     plugin: nil

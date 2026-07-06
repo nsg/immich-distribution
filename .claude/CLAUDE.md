@@ -45,7 +45,7 @@ The plugins build (`snap/snapcraft.yaml`) uses `sed` to downgrade `extism-js` fr
 Machine learning is built with `cpu` extras only (no CUDA/GPU). `libmimalloc.so.2` is preloaded via `LD_PRELOAD` - version in path must match the `nsg-mimalloc` package.
 
 ### Pinned External Dependencies
-Several deps are pinned with checksums and break if removed/republished: `jellyfin-ffmpeg7` deb (tied to `jammy`), `uv` (Python installer, version + SHA256), test assets (pinned git commit). Node.js comes from `node/20/stable` snap channel (EOL April 2026).
+Several deps are pinned with checksums and break if removed/republished: `jellyfin-ffmpeg7` deb (tied to `jammy`), `uv` (Python installer, version + SHA256), test assets (pinned git commit). Node.js comes from `node/24/stable` snap channel (LTS until April 2028).
 
 ### Era-Based Upgrade Protection
 `snap/hooks/post-refresh` blocks skipping eras (currently era `2` in `src/bin/load-env`). Users cannot skip intermediate era versions. Escape hatches: touching `$SNAP_COMMON/no-pre-refresh-hook` or `$SNAP_COMMON/no-post-refresh-hook` disables hooks entirely.
