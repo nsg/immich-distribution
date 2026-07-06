@@ -8,13 +8,20 @@ This page lists the revision history of Immich Distribution releases. Each revis
 
 {% admonition(type="info", title="Last updated") %}
 This page is updated from time to time with the latest revision information.
-Last updated: **2025-10-22**.
+Last updated: **2026-07-05**.
 {% end %}
 
 ## Revision Table
 
 | Era | Revision | Immich Version | Released | Comments |
 |-----|----------|----------------|----------|----------|
+| 2 | 267 | [v2.7.5](https://github.com/nsg/immich-distribution/issues/375) | 22 Apr 2026 | |
+| 2 | 266 | [v2.7.4](https://github.com/nsg/immich-distribution/issues/375) | 22 Apr 2026 | |
+| 2 | 264 | [v2.6.3](https://github.com/nsg/immich-distribution/issues/368) | 29 Mar 2026 | |
+| 2 | 258 | [v2.5.6](https://github.com/nsg/immich-distribution/issues/363) | 21 Feb 2026 | First era 2 release: pgvecto.rs removed from the image after the [VectorChord migration](/news/2025/08/31/vectorchord-migration-rollout/) |
+| 1 | 254 | [v2.4.1](https://github.com/nsg/immich-distribution/issues/360) | 27 Dec 2025 | |
+| 1 | 252 | [v2.3.1](https://github.com/nsg/immich-distribution/issues/356) | 12 Dec 2025 | |
+| 1 | 250 | [v2.2.3](https://github.com/nsg/immich-distribution/issues/352) | 08 Dec 2025 | |
 | 1 | 249 | [v2.1.0](https://github.com/nsg/immich-distribution/issues/349) | 17 Oct 2025 | |
 | 1 | 248 | [v2.0.1](https://github.com/nsg/immich-distribution/issues/344) | 10 Oct 2025 | |
 | 1 | 246 | [v1.144.1](https://github.com/nsg/immich-distribution/issues/342) | 09 Oct 2025 | |

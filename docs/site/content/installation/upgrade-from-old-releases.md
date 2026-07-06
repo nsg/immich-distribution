@@ -14,7 +14,7 @@ Systems that are regularly updated should move between supported eras sequential
 
 | Era | Version  | Revision | Notes                 |
 | --- | ---------| ---------| --------------------- |
-| 2   | v2.5.0   | -        | pgvecto.rs removed from image, [VectorChord migration](/news/2025/08/31/vectorchord-migration-rollout/) completed |
+| 2   | v2.5.6   | 258      | pgvecto.rs removed from image, [VectorChord migration](/news/2025/08/31/vectorchord-migration-rollout/) completed |
 | 1   | v1.142.1 | 240      | Eras implemented, [VectorChord migration](/news/2025/08/31/vectorchord-migration-rollout/) in progress |
 | 0   | -        | -        | A release before revision 240 is counted as era `0` |
 

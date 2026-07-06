@@ -25,6 +25,10 @@ drop_privileges $SNAP/bin/postgres-configure
     done
     
     drop_privileges $SNAP/usr/local/pgsql/bin/createdb --username=postgres immich
+
+    # Empty schema left behind by the pgvecto.rs to VectorChord migration (#327)
+    drop_privileges $SNAP/usr/local/pgsql/bin/psql --username=postgres -d immich \
+        -c "DROP SCHEMA IF EXISTS vectors;"
 ) &
 
 drop_privileges $SNAP/usr/local/pgsql/bin/postgres
