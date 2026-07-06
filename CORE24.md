@@ -95,7 +95,7 @@ Neither is currently used in this project, so no change needed.
 | Redis (system) | 6.0 | **7.0** |
 | Node.js (system) | 12.x | **18.x** |
 
-Note: This snap uses `nsg-*` packages and `node/20/stable` snap channel, not system packages directly.
+Note: This snap uses `nsg-*` packages and `node/22/stable` snap channel, not system packages directly. The `node/24` snap is built on `core24` and requires glibc 2.38+, so moving to it depends on this migration.
 
 ## Recommendation
 
