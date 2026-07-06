@@ -36,7 +36,11 @@ export IMMICH_PORT=3001
 export IMMICH_SERVER_URL="http://127.0.0.1:3001" # Not used by Immich anymore, but still used by Immich Distribution
 export IMMICH_HOST="127.0.0.1"
 export IMMICH_MACHINE_LEARNING_URL="http://127.0.0.1:3003"
-export IMMICH_BUILD_DATA="$SNAP/var/lib/immich/build" # Contains www, geodata and build-lock.json
+# Contains www, geodata and build-lock.json. Use the "current" symlink instead
+# of the revisioned $SNAP path: Immich stores paths derived from this (like the
+# core plugin wasmPath) in the database, and a revisioned path goes stale on
+# every snap refresh.
+export IMMICH_BUILD_DATA="${SNAP%/*}/current/var/lib/immich/build"
 export IMMICH_MEDIA_LOCATION="$SNAP_COMMON/upload"
 export IMMICH_API_METRICS_PORT=8081
 export IMMICH_MICROSERVICES_METRICS_PORT=8082
