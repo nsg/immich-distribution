@@ -29,7 +29,6 @@ Therefore, if you configure your firewall to limit what Immich can access, it wo
 | immich-server | [network](https://snapcraft.io/docs/network-interface), [network-bind](https://snapcraft.io/docs/network-bind-interface) | General network access, Listen for incoming connections |
 | immich-machine-learning | [network](https://snapcraft.io/docs/network-interface), [network-bind](https://snapcraft.io/docs/network-bind-interface) | General network access, Listen for incoming connections |
 | haproxy | [network](https://snapcraft.io/docs/network-interface), [network-bind](https://snapcraft.io/docs/network-bind-interface) | General network access, Listen for incoming connections |
-| sync | [network](https://snapcraft.io/docs/network-interface) | General network access |
 | backup | - | |
 | import | - | |
 | acme | [network](https://snapcraft.io/docs/network-interface), [network-bind](https://snapcraft.io/docs/network-bind-interface) | General network access, Listen for incoming connections |

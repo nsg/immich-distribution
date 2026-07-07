@@ -17,7 +17,7 @@ rm -rf $SNAP_COMMON/reverse-geocoding-dump
 rm -rf $SNAP_COMMON/typesense
 snapctl unset typesense-key
 
-mkdir -p $SNAP_COMMON/{pgsql,redis,reverse-geocoding-dump,upload,sync,backups,acme/haproxy,cache}
+mkdir -p $SNAP_COMMON/{pgsql,redis,reverse-geocoding-dump,upload,backups,acme/haproxy,cache}
 chown snap_daemon:snap_daemon $SNAP_COMMON/pgsql
 
 if [[ $(snapctl get database-password) == "" ]]; then
@@ -48,10 +48,6 @@ if [[ $(snapctl get acme-challenge-type) == "" ]]; then
     snapctl set acme-challenge-type="http"
 fi
 
-if [[ $(snapctl get sync-delete-threshold) == "" ]]; then
-    snapctl set sync-delete-threshold="300"
-fi
-
 if [[ $(snapctl get metrics-enabled) == "true" ]]; then
     snapctl set metrics-telemetry-include="all"
 fi
@@ -64,6 +60,11 @@ snapctl unset metrics-io-enabled
 snapctl unset metrics-job-enabled
 snapctl unset manager-migrations-version
 
+# Clean up configuration from the removed legacy sync service
+snapctl unset sync-enabled
+snapctl unset sync-delete-threshold
+snapctl unset sync
+
 if [[ $(snapctl get backup-database-daily) == "" ]]; then
     snapctl set backup-database-daily="false"
 fi
@@ -72,4 +73,3 @@ fi
 snapctl restart immich-distribution.postgres
 snapctl restart immich-distribution.haproxy
 snapctl restart immich-distribution.immich-server
-snapctl restart immich-distribution.sync-service

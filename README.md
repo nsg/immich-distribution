@@ -10,7 +10,7 @@
 
 ## About
 
-Immich Distribution is an independent community project that packages [Immich](https://immich.app/) as a [snap](https://snapcraft.io/docs). It bundles the Immich server, machine learning, a database, and supporting services into a single installable package with automatic updates. Extra tools for backup, restore, file sync, and HTTPS are included but optional.
+Immich Distribution is an independent community project that packages [Immich](https://immich.app/) as a [snap](https://snapcraft.io/docs). It bundles the Immich server, machine learning, a database, and supporting services into a single installable package with automatic updates. Extra tools for backup, restore, and HTTPS are included but optional.
 
 This project is not affiliated with the upstream [Immich project](https://immich.app/), its developers, or [FUTO](https://futo.org). If you prefer the official Docker-based installation, see the [upstream docs](https://immich.app/docs/install/docker-compose). Please only report bugs upstream if they also occur in the official images.
 
@@ -32,7 +32,6 @@ Open `http://<your-server-ip>` in your browser to complete setup. For detailed i
 | [Redis](https://redis.io/) | Key-value store for caching and job queues |
 | [HAProxy](https://www.haproxy.org/) | Reverse proxy for HTTP/HTTPS traffic |
 | [lego](https://github.com/go-acme/lego) | Let's Encrypt ACME client for TLS certificates |
-| [Sync Service](https://immich-distribution.nsg.cc/configuration/sync/) | Two-way folder synchronization with Immich |
 | [Backup & Restore](https://immich-distribution.nsg.cc/configuration/backup-restore/) | Database and asset backup tools |
 
 ## Configuration

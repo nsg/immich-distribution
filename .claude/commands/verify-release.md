@@ -1,143 +1,33 @@
 ---
 description: Verify upstream release impact on snap package
-model: opus
 allowed-tools: Read, Grep, Glob, Bash(git:*), Bash(gh:*), Bash(cat:*), Bash(unzip:*), Bash(ls:*), Bash(wc:*), Task, WebFetch
 ---
 
-You are verifying an upstream Immich release for the snap distribution package. Follow each phase below. Use subagents aggressively for parallel work.
+Verify the upstream Immich release this bump branch targets: analyze everything between PREVIOUS and CURRENT, then report findings and action items.
 
-## Setup
+**Verification only — strictly read-only.** Never modify this repository or write fixes/news entries; every problem becomes an action item.
 
-Determine versions and PR:
-```bash
-CURRENT=$(cat VERSION | tr -d '[:space:]')
-PREVIOUS=$(git show $(git log --oneline -2 VERSION | tail -1 | cut -d' ' -f1):VERSION | tr -d '[:space:]')
-BRANCH=$(git branch --show-current)
-PR_NUMBER=$(gh pr list --head "$BRANCH" --json number --jq '.[0].number')
-```
+Bump workflow: one tracking issue per minor (1.x), one PR per patch (1.2.x); CI runs extensive tests on `bump/*` branches. The PR for this branch has a body containing upstream release notes URLs and **monitored upstream file diffs** — pre-selected high-risk files. Analyze those diffs, don't skip them. An "Error, \<file\> do not exists" line means upstream moved/deleted a monitored file — find where it went and whether we still reference the old path.
 
-Store these for use throughout. Fetch the full PR body with `gh pr view $PR_NUMBER --json body --jq .body`.
+Fan out subagents for the independent analyses below and keep raw diffs/logs out of the main context. Don't use more smarts than a task needs: run mechanical checks (patch `git apply --check`, path/version-string existence, CI log retrieval) on `model: haiku`, and reserve the default session model for analysis-heavy work (release notes, schema/commit review, dependency comparison). The CLAUDE.md gotchas are the review checklist — pass the relevant ones to each subagent. Be critical: Docker-specific breaking changes often don't affect a snap package; schema changes, dependency shifts, and Python/Node requirement changes definitely do.
 
-**Compute all intermediate versions** between PREVIOUS and CURRENT. If multiple patch releases were skipped (e.g. PREVIOUS=1.5.0 and CURRENT=1.5.6), we need release notes for every version in between. Enumerate them:
-```bash
-# Given PREVIOUS and CURRENT share major.minor, enumerate all patch versions
-MAJOR_MINOR=$(echo $CURRENT | cut -d. -f1-2)
-PREV_PATCH=$(echo $PREVIOUS | cut -d. -f3)
-CURR_PATCH=$(echo $CURRENT | cut -d. -f3)
-ALL_VERSIONS=""
-for p in $(seq $((PREV_PATCH + 1)) $CURR_PATCH); do
-  ALL_VERSIONS="$ALL_VERSIONS $MAJOR_MINOR.$p"
-done
-echo "Versions to check: $ALL_VERSIONS"
-```
+## Inputs
 
-If major or minor versions differ, use `gh release list --repo immich-app/immich --limit 50` to find all releases between PREVIOUS and CURRENT instead of the patch enumeration above.
+- CURRENT is in `VERSION`; PREVIOUS is the file's content before the last commit that changed it.
+- Check release notes for **every** upstream release between PREVIOUS and CURRENT, not just the latest. For major bumps, also find the upstream migration guide / breaking-changes post.
 
-Store ALL_VERSIONS for Subagent A.
+## What to verify
 
-Ensure the upstream repo is available and fetch tags:
-```bash
-cd upstream/immich && git fetch --tags --quiet origin && cd -
-```
+1. **Release notes + monitored diffs** — anything that hits a CLAUDE.md gotcha: schema changes, dependency bumps, new/changed env vars, path restructuring, ML runtime changes.
+2. **Commit sweep** — commits in `upstream/immich` between the two tags, analyzing full diffs, not just messages. Path-filter to server, machine-learning, packages, migrations, Dockerfiles, and root config (web UI, mobile, and non-env-var docs usually don't matter); exclude lockfiles and generated files from diffs. Chunk across `model: sonnet` subagents for routine patch bumps; use `model: opus` when the range is high-risk — a major version bump, hundreds of commits, or known schema/dependency breaks. Each agent needs two things to judge "will this affect the snap package": the CLAUDE.md overview and gotchas, and a short description of what we ship and add on top (the parts and build steps in `snap/snapcraft.yaml`, the patches in `parts/immich-server/patches/`, config hooks) — so it can reason from what the package contains, not only pattern-match the gotcha list. Tell agents to over-flag: report anything plausibly relevant with a one-line reason. Review the flagged commits yourself.
+3. **Base images & `nsg-*` packages** — if the `base-server-*` tags in `server/Dockerfile` changed, review what changed in `immich-app/base-images` between those dates and compare each mirrored dependency against the version we publish in `upstream/aptly` (pull it first; on failure fall back to `tests/test_vips_version.py`). A mismatch means an APT package bump (blocks the snap build — flag prominently) and possibly a hardcoded layout version in `snap/snapcraft.yaml`.
+4. **Patches** — check out `v$CURRENT` in `upstream/immich` and `git apply --check -p1` each patch in `parts/immich-server/patches/`. For any that break, find out what happened to the target file.
+5. **Snapcraft vs upstream tree** — paths and version strings that `snap/snapcraft.yaml` build steps reference in the upstream tree (plugins part, `mise.toml` locations, sed/grep targets like the extism-js pin) must still exist and match at `v$CURRENT`.
+6. **CI** — latest run on this branch, one subagent per failed job. When a failure looks upstream-caused, search upstream issues and check the other `immich-app` org repos we depend on.
 
-Get ALL commits between the two versions:
-```bash
-cd upstream/immich && git log --oneline --no-merges v$PREVIOUS..v$CURRENT && cd -
-```
+## Report
 
-Also read our current patches to know which files they target:
-```bash
-ls -1 parts/immich-server/patches/
-```
+Concise summary grouped by the areas above, then numbered action items stating what must happen before merge. Two questions must be answered explicitly, even if the answer is "not needed":
 
-## Phase 1 & 2: Release Notes + Commit Analysis (parallel)
-
-Launch these two subagents **in parallel** — they are independent of each other.
-
-### Subagent A: Upstream Release Notes Analysis
-
-We may have skipped multiple upstream releases. ALL_VERSIONS (computed in Setup) contains every version between PREVIOUS and CURRENT that needs its release notes checked.
-
-Launch a **single subagent** (Task tool, subagent_type: general-purpose, model: sonnet) with ALL_VERSIONS. The subagent must:
-
-- For **each version** in ALL_VERSIONS, fetch release notes using `gh release view v<version> --repo immich-app/immich --json body --jq .body`. If a release doesn't exist for a particular version, note it and move on.
-- Also extract any upstream release notes URLs from the PR body (under "## Upstream release notes") and fetch those with WebFetch for additional context
-- Analyze **all** release notes collectively for changes that affect this snap package, considering:
-  - Database schema changes (affects `src/etc/modify-db.sql` custom tables/triggers on `asset` table)
-  - Dependency version bumps (Node.js, Python, Redis, PostgreSQL, libvips, Sharp, ffmpeg, onnxruntime)
-  - New environment variables or config changes (we map these via `snap set/get`)
-  - API changes that affect our patches in `parts/immich-server/patches/`
-  - Machine learning model or runtime changes (we're CPU-only, no CUDA)
-  - File path changes (snap layouts have hardcoded paths)
-  - Breaking changes listed explicitly — but remember: Docker-specific breaking changes may NOT affect us, and unlisted changes MAY affect us
-- Return a structured summary of findings relevant to this snap package, **noting which version each finding comes from**
-
-### Subagent B: Commit-Level Analysis (coordinator)
-
-Launch a **single coordinator subagent** (Task tool, subagent_type: general-purpose, model: sonnet) that will handle the entire commit analysis internally. Pass it:
-
-- The full commit list (from `git log` above)
-- The list of patch files and their target paths
-- The PREVIOUS and CURRENT version strings
-- The working directory path for `upstream/immich`
-
-The coordinator subagent must:
-
-1. **Discover the repository structure** by listing top-level directories in the upstream repo (`ls upstream/immich/`). Decide which paths are relevant to a snap server/ML package and which are not (e.g. web UI, mobile app, docs that aren't env-var docs, GitHub workflows, etc. are typically irrelevant). Use this to build a path exclusion list.
-2. **Pre-filter commits** using `git log --oneline --no-merges v$PREVIOUS..v$CURRENT -- <relevant-paths>` to get only commits touching relevant paths. Also separately check root-level config files like `docker-compose.yml`, `Dockerfile`s, `package.json`, `pyproject.toml`. Log how many commits were filtered out.
-3. **Split the filtered commits** into **10 roughly equal batches** (or fewer if there aren't enough commits)
-4. **Launch workers in parallel** (Task tool, subagent_type: general-purpose, model: haiku), each receiving its batch of commit hashes with instructions to:
-   - First run `git show <hash> --stat` to see which files changed
-   - Only fetch full diffs (`git show <hash> -- <file>`) for files that look relevant to the snap package
-   - Watch for:
-     - Changes to files our patches touch
-     - Database migrations or schema changes (especially the `asset` table)
-     - Dependency version changes in `package.json`, `pyproject.toml`, `Dockerfile`s
-     - New or changed environment variables
-     - Changes to server startup, CLI commands, or service architecture
-     - Path changes that would break snap layouts
-     - Sharp/libvips related changes
-     - Machine learning model loading or runtime changes
-     - Changes to `extism-js` or plugin system
-     - PostgreSQL, Redis, or other infrastructure changes
-     - Python version requirement changes (we're pinned to 3.10 via core22)
-     - Node.js version requirement changes (we use node/22/stable snap)
-   - Return: for each commit with relevant findings, the hash, one-line summary, and what specifically is relevant
-5. After all workers complete, **collate findings, discard commits with no findings**, and return a concise aggregated summary grouped by category
-
-This two-tier approach keeps the main context clean — only the coordinator's aggregated result comes back.
-
-## Phase 3: CI Status Check
-
-Check CI status:
-```bash
-BRANCH=$(git branch --show-current)
-RUN_ID=$(gh run list --branch "$BRANCH" --limit 1 --json databaseId --jq '.[0].databaseId')
-gh run view $RUN_ID --json jobs --jq '.jobs[] | "[\(.conclusion // "running" | ascii_upcase)] \(.name)"'
-```
-
-If ALL jobs passed: report success briefly.
-
-If any jobs FAILED: download and inspect logs using subagents:
-```bash
-gh ext run-logs $RUN_ID
-```
-This outputs a zip file path. Unzip it and use **one subagent per failed job** (Task tool, subagent_type: general-purpose) to:
-- Read the relevant log file
-- Identify the root cause of the failure
-- Search upstream GitHub issues if the failure seems related to upstream changes: `gh search issues --repo immich-app/immich "<search terms>"`
-- Suggest fixes specific to this snap package
-
-If CI is still running: report that and show which jobs are in progress.
-
-## Phase 4: Summary Report
-
-Present a clear, concise summary with sections:
-
-1. **Release Overview** — Version bump, one-line summary
-2. **Release Notes Findings** — What from the release notes affects us
-3. **Commit Analysis Findings** — Commits that need attention, grouped by category
-4. **CI Status** — Pass/fail, failures explained
-5. **Action Items** — Numbered list of concrete things to do before merging (patches to update, configs to change, versions to bump, etc.)
-
-Be critical and specific. Don't just list things — state whether they actually affect us and why. Docker-specific changes often don't matter for a snap package. But Python version bumps, schema changes, and dependency shifts definitely do.
+- **Era bump** — should `IMMICH_DISTRIBUTION_ERA` be incremented (major version or destructive schema change on tables our custom SQL touches), so users can't skip over this version? Recommend with reasoning.
+- **News entry** — recommend one if the release has user-visible impact (`docs/site/content/news/YYYY/MM/DD-slug.md`, see recent entries for format). Outline its content; don't write it.

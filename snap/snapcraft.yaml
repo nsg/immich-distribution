@@ -1,6 +1,6 @@
 name: immich-distribution
 title: Immich Distribution
-version: "v2.7.5"
+version: "v3.0.1"
 base: core22
 grade: stable
 confinement: strict
@@ -110,15 +110,6 @@ apps:
       - network-bind
       - network
 
-  sync-service:
-    command: bin/sync-service.sh
-    daemon: simple
-    restart-delay: 10s
-    after:
-      - immich-server
-    plugs:
-      - network
-
   manager:
     command: bin/manager
     daemon: simple
@@ -180,7 +171,7 @@ parts:
   server:
     plugin: nil
     source: https://github.com/immich-app/immich.git
-    source-tag: v2.7.5
+    source-tag: v3.0.1
     build-environment:
       - SHARP_FORCE_GLOBAL_LIBVIPS: "true"
       - COREPACK_ENABLE_DOWNLOAD_PROMPT: "0"
@@ -202,8 +193,8 @@ parts:
 
       mkdir -p ${CRAFT_PART_INSTALL}/usr/src/app
 
-      pnpm --filter immich --frozen-lockfile build
-      pnpm --filter immich --frozen-lockfile --prod --no-optional deploy ${CRAFT_PART_INSTALL}/usr/src/app
+      pnpm --filter @immich/sdk --filter @immich/plugin-sdk --filter immich build
+      pnpm --filter immich --prod --no-optional deploy ${CRAFT_PART_INSTALL}/usr/src/app
 
       rm -rf ${CRAFT_PART_INSTALL}/usr/src/app/.nvmrc
       rm -rf ${CRAFT_PART_INSTALL}/usr/src/app/.prettierignore
@@ -267,7 +258,7 @@ parts:
   web:
     plugin: nil
     source: https://github.com/immich-app/immich.git
-    source-tag: v2.7.5
+    source-tag: v3.0.1
     build-environment:
       - COREPACK_ENABLE_DOWNLOAD_PROMPT: "0"
       - CI: "1"
@@ -292,24 +283,16 @@ parts:
   plugins:
     plugin: nil
     source: https://github.com/immich-app/immich.git
-    source-tag: v2.7.5
+    source-tag: v3.0.1
     build-environment:
-      - COREPACK_ENABLE_DOWNLOAD_PROMPT: "0"
       - CI: "1"
       - MISE_DATA_DIR: "${CRAFT_PART_BUILD}/mise-data"
-      - MISE_TRUSTED_CONFIG_PATHS: "${CRAFT_PART_SRC}/plugins/mise.toml"
+      - MISE_TRUSTED_CONFIG_PATHS: "${CRAFT_PART_SRC}/mise.toml:${CRAFT_PART_BUILD}/mise.toml:${CRAFT_PART_SRC}/packages/plugin-core/mise.toml:${CRAFT_PART_BUILD}/packages/plugin-core/mise.toml"
+      - MISE_DISABLE_TOOLS: "flutter"
     override-build: |
       # Install mise
       curl -sSL https://mise.run | sh
       export PATH="$HOME/.local/bin:$PATH"
-
-      # Remove root mise.toml to prevent monorepo inheritance (installs flutter, etc.)
-      rm -f mise.toml
-
-      npm install --global corepack@latest
-      corepack enable pnpm
-
-      cd plugins
 
       # Override extism-js version to 1.3.0 (last confirmed GLIBC 2.35/Ubuntu 22.04 compatible version).
       # Versions 1.4.0-1.5.x require GLIBC 2.39 (see extism/js-pdk#129). v1.6.0 reverted CI back to
@@ -318,15 +301,17 @@ parts:
       sed -i 's/"github:extism\/js-pdk" = "1.6.0"/"github:extism\/js-pdk" = "1.3.0"/' mise.toml
       grep -q '"github:extism/js-pdk" = "1.3.0"' mise.toml || { echo "ERROR: extism-js version override failed, upstream may have changed the version"; exit 1; }
 
+      # Drop mise.lock so the js-pdk override above takes effect (the lock pins the v1.6.0
+      # download URLs); all tool versions stay exact since they are pinned in mise.toml.
+      rm -f mise.lock
+
       mise install
-      mise run build
+      mise //:plugins
 
       # Install the built plugin
-      mkdir -p ${CRAFT_PART_INSTALL}/var/lib/immich/build/corePlugin
-      cp -r dist ${CRAFT_PART_INSTALL}/var/lib/immich/build/corePlugin/
-      cp manifest.json ${CRAFT_PART_INSTALL}/var/lib/immich/build/corePlugin/
-    build-snaps:
-      - node/22/stable
+      mkdir -p ${CRAFT_PART_INSTALL}/var/lib/immich/build/plugins/immich-plugin-core
+      cp -r packages/plugin-core/dist ${CRAFT_PART_INSTALL}/var/lib/immich/build/plugins/immich-plugin-core/
+      cp packages/plugin-core/manifest.json ${CRAFT_PART_INSTALL}/var/lib/immich/build/plugins/immich-plugin-core/
 
   uv-python312:
     plugin: nil
@@ -345,7 +330,7 @@ parts:
   machine-learning:
     plugin: uv
     source: https://github.com/immich-app/immich.git
-    source-tag: v2.7.5
+    source-tag: v3.0.1
     source-subdir: machine-learning
     uv-extras:
       - cpu
@@ -404,35 +389,37 @@ parts:
       - nsg-haproxy
       - nsg-lego
 
-  sync:
-    plugin: uv
-    source: parts/sync
-    build-environment:
-      - UV_PROJECT_ENVIRONMENT: "${CRAFT_PART_INSTALL}/sync"
-    after: [uv-deps]
-    stage:
-      - sync
-
   geodata:
-    # Download geodata from geonames.org, based Immich Server base image
+    # Geodata from geonames.org, based on Immich Server base image
     # https://github.com/immich-app/base-images/blob/main/server/Dockerfile
-    plugin: dump
-    source: https://download.geonames.org/export/dump/cities500.zip
+    # Assets are copied from geodata-cache/ in the project root when present
+    # (populated by the CI cache), otherwise downloaded directly.
+    plugin: nil
     override-build: |
-      # Download cities500.zip and unpack it as cities500.txt
-      craftctl default
+      fetch() {
+        if [ -f "$CRAFT_PROJECT_DIR/geodata-cache/$1" ]; then
+          cp "$CRAFT_PROJECT_DIR/geodata-cache/$1" "$2"
+        else
+          curl -fsSL --retry 5 --retry-all-errors "$3" -o "$2"
+        fi
+      }
 
       # Create folder structure and write geodata-date.txt
-      mkdir -p $CRAFT_PART_INSTALL/var/lib/immich/build/geodata
-      date --iso-8601=seconds | tr -d "\n" > $CRAFT_PART_INSTALL/var/lib/immich/build/geodata/geodata-date.txt
+      GEODATA=$CRAFT_PART_INSTALL/var/lib/immich/build/geodata
+      mkdir -p $GEODATA
+      date --iso-8601=seconds | tr -d "\n" > $GEODATA/geodata-date.txt
 
-      # Download admin1CodesASCII.txt and admin2Codes.txt and move cities500.txt to geodata
-      mv $CRAFT_PART_INSTALL/cities500.txt $CRAFT_PART_INSTALL/var/lib/immich/build/geodata/cities500.txt
-      curl https://download.geonames.org/export/dump/admin1CodesASCII.txt -o $CRAFT_PART_INSTALL/var/lib/immich/build/geodata/admin1CodesASCII.txt
-      curl https://download.geonames.org/export/dump/admin2Codes.txt -o $CRAFT_PART_INSTALL/var/lib/immich/build/geodata/admin2Codes.txt
-      curl https://raw.githubusercontent.com/nvkelso/natural-earth-vector/v5.1.2/geojson/ne_10m_admin_0_countries.geojson -o $CRAFT_PART_INSTALL/var/lib/immich/build/geodata/ne_10m_admin_0_countries.geojson
+      # cities500.zip is unpacked as cities500.txt into geodata
+      fetch cities500.zip cities500.zip https://download.geonames.org/export/dump/cities500.zip
+      unzip -o cities500.zip cities500.txt -d $GEODATA
+
+      fetch admin1CodesASCII.txt $GEODATA/admin1CodesASCII.txt https://download.geonames.org/export/dump/admin1CodesASCII.txt
+      fetch admin2Codes.txt $GEODATA/admin2Codes.txt https://download.geonames.org/export/dump/admin2Codes.txt
+      fetch ne_10m_admin_0_countries.geojson $GEODATA/ne_10m_admin_0_countries.geojson https://raw.githubusercontent.com/nvkelso/natural-earth-vector/v5.1.2/geojson/ne_10m_admin_0_countries.geojson
+      echo "239eec57ac17f100a11e2536cffc56752c318b50ae765b0918ff7aab4ce8f255  $GEODATA/ne_10m_admin_0_countries.geojson" | sha256sum -c
     build-packages:
       - curl
+      - unzip
 
   manager:
     plugin: dump

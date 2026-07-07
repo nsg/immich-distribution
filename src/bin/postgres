@@ -30,6 +30,13 @@ drop_privileges $SNAP/bin/postgres-configure
     drop_privileges $SNAP/usr/local/pgsql/bin/psql --username=postgres -d immich \
         -c "DROP SCHEMA IF EXISTS vectors;"
 
+    # Custom tables and trigger left behind by the removed legacy sync service
+    drop_privileges $SNAP/usr/local/pgsql/bin/psql --username=postgres -d immich \
+        -c "DROP TRIGGER IF EXISTS trigger_assets_delete_audits ON asset;" \
+        -c "DROP FUNCTION IF EXISTS log_assets_delete_audits;" \
+        -c "DROP TABLE IF EXISTS assets_delete_audits;" \
+        -c "DROP TABLE IF EXISTS assets_filesync_lookup;"
+
     # Plugin wasm paths were stored with a revisioned $SNAP path and go stale
     # on refresh, breaking plugin loading. Re-point them at the current symlink.
     drop_privileges $SNAP/usr/local/pgsql/bin/psql --username=postgres -d immich <<EOF

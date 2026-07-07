@@ -92,7 +92,6 @@ fi
 export HAPROXY_HTTP_BIND="$(snapctl get haproxy-http-bind)"
 export HAPROXY_HTTPS_BIND="$(snapctl get haproxy-https-bind)"
 
-export SYNC_DELETE_THRESHOLD="$(snapctl get sync-delete-threshold)"
 export BACKUP_DATABASE_DAILY="$(snapctl get backup-database-daily)"
 
 NODE_OPTIONS_VALUE="$(snapctl get node-options)"
@@ -135,10 +134,6 @@ banner() {
 
 lego_staging_string() {
     [ x$ACME_STAGING == xtrue ] && echo "--server=https://acme-staging-v02.api.letsencrypt.org/directory"
-}
-
-sync_enabled() {
-    snapctl get sync-enabled | grep -q "true"
 }
 
 query_db() {

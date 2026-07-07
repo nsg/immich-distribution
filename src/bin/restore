@@ -20,7 +20,6 @@ restore_database() {
     echo "Shut down Immich Services"
     snapctl stop immich-distribution.immich-machine-learning
     snapctl stop immich-distribution.immich-server
-    snapctl stop immich-distribution.sync-service
 
     echo "Stop database services"
     snapctl stop immich-distribution.postgres
@@ -45,7 +44,6 @@ restore_database() {
     echo "Starting Immich Services"
     snapctl start immich-distribution.immich-machine-learning
     snapctl start immich-distribution.immich-server
-    snapctl start immich-distribution.sync-service
 
     echo "Database restored"
 }
