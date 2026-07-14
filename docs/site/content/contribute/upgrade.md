@@ -7,7 +7,7 @@ title = "Upgrade instructions"
 This page describe the upgrade process as a **developer** that I follow when I release a new version of Immich Distribution. If you like to contribute and help me with an update, follow this guide.
 
 {% admonition(type="danger", title="This page is for developers") %}
-This page **do not** describe the update process done as a user. That's automatic! :partying_face: For update and user focused instructions see the [install page](/install/#updates).
+This page **do not** describe the update process done as a user. That's automatic! :partying_face: For update and user focused instructions see the [install page](/installation/#updates).
 {% end %}
 
 ## Tracking issue
