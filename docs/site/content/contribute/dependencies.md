@@ -72,7 +72,6 @@ subgraph ID["Immich distribution"]
     Immich
     Server
     Scripts
-    Sync
 end
 
 nsg-redis --- Server
@@ -85,6 +84,4 @@ nsg-mimalloc --- machine-learning
 
 nsg-haproxy --- Scripts
 nsg-lego --- Scripts
-
-nsg-python --- Sync
 ```
