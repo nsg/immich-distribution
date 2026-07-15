@@ -84,7 +84,7 @@ For example, if you installed immich-distribution on a server with the IP addres
 
 The official [Post Install Steps](https://immich.app/docs/install/post-install) will guide you to set up your account, and how to configure your mobile application.
 
-If this installation is exposed to the public internet I strongly suggest that you set up [https](/configuration/https) and read the [security](/configuration/security) section.
+If this installation is exposed to the public internet I strongly suggest that you set up [https](@/guides/https.md) and read the [security](/configuration/security) section.
 
 ## Updates
 

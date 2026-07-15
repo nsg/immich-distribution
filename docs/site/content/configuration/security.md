@@ -50,6 +50,6 @@ A process running inside a Snap package has a limited view of your host system. 
 
 ## TLS and HTTPS
 
-By default, Immich serves traffic over plain text HTTP. You can issue Let's Encrypt certificates and configure HAProxy to use them, thereby encrypting all traffic leaving the server. For more information, see [Configure HTTPS](/configuration/https).
+By default, Immich serves traffic over plain text HTTP. You can issue Let's Encrypt certificates and configure HAProxy to use them, thereby encrypting all traffic leaving the server. For more information, see the [Configure HTTPS guide](@/guides/https.md).
 
 Internal traffic between Immich services is not encrypted. This traffic is sent locally via the loopback interface (lo, 127.0.0.1), so an external observer cannot intercept it. However, this could be a security consideration if untrusted users or software are running on the same server.

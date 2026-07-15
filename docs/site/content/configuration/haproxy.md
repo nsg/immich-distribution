@@ -14,7 +14,7 @@ sudo snap set immich-distribution https-enabled="true"
 ```
 {% end %}
 
-The command above enables the TLS frontend in HAProxy. This is automatically enabled if you configure [HTTPS with Let's Encrypt](/configuration/https).
+The command above enables the TLS frontend in HAProxy. This is automatically enabled if you configure [HTTPS with Let's Encrypt](@/guides/https.md).
 
 ## Disable HTTP
 
