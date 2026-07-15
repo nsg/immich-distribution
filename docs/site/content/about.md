@@ -6,11 +6,11 @@ title = "About"
 
 <img src="/assets/immich-dist.png" alt="Immich Distribution Logo" class="img-scale" style="float: right; margin-left: 1rem;">
 
-These pages contains documentation related to the [snap](https://snapcraft.io/docs) package [immich-distribution](https://snapcraft.io/immich-distribution). It's based on [Immich](https://immich.app/), a self hosted [Google Photos](https://en.wikipedia.org/wiki/Google_Photos) replacement in early development. The package is inspired of the official Immich images. It will be **similar, but not identical** with the official Docker-based installation. Extra tools and customizations are included. This project is **not related to [FUTO](https://futo.org/)** in any way.
+These pages contains documentation related to the [snap](https://snapcraft.io/docs) package [immich-distribution](https://snapcraft.io/immich-distribution). It's based on [Immich](https://immich.app/), a self hosted [Google Photos](https://en.wikipedia.org/wiki/Google_Photos) replacement. The package is inspired of the official Immich images. It will be **similar, but not identical** with the official Docker-based installation. Extra tools and customizations are included. This project is **not related to [FUTO](https://futo.org/)** in any way.
 
 ## Expectations
 
-Do not expect me to release updates the same day as the upstream Immich release. Immich is a really fast moving project and it's not uncommon that it takes me a few days to find the time to prepare a release. When Immich releases an update, I will build and push an update and try it out for a few days before I release it to the stable channel. You can track update progress over at [GitHub](https://github.com/nsg/immich-distribution/issues?q=is%3Aissue+is%3Aopen+label%3Anew-version).
+Do not expect me to release updates the same day as the upstream Immich release. Immich has settled down to a calmer release pace these days, but it's still not uncommon that it takes me a few days to find the time to prepare a release. When Immich releases an update, I will build and push an update and try it out for a few days before I release it to the stable channel. You can track update progress over at [GitHub](https://github.com/nsg/immich-distribution/issues?q=is%3Aissue+is%3Aopen+label%3Anew-version).
 
 ## Support
 
@@ -18,7 +18,7 @@ The [GitHub project page](https://github.com/nsg/immich-distribution) is also th
 
 ## History
 
-I deployed the [Docker based images](https://immich.app/docs/install/docker-compose) on a server initally, it worked just fine[^1]. But Immich is fast moving, with updates several times a week is not uncommon. I know that I'm lazy be nature and I have really enjoyed running [Nextcloud as a snap package](https://snapcraft.io/nextcloud) for several years. This has been a zero care experience for me, it just updates in the background automatically. There was no solution like that for Immich, so I created Immich Distribution. Sure, this is more job for me to run compared to "just run the docker images" but now, **you** and hundreds of people have a super easy deployment option.
+I deployed the [Docker based images](https://immich.app/docs/install/docker-compose) on a server initally, it worked just fine[^1]. But Immich was fast moving back then, with updates several times a week. I know that I'm lazy be nature and I have really enjoyed running [Nextcloud as a snap package](https://snapcraft.io/nextcloud) for several years. This has been a zero care experience for me, it just updates in the background automatically. There was no solution like that for Immich, so I created Immich Distribution. Sure, this is more job for me to run compared to "just run the docker images" but now, **you** and hundreds of people have a super easy deployment option.
 
 ## Contribute
 
