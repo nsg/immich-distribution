@@ -19,7 +19,7 @@ The package is over 700MB so it can take some time to download. For more informa
 {{ snapstore_versions() }}
 
 {% admonition(type="warning", title="Important information if you like to use candidate, beta or edge") %}
-The `edge` channel is not intended for end users, it contains experimental untested builds directly from the repository. The `beta` channel contains software that "works on my machine" and is published for general testing, expect things to break. I personally use `candidate` as a staging ground to try out a release for a few days before I push it to stable.
+The `edge` channel is not intended for end users, it contains experimental untested builds directly from the repository. The `beta` channel contains software that "works on my machine" and is published for general testing, expect things to break. I personally use `beta` these days to try out a release for a few days. The `candidate` channel is a staging ground for the next stable release.
 
 Updates from "candidate to candidate", "stable to stable" or "stable to candidate" should always work. Otherwise I consider it a bug. The snap may contain migration logic that makes it hard to downgrade, **never** downgrade a revision.
 
@@ -112,7 +112,7 @@ snap refresh --hold=forever immich-distribution
 ```
 {% end %}
 
-**Do not expect me to release updates the same day** as an upstream Immich release. I hope to do so in a **reasonable time**. When Immich releases an update I will build and push an update to the candidate channel when I believe I got it right (my server uses this channel) and try it out myself for a few days. I will release the build to the stable channel after a few days, if everything works.
+**Do not expect me to release updates the same day** as an upstream Immich release. I hope to do so in a **reasonable time**. When Immich releases an update I will build and push an update to the candidate channel when I believe I got it right (my server uses the beta channel) and try it out myself for a few days. I will release the build to the stable channel after a few days, if everything works.
 
 {% admonition(type="note", title="When is the next update released?", collapsible=true) %}
 Updates can be quick and easy, or a lot of work depending on the changes upstream. A tracking issue tagged with [new-version](https://github.com/nsg/immich-distribution/issues?q=is%3Aissue+is%3Aopen+label%3Anew-version) should appear when an update is detected, feel free to ask questions there. If you have experience with building snap packages, see [upgrade](/contribute/upgrade/) how to contribute to the project.
