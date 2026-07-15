@@ -8,13 +8,14 @@ This page lists the revision history of Immich Distribution releases. Each revis
 
 {% admonition(type="info", title="Last updated") %}
 This page is updated from time to time with the latest revision information.
-Last updated: **2026-07-05**.
+Last updated: **2026-07-14**.
 {% end %}
 
 ## Revision Table
 
 | Era | Revision | Immich Version | Released | Comments |
 |-----|----------|----------------|----------|----------|
+| 2 | 272 | [v2.7.5](https://github.com/nsg/immich-distribution/issues/375) | 08 Jul 2026 | Last v2 release before [v3](/news/2026/07/07/immich-v3/) |
 | 2 | 267 | [v2.7.5](https://github.com/nsg/immich-distribution/issues/375) | 22 Apr 2026 | |
 | 2 | 266 | [v2.7.4](https://github.com/nsg/immich-distribution/issues/375) | 22 Apr 2026 | |
 | 2 | 264 | [v2.6.3](https://github.com/nsg/immich-distribution/issues/368) | 29 Mar 2026 | |

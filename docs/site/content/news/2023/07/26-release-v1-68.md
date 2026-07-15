@@ -11,6 +11,6 @@ authors = ["nsg"]
 
 Bumped the version, improved tooling around my [update modal patch](/build/patches/) because it had changed in upstream again. This should make it easier for me to update this in the future if the file changes.
 
-{% admonition(type="info", title="Vaccation") %}
-The update was delayed a little due my vacation and the above patch made this a tiny bit more complex.
+{% admonition(type="info", title="Vacation") %}
+The update was delayed a little due to my vacation and the above patch made this a tiny bit more complex.
 {% end %}

@@ -28,4 +28,4 @@ Choosing a folder under `/root/snap/immich-distribution/common` is generally rec
 
 Alternatively, you can use a bind mount to make an existing folder accessible. For example, if your pictures are located in `/data/pictures` (which is outside the sandbox), you would bind mount `/data/pictures` to an accessible path like `/root/snap/immich-distribution/common/pictures`. Then, you add this latter path (`/root/snap/immich-distribution/common/pictures`) as an external library in Immich.
 
-For detailed instructions on creating mounts, refer to [the storage how-to guide](howto.md).
+For detailed instructions on creating mounts, refer to [the storage how-to guide](@/guides/storage-howto.md).

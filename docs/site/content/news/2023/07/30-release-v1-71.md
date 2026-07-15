@@ -7,8 +7,8 @@ authors = ["nsg"]
 +++
 
 
-{% admonition(type="note", title="Relese updates") %}
-From this point on forward, I will omit news posts that says nothing more interesting than "new version".
+{% admonition(type="note", title="Release updates") %}
+From this point on forward, I will omit news posts that say nothing more interesting than "new version".
 If you like to follow my release process [the new-version tag](https://github.com/nsg/immich-distribution/issues?q=is%3Aissue+label%3Anew-version+) is probably more interesting.
 {% end %}
 

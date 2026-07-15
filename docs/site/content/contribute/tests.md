@@ -4,7 +4,7 @@ title = "Tests"
 
 # Tests
 
-The rests are triggered as part of an GitHub Action in any Pull Request you open.
+The tests are triggered as part of a GitHub Action in any Pull Request you open.
 
 ## Run the tests locally
 
@@ -27,7 +27,7 @@ backend be_server
     server immich-server 127.0.0.1:3001 maxconn 64 check inter 5s fall 2 rise 6
 ```
 
-To summarize, HAProxy do a few basic backend checks to make sure that the services runs correctly. I use this information to detect if everyting is started and behaves correctly. This is exposed with the `tests/test_haproxy.py` test.
+To summarize, HAProxy does a few basic backend checks to make sure that the services run correctly. I use this information to detect if everything is started and behaves correctly. This is exposed with the `tests/test_haproxy.py` test.
 
 ## Asset processing tests
 
@@ -38,4 +38,4 @@ The asset processing tests use API calls against a running Immich Distribution i
 3. `tests/test_assets_people.py` uploads the people fixtures, triggers face detection, and verifies that people are detected.
 4. `tests/test_assets_ocr.py` uploads the OCR fixture and verifies extracted text and response structure.
 
-I hope to add more test over time, like more filetypes. If you like to contribute a file with an appropriate license, open an issue.
+I hope to add more tests over time, like more filetypes. If you like to contribute a file with an appropriate license, open an issue.

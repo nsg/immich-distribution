@@ -7,4 +7,4 @@ authors = ["nsg"]
 +++
 
 
-I have upgraded mkdocs-material to the latest version and enabled the blog. This was earlier a payed feature. I have migrated all old news articles over.
+I have upgraded mkdocs-material to the latest version and enabled the blog. This was earlier a paid feature. I have migrated all old news articles over.

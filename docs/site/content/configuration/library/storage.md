@@ -41,4 +41,4 @@ If you have a smaller NVMe drive that cannot fit your entire library, moving the
 
 ## How to move the folders
 
-From Immich Distribution's perspective, all these folders must reside within `/var/snap/immich-distribution/common`. You cannot simply move these folders; instead, you must use mounts to relocate the data. Standard symbolic links (symlinks) will not work due to the sandbox. For detailed instructions on creating mounts, see [the storage how-to guide](howto.md).
+From Immich Distribution's perspective, all these folders must reside within `/var/snap/immich-distribution/common`. You cannot simply move these folders; instead, you must use mounts to relocate the data. Standard symbolic links (symlinks) will not work due to the sandbox. For detailed instructions on creating mounts, see [the storage how-to guide](@/guides/storage-howto.md).
