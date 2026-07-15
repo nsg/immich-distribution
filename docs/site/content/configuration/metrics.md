@@ -27,4 +27,4 @@ sudo snap set immich-distribution metrics-telemetry-exclude="api"
 ```
 {% end %}
 
-Mix and match as you see please, available options are `host`, `api`, `io`, `repo`, `job`.
+Mix and match as you please, available options are `host`, `api`, `io`, `repo`, `job`.

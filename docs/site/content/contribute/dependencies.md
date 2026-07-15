@@ -4,7 +4,7 @@ title = "Package dependencies"
 
 # Package dependencies
 
-I use this page to track custom built deb-packages that I have built as a dependency for Immich Distribution. The packages are build in clean containers targeting Ubuntu 22.04.
+I use this page to track custom built deb-packages that I have built as a dependency for Immich Distribution. The packages are built in clean containers targeting Ubuntu 22.04.
 
 ## Repository
 

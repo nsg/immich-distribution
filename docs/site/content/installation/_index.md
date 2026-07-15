@@ -4,13 +4,13 @@ title = "Installation"
 
 # Installation
 
-The package can be installed from the snap store like any other snap package, below is the CLI command to install Immich. You can of course use Software / App Center to install is as well.
+The package can be installed from the snap store like any other snap package, below is the CLI command to install Immich. You can of course use Software / App Center to install it as well.
 
 ``` bash
 sudo snap install immich-distribution
 ```
 
-The package is over 700MB so it can take some time to download. For more information see the [Snap Store](https://snapcraft.io/immich-distribution). Also checkout the prerequisites below.
+The package is over 700MB so it can take some time to download. For more information see the [Snap Store](https://snapcraft.io/immich-distribution). Also check out the prerequisites below.
 
 <a href="https://snapcraft.io/immich-distribution"><img src="/assets/button.png" alt="Link to the Snapcraft Store" class="center-image"></a>
 
@@ -21,7 +21,7 @@ The package is over 700MB so it can take some time to download. For more informa
 {% admonition(type="warning", title="Important information if you like to use candidate, beta or edge") %}
 The `edge` channel is not intended for end users, it contains experimental untested builds directly from the repository. The `beta` channel contains software that "works on my machine" and is published for general testing, expect things to break. I personally use `candidate` as a staging ground to try out a release for a few days before I push it to stable.
 
-Updates from "candidate to candidate", "stable to stable" or "stable to candidate" should always work. Otherwise I consider it a bug. The snap may contain migration logic that makes hard to downgrade, **never** downgrade a revision.
+Updates from "candidate to candidate", "stable to stable" or "stable to candidate" should always work. Otherwise I consider it a bug. The snap may contain migration logic that makes it hard to downgrade, **never** downgrade a revision.
 
 ![](/assets/channel-flow.png)
 
@@ -36,7 +36,7 @@ Feel free to use the `candidate` channel if you can't wait, but overall for a tr
 
 ### snapd
 
-A computer running Linux with [support for snapd](https://snapcraft.io/docs/installing-snapd). Most commonly used Linux distributions are supported. If you do not have any strong preferences I recommends Ubuntu, or something Ubuntu based.
+A computer running Linux with [support for snapd](https://snapcraft.io/docs/installing-snapd). Most commonly used Linux distributions are supported. If you do not have any strong preferences I recommend Ubuntu, or something Ubuntu based.
 
 {% admonition(type="info", title="Windows and WSL2", collapsible=true) %}
 The snap *almost* works under Windows Subsystem for Linux. This is **not** a tested deployment but feel free to try it out if you are a Windows user. I did a quick test and noticed only a minor problem with the machine learning service.
@@ -49,7 +49,7 @@ A computer with a relatively modern Intel or AMD based CPU. You need **at minimu
 {% admonition(type="note", title="What about ARM?", collapsible=true) %}
 There is nothing technically blocking me from adapting this package for more architectures like ARM. At the moment I do not have any ARM based systems running to test and develop ARM support, so I have focused my resources on what I use personally.
 
-If you like to comment, chat or vote for ARM support please do a :thumbsup: or write an comment [at this issue](https://github.com/nsg/immich-distribution/issues/192).
+If you like to comment, chat or vote for ARM support please do a :thumbsup: or write a comment [at this issue](https://github.com/nsg/immich-distribution/issues/192).
 {% end %}
 
 ### Used ports
@@ -82,16 +82,16 @@ After installing Immich Distribution, the services will start automatically in t
 
 For example, if you installed immich-distribution on a server with the IP address `192.168.1.10`, you would navigate to `http://192.168.1.10` in your browser.
 
-The official [Post Install Steps](https://immich.app/docs/install/post-install) will guide you to setup your account, and how to configure your mobile application.
+The official [Post Install Steps](https://immich.app/docs/install/post-install) will guide you to set up your account, and how to configure your mobile application.
 
-If this installation is exposed to the public internet I stronly suggest that you set up [https](/configuration/https) and read the [security](/configuration/security) section.
+If this installation is exposed to the public internet I strongly suggest that you set up [https](/configuration/https) and read the [security](/configuration/security) section.
 
 ## Updates
 
 Updates are by **default** automatic, this is a core concept of the package format. I write the software with that in mind assuming users update regularly from version to version, so I will never push a breaking change. You should never have a broken system as a result of an automatic update. However, if you skip many versions for any reason, check the [news section](/news/) to avoid missing critical upgrade instructions.
 
 {% admonition(type="note", title="Disable or control automatic updates", collapsible=true) %}
-The advantages with automatic updates usually outweights the disadvantages for ordinary users, that's why automatic updates are on by default. If you have other needs this behavior can be changed with the following commands.
+The advantages with automatic updates usually outweigh the disadvantages for ordinary users, that's why automatic updates are on by default. If you have other needs this behavior can be changed with the following commands.
 
 You can schedule updates for convenient times. For more scheduling options and detailed control, see [snapd's documentation](https://snapcraft.io/docs/keeping-snaps-up-to-date).
 
@@ -112,7 +112,7 @@ snap refresh --hold=forever immich-distribution
 ```
 {% end %}
 
-**Do not expect me to release updates the same day** as an upstream Immich release. I hope to do so in a **reasonable time**. When Immich releases an update I will build and push an update to the candidate channel when I beleave I got it right (my server uses this channel) and try it out myself for a few days. I will relese the build to the stable channel after a few days, if everyting works.
+**Do not expect me to release updates the same day** as an upstream Immich release. I hope to do so in a **reasonable time**. When Immich releases an update I will build and push an update to the candidate channel when I believe I got it right (my server uses this channel) and try it out myself for a few days. I will release the build to the stable channel after a few days, if everything works.
 
 {% admonition(type="note", title="When is the next update released?", collapsible=true) %}
 Updates can be quick and easy, or a lot of work depending on the changes upstream. A tracking issue tagged with [new-version](https://github.com/nsg/immich-distribution/issues?q=is%3Aissue+is%3Aopen+label%3Anew-version) should appear when an update is detected, feel free to ask questions there. If you have experience with building snap packages, see [upgrade](/contribute/upgrade/) how to contribute to the project.
@@ -122,7 +122,7 @@ To speed up the transition time from "candidate to stable", help me test the bui
 
 ### Mobile app
 
-If you use the mobile application you have probably installed it from [Google Play Store](https://play.google.com/store/apps/details?id=app.alextran.immich), [Apple App Store](https://apps.apple.com/us/app/immich/id1613945652) or [F-Droid](https://f-droid.org/packages/app.alextran.immich). These stores usually update the apps automatically in the background. It's rare, but if there is a breaking change in the API the mobile app may temporary break if there is a version mismatch between the mobile app and the server.
+If you use the mobile application you have probably installed it from [Google Play Store](https://play.google.com/store/apps/details?id=app.alextran.immich), [Apple App Store](https://apps.apple.com/us/app/immich/id1613945652) or [F-Droid](https://f-droid.org/packages/app.alextran.immich). These stores usually update the apps automatically in the background. It's rare, but if there is a breaking change in the API the mobile app may temporarily break if there is a version mismatch between the mobile app and the server.
 
 ## Configuration
 

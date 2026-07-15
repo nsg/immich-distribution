@@ -9,7 +9,7 @@ authors = ["nsg"]
 
 [Issue #51](https://github.com/nsg/immich-distribution/issues/51) - (Released to beta 2023-07-17)
 
-This was a simple release, I have bumped the version to the latest Immich relese.
+This was a simple release, I have bumped the version to the latest Immich release.
 
 ## Changes
 
