@@ -1,10 +1,11 @@
 +++
 title = "Storage How To"
+aliases = ["/configuration/library/howto/"]
 +++
 
 # Storage How To
 
-This page explains how to create different types of mounts to relocate or add library storage locations for Immich Distribution.
+This page explains how to create different types of mounts to relocate or add library storage locations for Immich Distribution. For background, see the configuration pages [Storage Locations](@/configuration/library/storage.md) for an overview of the storage layout, and [External Libraries](@/configuration/library/external.md) for how external libraries work inside the snap sandbox.
 
 {% admonition(type="danger") %}
 Incorrectly configuring mounts can potentially break your Immich installation or even your server.
@@ -50,14 +51,14 @@ sudo snap start immich-distribution
 {% end %}
 
 {% admonition(type="warning", title="Please note") %}
-The `mount` command in the example above is temporary and will not persist across reboots. To make the mount permanent, you need to configure it in `/etc/fstab`, create a systemd `.mount` unit file, or use another method appropriate for your system.
+The `mount` command in the example above is temporary and will not persist across reboots. To make the mount permanent, you need to configure it in `/etc/fstab`, create a systemd `.mount` unit file (see the [systemd bind mount example](#systemd-bind-mount-example) below), or use another method appropriate for your system.
 {% end %}
 
 ### Store all images and video on a network attached NAS
 
 This is also a common scenario. Follow the external drive guide above, but instead of mounting `/dev/sda2`, mount your NAS share.
 
-Note that network-attached storage (NAS) is typically slower than local drives. To potentially improve performance, consider moving only the `/var/snap/immich-distribution/common/upload/library` directory (which contains large original files) to the NAS, while keeping smaller, frequently accessed assets like thumbnails and encoded videos on a local drive.
+Note that network-attached storage (NAS) is typically slower than local drives. To potentially improve performance, consider moving only the `/var/snap/immich-distribution/common/upload/library` directory (which contains large original files) to the NAS, while keeping smaller, frequently accessed assets like thumbnails and encoded videos on a local drive. See [Storage Locations](@/configuration/library/storage.md) for what each folder contains.
 
 ### How to access external libraries
 
@@ -79,10 +80,10 @@ sudo mount --bind /data/lunar-holiday /root/snap/immich-distribution/common/luna
 ```
 {% end %}
 
-Once bind-mounted, you can add the path `/root/snap/immich-distribution/common/lunar-holiday` to Immich as an external library via the web interface.
+Once bind-mounted, you can add the path `/root/snap/immich-distribution/common/lunar-holiday` to Immich as an external library via the web interface. See [External Libraries](@/configuration/library/external.md) for more details.
 
 {% admonition(type="warning", title="Please note") %}
-The `mount` commands in these examples are temporary and will not persist across reboots. You need to configure the mount in `/etc/fstab`, a systemd `.mount` unit file, or use another method appropriate for your system.
+The `mount` commands in these examples are temporary and will not persist across reboots. You need to configure the mount in `/etc/fstab`, a systemd `.mount` unit file (see the [systemd bind mount example](#systemd-bind-mount-example) below), or use another method appropriate for your system.
 {% end %}
 
 ### Systemd bind mount example
