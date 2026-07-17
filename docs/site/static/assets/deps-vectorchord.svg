@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 890 140" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif">
+  <title>VectorChord dependency tree</title>
+  <desc>nsg-vectorchord and nsg-pgvector build on nsg-postgres, which the Immich server uses.</desc>
+  <defs>
+    <clipPath id="node"><rect x="0" y="0" width="150" height="40" rx="8"/></clipPath>
+  </defs>
+
+  <g fill="none" stroke="#b0b0b0" stroke-width="1.6">
+    <path d="M 160 70 L 240 70"/>
+    <path d="M 390 70 L 470 70"/>
+    <path d="M 85 50 C 85 10 545 10 545 50"/>
+    <path d="M 620 70 L 713 70" stroke-dasharray="5 4"/>
+  </g>
+
+  <g id="nsg-vectorchord" transform="translate(10,50)">
+    <rect width="150" height="40" rx="8" fill="#ffffff" stroke="#dcdcdc"/>
+    <rect width="150" height="4" fill="#d40000" clip-path="url(#node)"/>
+    <text x="75" y="27" text-anchor="middle" font-size="13" font-weight="600" fill="#333333">nsg-vectorchord</text>
+  </g>
+  <g id="nsg-pgvector" transform="translate(240,50)">
+    <rect width="150" height="40" rx="8" fill="#ffffff" stroke="#dcdcdc"/>
+    <rect width="150" height="4" fill="#d40000" clip-path="url(#node)"/>
+    <text x="75" y="27" text-anchor="middle" font-size="13" font-weight="600" fill="#333333">nsg-pgvector</text>
+  </g>
+  <g id="nsg-postgres" transform="translate(470,50)">
+    <rect width="150" height="40" rx="8" fill="#ffffff" stroke="#dcdcdc"/>
+    <rect width="150" height="4" fill="#d40000" clip-path="url(#node)"/>
+    <text x="75" y="27" text-anchor="middle" font-size="13" font-weight="600" fill="#333333">nsg-postgres</text>
+  </g>
+
+  <g id="immich-group">
+    <rect x="700" y="24" width="176" height="86" rx="10" fill="none" stroke="#c9c9c9" stroke-dasharray="4 4"/>
+    <text x="712" y="44" font-size="11" font-weight="600" fill="#999999" letter-spacing="0.5">IMMICH</text>
+    <g transform="translate(713,50)">
+      <rect width="150" height="40" rx="8" fill="#f8f9fa" stroke="#dcdcdc"/>
+      <text x="75" y="25" text-anchor="middle" font-size="13" fill="#555555">server</text>
+    </g>
+  </g>
+</svg>

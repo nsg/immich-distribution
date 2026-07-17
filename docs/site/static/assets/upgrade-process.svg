@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 100" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif">
+  <title>The upgrade process</title>
+  <desc>Upstream release, tracking issue, bump PR with CI, review and merge, then channel promotion.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1 L 9 5 L 0 9" fill="none" stroke="#b0b0b0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+    <clipPath id="card"><rect x="0" y="0" width="160" height="72" rx="10"/></clipPath>
+  </defs>
+
+  <g id="step-1" transform="translate(4,14)">
+    <rect width="160" height="72" rx="10" fill="#ffffff" stroke="#dcdcdc" stroke-width="1"/>
+    <rect width="160" height="4" fill="#d40000" clip-path="url(#card)"/>
+    <text x="80" y="37" text-anchor="middle" font-size="15" font-weight="600" fill="#333333">Upstream release</text>
+    <text x="80" y="57" text-anchor="middle" font-size="12" fill="#777777">new Immich version</text>
+  </g>
+  <line x1="168" y1="50" x2="192" y2="50" stroke="#b0b0b0" stroke-width="1.8" marker-end="url(#arrow)"/>
+
+  <g id="step-2" transform="translate(196,14)">
+    <rect width="160" height="72" rx="10" fill="#ffffff" stroke="#dcdcdc" stroke-width="1"/>
+    <rect width="160" height="4" fill="#d40000" clip-path="url(#card)"/>
+    <text x="80" y="37" text-anchor="middle" font-size="15" font-weight="600" fill="#333333">Tracking issue</text>
+    <text x="80" y="57" text-anchor="middle" font-size="12" fill="#777777">GitHub automation</text>
+  </g>
+  <line x1="360" y1="50" x2="384" y2="50" stroke="#b0b0b0" stroke-width="1.8" marker-end="url(#arrow)"/>
+
+  <g id="step-3" transform="translate(388,14)">
+    <rect width="160" height="72" rx="10" fill="#ffffff" stroke="#dcdcdc" stroke-width="1"/>
+    <rect width="160" height="4" fill="#d40000" clip-path="url(#card)"/>
+    <text x="80" y="37" text-anchor="middle" font-size="15" font-weight="600" fill="#333333">Bump PR + CI</text>
+    <text x="80" y="57" text-anchor="middle" font-size="12" fill="#777777">full test suite</text>
+  </g>
+  <line x1="552" y1="50" x2="576" y2="50" stroke="#b0b0b0" stroke-width="1.8" marker-end="url(#arrow)"/>
+
+  <g id="step-4" transform="translate(580,14)">
+    <rect width="160" height="72" rx="10" fill="#ffffff" stroke="#dcdcdc" stroke-width="1"/>
+    <rect width="160" height="4" fill="#d40000" clip-path="url(#card)"/>
+    <text x="80" y="37" text-anchor="middle" font-size="15" font-weight="600" fill="#333333">Review &amp; merge</text>
+    <text x="80" y="57" text-anchor="middle" font-size="12" fill="#777777">human + AI</text>
+  </g>
+  <line x1="744" y1="50" x2="768" y2="50" stroke="#b0b0b0" stroke-width="1.8" marker-end="url(#arrow)"/>
+
+  <g id="step-5" transform="translate(772,14)">
+    <rect width="160" height="72" rx="10" fill="#ffffff" stroke="#dcdcdc" stroke-width="1"/>
+    <rect width="160" height="4" fill="#d40000" clip-path="url(#card)"/>
+    <text x="80" y="37" text-anchor="middle" font-size="15" font-weight="600" fill="#333333">Channel promotion</text>
+    <text x="80" y="57" text-anchor="middle" font-size="12" fill="#777777">edge → beta → stable</text>
+  </g>
+</svg>

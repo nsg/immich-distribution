@@ -115,7 +115,7 @@ snap refresh --hold=forever immich-distribution
 **Do not expect me to release updates the same day** as an upstream Immich release. I hope to do so in a **reasonable time**. When Immich releases an update I will build and push an update to the candidate channel when I believe I got it right (my server uses the beta channel) and try it out myself for a few days. I will release the build to the stable channel after a few days, if everything works.
 
 {% admonition(type="note", title="When is the next update released?", collapsible=true) %}
-Updates can be quick and easy, or a lot of work depending on the changes upstream. A tracking issue tagged with [new-version](https://github.com/nsg/immich-distribution/issues?q=is%3Aissue+is%3Aopen+label%3Anew-version) should appear when an update is detected, feel free to ask questions there. If you have experience with building snap packages, see [upgrade](/contribute/upgrade/) how to contribute to the project.
+Updates can be quick and easy, or a lot of work depending on the changes upstream. A tracking issue tagged with [new-version](https://github.com/nsg/immich-distribution/issues?q=is%3Aissue+is%3Aopen+label%3Anew-version) should appear when an update is detected, feel free to ask questions there. If you have experience with building snap packages, see the [upgrade process](/contribute/upgrade/) for how to contribute to the project.
 
 To speed up the transition time from "candidate to stable", help me test the build and inform me of problems, try to troubleshoot them, and of course, also report success! Finally, just a thumbs up or any message will keep me motivated to carry on!
 {% end %}
