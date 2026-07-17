@@ -20,68 +20,14 @@ For more information and available packages, visit: [https://nsg.github.io/aptly
 
 ### libvips
 
-```mermaid
-flowchart LR
-
-subgraph Immich
-    sharp
-end
-
-nsg-cgif --- nsg-libvips
-nsg-libraw --- nsg-imagemagick
-nsg-x265 --- nsg-imagemagick
-nsg-x265 --- nsg-libheif
-nsg-libde265 --- nsg-libheif
-nsg-libde265 --- nsg-imagemagick
-nsg-libheif --- nsg-imagemagick
-nsg-libheif --- nsg-libvips
-nsg-imagemagick --- nsg-libvips
-nsg-libvips -.- sharp
-```
+![Dependency tree where nsg-cgif, nsg-libheif and nsg-imagemagick feed into nsg-libvips, used by sharp inside Immich](/assets/deps-libvips.svg)
 
 Immich uses sharp for image processing. Sharp uses libvips, and libvips has imagemagick as a backend and uses it as a fallback engine if it can't handle an image format directly.
 
 ### VectorChord
 
-```mermaid
-flowchart LR
-
-subgraph Immich
-    server
-end
-
-nsg-vectorchord --- nsg-pgvector
-nsg-vectorchord --- nsg-postgres
-nsg-pgvector --- nsg-postgres
-nsg-postgres -.- server
-```
+![Dependency tree where nsg-vectorchord and nsg-pgvector build on nsg-postgres, used by the Immich server](/assets/deps-vectorchord.svg)
 
 ### Immich Distribution
 
-```mermaid
-flowchart TD
-
-subgraph Immich
-    Server
-    Web
-    machine-learning["Machine Learning"]
-end
-
-
-subgraph ID["Immich distribution"]
-    Immich
-    Server
-    Scripts
-end
-
-nsg-redis --- Server
-nsg-postgres --- Server
-nsg-libvips --- Server
-nsg-vectorchord --- Server
-
-nsg-python --- machine-learning
-nsg-mimalloc --- machine-learning
-
-nsg-haproxy --- Scripts
-nsg-lego --- Scripts
-```
+![Overview of nsg packages feeding the Immich server, machine learning, and the distribution scripts](/assets/deps-overview.svg)

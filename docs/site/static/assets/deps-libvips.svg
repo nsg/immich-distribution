@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 890 250" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif">
+  <title>libvips dependency tree</title>
+  <desc>nsg-cgif, nsg-libheif and nsg-imagemagick feed into nsg-libvips, which sharp inside Immich uses.</desc>
+  <defs>
+    <clipPath id="node"><rect x="0" y="0" width="150" height="40" rx="8"/></clipPath>
+  </defs>
+
+  <g fill="none" stroke="#b0b0b0" stroke-width="1.6">
+    <path d="M 160 30 C 205 30 205 150 250 150"/>
+    <path d="M 160 90 C 205 90 205 60 250 60"/>
+    <path d="M 160 90 C 205 90 205 150 250 150"/>
+    <path d="M 160 150 C 205 150 205 60 250 60"/>
+    <path d="M 160 150 L 250 150"/>
+    <path d="M 160 210 C 400 210 565 190 565 140"/>
+    <path d="M 325 80 L 325 130"/>
+    <path d="M 400 60 C 445 60 445 120 490 120"/>
+    <path d="M 400 150 C 445 150 445 120 490 120"/>
+    <path d="M 640 120 L 713 120" stroke-dasharray="5 4"/>
+  </g>
+
+  <g id="nsg-libraw" transform="translate(10,10)">
+    <rect width="150" height="40" rx="8" fill="#ffffff" stroke="#dcdcdc"/>
+    <rect width="150" height="4" fill="#d40000" clip-path="url(#node)"/>
+    <text x="75" y="27" text-anchor="middle" font-size="13" font-weight="600" fill="#333333">nsg-libraw</text>
+  </g>
+  <g id="nsg-x265" transform="translate(10,70)">
+    <rect width="150" height="40" rx="8" fill="#ffffff" stroke="#dcdcdc"/>
+    <rect width="150" height="4" fill="#d40000" clip-path="url(#node)"/>
+    <text x="75" y="27" text-anchor="middle" font-size="13" font-weight="600" fill="#333333">nsg-x265</text>
+  </g>
+  <g id="nsg-libde265" transform="translate(10,130)">
+    <rect width="150" height="40" rx="8" fill="#ffffff" stroke="#dcdcdc"/>
+    <rect width="150" height="4" fill="#d40000" clip-path="url(#node)"/>
+    <text x="75" y="27" text-anchor="middle" font-size="13" font-weight="600" fill="#333333">nsg-libde265</text>
+  </g>
+  <g id="nsg-cgif" transform="translate(10,190)">
+    <rect width="150" height="40" rx="8" fill="#ffffff" stroke="#dcdcdc"/>
+    <rect width="150" height="4" fill="#d40000" clip-path="url(#node)"/>
+    <text x="75" y="27" text-anchor="middle" font-size="13" font-weight="600" fill="#333333">nsg-cgif</text>
+  </g>
+
+  <g id="nsg-libheif" transform="translate(250,40)">
+    <rect width="150" height="40" rx="8" fill="#ffffff" stroke="#dcdcdc"/>
+    <rect width="150" height="4" fill="#d40000" clip-path="url(#node)"/>
+    <text x="75" y="27" text-anchor="middle" font-size="13" font-weight="600" fill="#333333">nsg-libheif</text>
+  </g>
+  <g id="nsg-imagemagick" transform="translate(250,130)">
+    <rect width="150" height="40" rx="8" fill="#ffffff" stroke="#dcdcdc"/>
+    <rect width="150" height="4" fill="#d40000" clip-path="url(#node)"/>
+    <text x="75" y="27" text-anchor="middle" font-size="13" font-weight="600" fill="#333333">nsg-imagemagick</text>
+  </g>
+
+  <g id="nsg-libvips" transform="translate(490,100)">
+    <rect width="150" height="40" rx="8" fill="#ffffff" stroke="#dcdcdc"/>
+    <rect width="150" height="4" fill="#d40000" clip-path="url(#node)"/>
+    <text x="75" y="27" text-anchor="middle" font-size="13" font-weight="600" fill="#333333">nsg-libvips</text>
+  </g>
+
+  <g id="immich-group">
+    <rect x="700" y="74" width="176" height="86" rx="10" fill="none" stroke="#c9c9c9" stroke-dasharray="4 4"/>
+    <text x="712" y="94" font-size="11" font-weight="600" fill="#999999" letter-spacing="0.5">IMMICH</text>
+    <g transform="translate(713,100)">
+      <rect width="150" height="40" rx="8" fill="#f8f9fa" stroke="#dcdcdc"/>
+      <text x="75" y="25" text-anchor="middle" font-size="13" fill="#555555">sharp</text>
+    </g>
+  </g>
+</svg>

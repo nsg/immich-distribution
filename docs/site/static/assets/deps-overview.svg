@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 650 420" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif">
+  <title>Immich Distribution dependency overview</title>
+  <desc>nsg packages feeding the Immich server, machine learning, and the distribution scripts.</desc>
+  <defs>
+    <clipPath id="node"><rect x="0" y="0" width="150" height="40" rx="8"/></clipPath>
+  </defs>
+
+  <g fill="none" stroke="#b0b0b0" stroke-width="1.6">
+    <path d="M 160 30 C 285 30 285 90 410 90"/>
+    <path d="M 160 86 C 285 86 285 90 410 90"/>
+    <path d="M 160 142 C 285 142 285 90 410 90"/>
+    <path d="M 160 198 C 285 198 285 90 410 90"/>
+    <path d="M 160 264 C 285 264 285 210 410 210"/>
+    <path d="M 160 330 C 285 330 285 370 410 370"/>
+    <path d="M 160 386 C 285 386 285 370 410 370"/>
+  </g>
+
+  <g id="nsg-redis" transform="translate(10,10)">
+    <rect width="150" height="40" rx="8" fill="#ffffff" stroke="#dcdcdc"/>
+    <rect width="150" height="4" fill="#d40000" clip-path="url(#node)"/>
+    <text x="75" y="27" text-anchor="middle" font-size="13" font-weight="600" fill="#333333">nsg-redis</text>
+  </g>
+  <g id="nsg-postgres" transform="translate(10,66)">
+    <rect width="150" height="40" rx="8" fill="#ffffff" stroke="#dcdcdc"/>
+    <rect width="150" height="4" fill="#d40000" clip-path="url(#node)"/>
+    <text x="75" y="27" text-anchor="middle" font-size="13" font-weight="600" fill="#333333">nsg-postgres</text>
+  </g>
+  <g id="nsg-libvips" transform="translate(10,122)">
+    <rect width="150" height="40" rx="8" fill="#ffffff" stroke="#dcdcdc"/>
+    <rect width="150" height="4" fill="#d40000" clip-path="url(#node)"/>
+    <text x="75" y="27" text-anchor="middle" font-size="13" font-weight="600" fill="#333333">nsg-libvips</text>
+  </g>
+  <g id="nsg-vectorchord" transform="translate(10,178)">
+    <rect width="150" height="40" rx="8" fill="#ffffff" stroke="#dcdcdc"/>
+    <rect width="150" height="4" fill="#d40000" clip-path="url(#node)"/>
+    <text x="75" y="27" text-anchor="middle" font-size="13" font-weight="600" fill="#333333">nsg-vectorchord</text>
+  </g>
+  <g id="nsg-mimalloc" transform="translate(10,244)">
+    <rect width="150" height="40" rx="8" fill="#ffffff" stroke="#dcdcdc"/>
+    <rect width="150" height="4" fill="#d40000" clip-path="url(#node)"/>
+    <text x="75" y="27" text-anchor="middle" font-size="13" font-weight="600" fill="#333333">nsg-mimalloc</text>
+  </g>
+  <g id="nsg-haproxy" transform="translate(10,310)">
+    <rect width="150" height="40" rx="8" fill="#ffffff" stroke="#dcdcdc"/>
+    <rect width="150" height="4" fill="#d40000" clip-path="url(#node)"/>
+    <text x="75" y="27" text-anchor="middle" font-size="13" font-weight="600" fill="#333333">nsg-haproxy</text>
+  </g>
+  <g id="nsg-lego" transform="translate(10,366)">
+    <rect width="150" height="40" rx="8" fill="#ffffff" stroke="#dcdcdc"/>
+    <rect width="150" height="4" fill="#d40000" clip-path="url(#node)"/>
+    <text x="75" y="27" text-anchor="middle" font-size="13" font-weight="600" fill="#333333">nsg-lego</text>
+  </g>
+
+  <g id="distribution-group">
+    <rect x="330" y="6" width="310" height="406" rx="10" fill="none" stroke="#c9c9c9" stroke-dasharray="4 4"/>
+    <text x="344" y="26" font-size="11" font-weight="600" fill="#999999" letter-spacing="0.5">IMMICH DISTRIBUTION</text>
+
+    <g id="immich-group">
+      <rect x="350" y="40" width="270" height="220" rx="10" fill="none" stroke="#c9c9c9" stroke-dasharray="4 4"/>
+      <text x="364" y="60" font-size="11" font-weight="600" fill="#999999" letter-spacing="0.5">IMMICH</text>
+      <g transform="translate(410,70)">
+        <rect width="150" height="40" rx="8" fill="#f8f9fa" stroke="#dcdcdc"/>
+        <text x="75" y="25" text-anchor="middle" font-size="13" fill="#555555">Server</text>
+      </g>
+      <g transform="translate(410,130)">
+        <rect width="150" height="40" rx="8" fill="#f8f9fa" stroke="#dcdcdc"/>
+        <text x="75" y="25" text-anchor="middle" font-size="13" fill="#555555">Web</text>
+      </g>
+      <g transform="translate(410,190)">
+        <rect width="150" height="40" rx="8" fill="#f8f9fa" stroke="#dcdcdc"/>
+        <text x="75" y="25" text-anchor="middle" font-size="13" fill="#555555">Machine Learning</text>
+      </g>
+    </g>
+
+    <g transform="translate(410,350)">
+      <rect width="150" height="40" rx="8" fill="#f8f9fa" stroke="#dcdcdc"/>
+      <text x="75" y="25" text-anchor="middle" font-size="13" fill="#555555">Scripts</text>
+    </g>
+  </g>
+</svg>
