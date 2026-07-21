@@ -426,9 +426,9 @@ parts:
     source: parts/manager
 
   jellyfin-ffmpeg:
-    source: https://github.com/jellyfin/jellyfin-ffmpeg/releases/download/v7.0.2-7/jellyfin-ffmpeg7_7.0.2-7-jammy_amd64.deb
+    source: https://github.com/jellyfin/jellyfin-ffmpeg/releases/download/v7.1.4-3/jellyfin-ffmpeg7_7.1.4-3-jammy_amd64.deb
     plugin: dump
-    source-checksum: sha256/f116e06281e5dc96a4b1d59a57aa39c1601deb01e9ed023d1741574886cc9432
+    source-checksum: sha256/4fccc21952a0badcb50261c3120eaaa57d726cee97339c6426bb5bcfc4dec3a5
     organize:
       usr/lib/jellyfin-ffmpeg/lib: usr/lib
       usr/lib/jellyfin-ffmpeg/share: usr/share
