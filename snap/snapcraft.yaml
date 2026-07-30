@@ -305,7 +305,14 @@ parts:
       # download URLs); all tool versions stay exact since they are pinned in mise.toml.
       rm -f mise.lock
 
+      # mise install rewrites pnpm-lock.yaml when it installs the npm-backed tools, dropping
+      # injectWorkspacePackages from its settings block, which then makes the frozen install in
+      # //:plugins fail with ERR_PNPM_LOCKFILE_CONFIG_MISMATCH. Upstream never hits this because
+      # their Dockerfile only exposes the lockfile to //:plugins, not to mise install.
+      cp pnpm-lock.yaml pnpm-lock.yaml.orig
       mise install
+      mv pnpm-lock.yaml.orig pnpm-lock.yaml
+
       mise //:plugins
 
       # Install the built plugin
