@@ -1,0 +1,13 @@
+# Backport of upstream commit 9d03a92b10c0d46c08c1fd2f94c1176235ef65b8.
+# Remove this patch when updating to Immich v3.2.0 or later.
+diff --git a/packages/plugin-core/src/index.ts b/packages/plugin-core/src/index.ts
+index e3f180f98..7b91ed711 100644
+--- a/packages/plugin-core/src/index.ts
++++ b/packages/plugin-core/src/index.ts
+@@ -92,3 +92,4 @@ const methods = wrapper<Manifest>({
+-  assetFileFilter: ({ data, config }) => matchValueResult(data.asset.originalFileName || '', config),
+-
++  assetFileFilter: ({ data, config }) =>
++    matchValueResult(config.usePath ? data.asset.originalPath : data.asset.originalFileName, config),
++
+   assetLocationFilter: ({ config, data }) => {

@@ -1,6 +1,6 @@
 name: immich-distribution
 title: Immich Distribution
-version: "v3.0.3"
+version: "v3.1.0"
 base: core22
 grade: stable
 confinement: strict
@@ -171,7 +171,7 @@ parts:
   server:
     plugin: nil
     source: https://github.com/immich-app/immich.git
-    source-tag: v3.0.3
+    source-tag: v3.1.0
     build-environment:
       - SHARP_FORCE_GLOBAL_LIBVIPS: "true"
       - COREPACK_ENABLE_DOWNLOAD_PROMPT: "0"
@@ -258,7 +258,7 @@ parts:
   web:
     plugin: nil
     source: https://github.com/immich-app/immich.git
-    source-tag: v3.0.3
+    source-tag: v3.1.0
     build-environment:
       - COREPACK_ENABLE_DOWNLOAD_PROMPT: "0"
       - CI: "1"
@@ -283,13 +283,15 @@ parts:
   plugins:
     plugin: nil
     source: https://github.com/immich-app/immich.git
-    source-tag: v3.0.3
+    source-tag: v3.1.0
     build-environment:
       - CI: "1"
       - MISE_DATA_DIR: "${CRAFT_PART_BUILD}/mise-data"
       - MISE_TRUSTED_CONFIG_PATHS: "${CRAFT_PART_SRC}/mise.toml:${CRAFT_PART_BUILD}/mise.toml:${CRAFT_PART_SRC}/packages/plugin-core/mise.toml:${CRAFT_PART_BUILD}/packages/plugin-core/mise.toml"
       - MISE_DISABLE_TOOLS: "flutter"
     override-build: |
+      git apply -p1 $CRAFT_STAGE/plugin-core__asset-file-filter-use-path.patch
+
       # Install mise
       curl -sSL https://mise.run | sh
       export PATH="$HOME/.local/bin:$PATH"
@@ -305,13 +307,22 @@ parts:
       # download URLs); all tool versions stay exact since they are pinned in mise.toml.
       rm -f mise.lock
 
+      # mise install rewrites pnpm-lock.yaml when it installs the npm-backed tools, dropping
+      # injectWorkspacePackages from its settings block, which then makes the frozen install in
+      # //:plugins fail with ERR_PNPM_LOCKFILE_CONFIG_MISMATCH. Upstream never hits this because
+      # their Dockerfile only exposes the lockfile to //:plugins, not to mise install.
+      cp pnpm-lock.yaml pnpm-lock.yaml.orig
       mise install
+      mv pnpm-lock.yaml.orig pnpm-lock.yaml
+
       mise //:plugins
 
       # Install the built plugin
       mkdir -p ${CRAFT_PART_INSTALL}/var/lib/immich/build/plugins/immich-plugin-core
       cp -r packages/plugin-core/dist ${CRAFT_PART_INSTALL}/var/lib/immich/build/plugins/immich-plugin-core/
       cp packages/plugin-core/manifest.json ${CRAFT_PART_INSTALL}/var/lib/immich/build/plugins/immich-plugin-core/
+    after:
+      - parts-server-patches
 
   uv-python312:
     plugin: nil
@@ -330,7 +341,7 @@ parts:
   machine-learning:
     plugin: uv
     source: https://github.com/immich-app/immich.git
-    source-tag: v3.0.3
+    source-tag: v3.1.0
     source-subdir: machine-learning
     uv-extras:
       - cpu
