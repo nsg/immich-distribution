@@ -290,6 +290,8 @@ parts:
       - MISE_TRUSTED_CONFIG_PATHS: "${CRAFT_PART_SRC}/mise.toml:${CRAFT_PART_BUILD}/mise.toml:${CRAFT_PART_SRC}/packages/plugin-core/mise.toml:${CRAFT_PART_BUILD}/packages/plugin-core/mise.toml"
       - MISE_DISABLE_TOOLS: "flutter"
     override-build: |
+      git apply -p1 $CRAFT_STAGE/plugin-core__asset-file-filter-use-path.patch
+
       # Install mise
       curl -sSL https://mise.run | sh
       export PATH="$HOME/.local/bin:$PATH"
@@ -319,6 +321,8 @@ parts:
       mkdir -p ${CRAFT_PART_INSTALL}/var/lib/immich/build/plugins/immich-plugin-core
       cp -r packages/plugin-core/dist ${CRAFT_PART_INSTALL}/var/lib/immich/build/plugins/immich-plugin-core/
       cp packages/plugin-core/manifest.json ${CRAFT_PART_INSTALL}/var/lib/immich/build/plugins/immich-plugin-core/
+    after:
+      - parts-server-patches
 
   uv-python312:
     plugin: nil
