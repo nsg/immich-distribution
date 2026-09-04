@@ -1,4 +1,5 @@
 /*.snap
+/SNAPTEST.md
 /src/etc/5xx.html
 __pycache__
 *.bkp
@@ -33,3 +34,4 @@ __pycache__
 /.claude-sandbox/
 /.mcp.json
 /geodata-cache/
+/.build-host/

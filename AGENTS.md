@@ -2,6 +2,21 @@
 
 Snap package for [Immich](https://github.com/immich-app/immich). Base: `core22` (Ubuntu 22.04). Strict confinement. Version in `VERSION` file, bumped via automated `bump/*` branch PRs. Upstream is Docker-based; mapping it onto snapd sometimes requires creative thinking. All deps must exist in Ubuntu 22.04 repos or the custom APT repo. User config via `snap set/get` and hooks.
 
+## Building
+
+Do all development work in the current sandbox. Use the configured `build-host`
+skill only to build snaps: copy the inputs needed for the build to the host, run
+the build there, then copy the resulting snap back into this sandbox.
+
+The build host is shared. Use a build directory dedicated to this repository,
+and reuse that directory for later builds so the retained build state and caches
+can speed them up. Do not clean up the remote build directory, outputs, or
+caches; the build host's regular recreation handles stale state. Never reuse or
+modify a directory belonging to another repository or job.
+
+Run pytest, Playwright, and similar test suites from this sandbox against the
+Telesnap server. Do not use the build host for those test runs.
+
 ## Gotchas
 
 ### Custom APT Repository (`nsg-*` packages)
@@ -36,6 +51,40 @@ Data-touching operations must run as `snap_daemon`, via `drop_privileges` in `sr
 
 ### `upstream/` Is Not a Submodule
 `upstream/` is gitignored scratch clones (`immich`, `aptly`). Must be manually cloned and checked out at the right tag for patch generation/validation and `update.sh` to work. Fetching/checking out tags there is always fine.
+
+### Test Installation
+Install and exercise built snaps only on the Telesnap server by following
+`SNAPTEST.md`. Never install a snap on the build host or inside the current
+sandbox.
+
+### Test Isolation
+Do not run all pytest files sequentially against one Telesnap installation.
+Mirror the GitHub Actions job boundaries: use a clean snap installation for
+each of `test_assets_uploads.py`, `test_assets_exif.py`,
+`test_assets_people.py`, `test_assets_ocr.py`, and `test_populated_web.py`.
+
+These suites upload overlapping files. The formats and populated-web suites
+both upload `ALL_TEST_ASSETS`; the EXIF, people, and OCR sets are subsets of
+it. Immich returns HTTP 200 with `status: duplicate` when an asset already
+exists, while the tests require HTTP 201 for a new upload. Reusing an instance
+therefore causes false failures even when asset processing is healthy.
+
+Before each suite, purge and reinstall the snap, reapply the Telesnap port
+setting, restart the services, and wait for Immich to become ready. Run
+`test_prep.py` after every reinstall to provision the user and generate a new
+API key; never reuse the API key file from a previous installation. If a reused
+instance returns a duplicate-upload failure, rerun the suite on a clean
+installation before treating it as a product regression.
+
+### Exploratory Browser Testing
+The CI suites are a baseline, not the limit of testing. After deploying the
+snap to Telesnap, agents may use the sandbox's local Playwright MCP for
+free-form exploratory testing against the configured Immich URL. Exercise UI
+paths beyond the scripted tests, including responsive layouts, navigation,
+asset viewing, search, settings, and administration. Inspect browser console
+and network failures while exploring. When behavior or rendering looks wrong,
+capture and retain a screenshot and show it to the user with a concise
+description and reproduction path.
 
 ## AI Behavior
 - Gather context before changes. Be concise.
