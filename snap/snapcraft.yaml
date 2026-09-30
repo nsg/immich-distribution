@@ -295,13 +295,13 @@ parts:
       export PATH="$HOME/.local/bin:$PATH"
 
       # Override extism-js version to 1.3.0 (last confirmed GLIBC 2.35/Ubuntu 22.04 compatible version).
-      # Versions 1.4.0-1.5.x require GLIBC 2.39 (see extism/js-pdk#129). v1.6.0 reverted CI back to
-      # ubuntu-22.04 so it _may_ be GLIBC 2.35 compatible again, but the fix has regressed before.
+      # Versions 1.4.0 and later require GLIBC 2.39 (see extism/js-pdk#129); the 1.6.0 and 1.7.0
+      # release binaries still do, even though v1.6.0 moved upstream CI back to ubuntu-22.04.
       # Immich's plugin uses only basic PDK APIs stable since v1.0, so 1.3.0 works fine.
-      sed -i 's/"github:extism\/js-pdk" = "1.6.0"/"github:extism\/js-pdk" = "1.3.0"/' mise.toml
+      sed -i 's/"github:extism\/js-pdk" = "v1.7.0"/"github:extism\/js-pdk" = "1.3.0"/' mise.toml
       grep -q '"github:extism/js-pdk" = "1.3.0"' mise.toml || { echo "ERROR: extism-js version override failed, upstream may have changed the version"; exit 1; }
 
-      # Drop mise.lock so the js-pdk override above takes effect (the lock pins the v1.6.0
+      # Drop mise.lock so the js-pdk override above takes effect (the lock pins the v1.7.0
       # download URLs); all tool versions stay exact since they are pinned in mise.toml.
       rm -f mise.lock
 
