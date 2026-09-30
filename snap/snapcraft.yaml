@@ -196,6 +196,11 @@ parts:
       pnpm --filter @immich/sdk --filter @immich/plugin-sdk --filter immich build
       pnpm --filter immich --prod --no-optional deploy ${CRAFT_PART_INSTALL}/usr/src/app
 
+      # sharp >= 0.35 no longer compiles itself on install, so build it explicitly in the deployed
+      # tree against the system libvips (nsg-libvips), which provides HEIC support. Mirrors the
+      # upstream server/Dockerfile.
+      pnpm --config.verify-deps-before-run=false --dir ${CRAFT_PART_INSTALL}/usr/src/app/node_modules/sharp exec npm run build
+
       rm -rf ${CRAFT_PART_INSTALL}/usr/src/app/.nvmrc
       rm -rf ${CRAFT_PART_INSTALL}/usr/src/app/.prettierignore
       rm -rf ${CRAFT_PART_INSTALL}/usr/src/app/.prettierrc
