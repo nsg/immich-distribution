@@ -1,12 +1,13 @@
 diff --git a/server/src/services/database-backup.service.ts b/server/src/services/database-backup.service.ts
+index f4365bb5f..5c22fe230 100644
 --- a/server/src/services/database-backup.service.ts
 +++ b/server/src/services/database-backup.service.ts
-@@ -205,7 +205,7 @@ export class DatabaseBackupService {
+@@ -215,7 +215,7 @@ export class DatabaseBackupService {
      }
-
+ 
      return {
 -      bin: `/usr/lib/postgresql/${databaseMajorVersion}/bin/${bin}`,
 +      bin: `${process.env.SNAP}/pg-server/${bin}`,
        args,
        databaseUsername,
-       databasePassword: isUrlConnection ? new URL(databaseConfig.url).password : databaseConfig.password,
+       databasePassword,
