@@ -290,8 +290,6 @@ parts:
       - MISE_TRUSTED_CONFIG_PATHS: "${CRAFT_PART_SRC}/mise.toml:${CRAFT_PART_BUILD}/mise.toml:${CRAFT_PART_SRC}/packages/plugin-core/mise.toml:${CRAFT_PART_BUILD}/packages/plugin-core/mise.toml"
       - MISE_DISABLE_TOOLS: "flutter"
     override-build: |
-      git apply -p1 $CRAFT_STAGE/plugin-core__asset-file-filter-use-path.patch
-
       # Install mise
       curl -sSL https://mise.run | sh
       export PATH="$HOME/.local/bin:$PATH"
