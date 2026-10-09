@@ -29,7 +29,7 @@ Layout symlinks in `snap/snapcraft.yaml` hardcode versions (`vips-modules-8.17`,
 Sharp prefers its own bundled libvips, which lacks HEIC — breaking photo imports from many phones. It must link against the system `nsg-libvips`. Most historical workarounds have been removed; watch for regressions on upgrades.
 
 ### Patches Against Upstream
-`parts/immich-server/patches/` (applied `git apply -p1`): pg_dumpall path, CLI command for admin API key, log spam removal. There is no standalone patch check — a patch that no longer applies fails the snap build in CI.
+`parts/immich-server/patches/` (applied `git apply -p1`): pg_dumpall path, CLI command for admin API key, log spam removal, disk usage block size on Node 22. There is no standalone patch check — a patch that no longer applies fails the snap build in CI.
 
 ### extism-js GLIBC Pinning
 The plugins build seds `extism-js` down to 1.3.0, the last GLIBC 2.35 (Ubuntu 22.04) compatible version; newer versions need GLIBC ≥2.39. A grep check fails the build if upstream changed the version string and the sed missed.

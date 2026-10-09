@@ -190,6 +190,7 @@ parts:
       git apply -p1 $CRAFT_STAGE/commands__index.ts.patch
       git apply -p1 $CRAFT_STAGE/services__cli.service.ts.patch
       git apply -p1 $CRAFT_STAGE/decorators.ts.patch
+      git apply -p1 $CRAFT_STAGE/repositories__storage.repository.ts.patch
 
       mkdir -p ${CRAFT_PART_INSTALL}/usr/src/app
 

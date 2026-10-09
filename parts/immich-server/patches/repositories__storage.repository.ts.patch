@@ -1,0 +1,18 @@
+diff --git a/server/src/repositories/storage.repository.ts b/server/src/repositories/storage.repository.ts
+--- a/server/src/repositories/storage.repository.ts
++++ b/server/src/repositories/storage.repository.ts
+@@ -217,10 +217,11 @@ export class StorageRepository {
+ 
+   async checkDiskUsage(folder: string): Promise<DiskUsage> {
+     const stats = await fs.statfs(folder);
++    const blockSize = stats.frsize ?? stats.bsize;
+     return {
+-      available: stats.bavail * stats.frsize,
+-      free: stats.bfree * stats.frsize,
+-      total: stats.blocks * stats.frsize,
++      available: stats.bavail * blockSize,
++      free: stats.bfree * blockSize,
++      total: stats.blocks * blockSize,
+     };
+   }
+ 
