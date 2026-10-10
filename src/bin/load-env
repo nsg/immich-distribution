@@ -42,6 +42,7 @@ export IMMICH_MACHINE_LEARNING_URL="http://127.0.0.1:3003"
 # every snap refresh.
 export IMMICH_BUILD_DATA="${SNAP%/*}/current/var/lib/immich/build"
 export IMMICH_MEDIA_LOCATION="$SNAP_COMMON/upload"
+export MAGICK_CONFIGURE_PATH="$SNAP/etc/ImageMagick"
 export IMMICH_API_METRICS_PORT=8081
 export IMMICH_MICROSERVICES_METRICS_PORT=8082
 export IMMICH_TELEMETRY_INCLUDE="$(snapctl get metrics-telemetry-include)"
