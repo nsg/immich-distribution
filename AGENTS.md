@@ -23,7 +23,7 @@ Telesnap server. Do not use the build host for those test runs.
 An externally managed APT repo (`https://nsg.github.io/aptly/deb`) provides `nsg-redis`, `nsg-libvips`, `nsg-postgres`, `nsg-pgvector`, `nsg-vectorchord`, `nsg-mimalloc`, `nsg-haproxy`, `nsg-lego` (plus `nsg-imagemagick`, `nsg-libheif`, `nsg-cgif` pulled in as deps of `nsg-libvips`). These mirror deps from upstream Docker images (`immich-app/base-images`); when upstream bumps deps, the APT packages usually need bumping too. Sources live in the gitignored local clone `upstream/aptly/` (`ARG VERSION=` in each `<package>/Containerfile` is the published version). If the repo is down or the GPG key (`snap/keys/5C61B36E.asc`) expires, builds fail with no fallback.
 
 ### Hardcoded Library Versions in Snap Layouts
-Layout symlinks in `snap/snapcraft.yaml` hardcode versions (`vips-modules-8.17`, `ImageMagick-7.1.2`) that must match the actual `nsg-libvips`/`nsg-imagemagick` versions. A mismatch silently breaks image processing: ImageMagick can't find delegates/coders, vips can't load format plugins, RAW/TIFF thumbnails fail via the vips magick fallback loader. `tests/test_vips_version.py` validates against the APT repo.
+Layout symlinks in `snap/snapcraft.yaml` hardcode versions (`vips-modules-8.18`, `ImageMagick-7.1.2`) that must match the actual `nsg-libvips`/`nsg-imagemagick` versions. A mismatch silently breaks image processing: ImageMagick can't find delegates/coders, vips can't load format plugins, RAW/TIFF thumbnails fail via the vips magick fallback loader. `tests/test_vips_version.py` validates against the APT repo.
 
 ### Sharp / Libvips HEIC Support
 Sharp prefers its own bundled libvips, which lacks HEIC — breaking photo imports from many phones. It must link against the system `nsg-libvips`. Most historical workarounds have been removed; watch for regressions on upgrades.
@@ -41,7 +41,7 @@ The `node/24` snap is built on `core24` (needs glibc ≥2.38) and cannot run on 
 Built with `cpu` extras only (no CUDA), running on a uv-installed CPython 3.12 (`uv-python312` part) — not the core22 system Python. `libmimalloc.so.2` is preloaded via `LD_PRELOAD` — the version in the path must match the `nsg-mimalloc` package.
 
 ### Pinned External Dependencies
-Pinned with checksums, break if removed/republished upstream: `jellyfin-ffmpeg7` deb (tied to `jammy`), `uv` (version + SHA256), test assets (pinned commit in `.github/actions/fetch-test-assets/`).
+Pinned with checksums, break if removed/republished upstream: `jellyfin-ffmpeg7` deb (tied to `jammy`), `uv` (version + SHA256), test assets (pinned commit in `.github/actions/fetch-test-assets/`). Upstream pins `immich-model` in `machine-learning/pyproject.toml` to a git revision of `immich-app/ml-models`, fetched from GitHub when the ML part builds.
 
 ### Era-Based Upgrade Protection
 `snap/hooks/post-refresh` blocks upgrades that skip an era (`IMMICH_DISTRIBUTION_ERA` in `src/bin/load-env`, currently `2`). Escape hatches: touching `$SNAP_COMMON/no-pre-refresh-hook` or `$SNAP_COMMON/no-post-refresh-hook` disables the hooks.
