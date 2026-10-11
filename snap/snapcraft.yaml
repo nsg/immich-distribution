@@ -1,6 +1,6 @@
 name: immich-distribution
 title: Immich Distribution
-version: "v3.2.4"
+version: "v3.3.0"
 base: core22
 grade: stable
 confinement: strict
@@ -171,7 +171,7 @@ parts:
   server:
     plugin: nil
     source: https://github.com/immich-app/immich.git
-    source-tag: v3.2.4
+    source-tag: v3.3.0
     build-environment:
       - SHARP_FORCE_GLOBAL_LIBVIPS: "true"
       - COREPACK_ENABLE_DOWNLOAD_PROMPT: "0"
@@ -190,6 +190,7 @@ parts:
       git apply -p1 $CRAFT_STAGE/commands__index.ts.patch
       git apply -p1 $CRAFT_STAGE/services__cli.service.ts.patch
       git apply -p1 $CRAFT_STAGE/decorators.ts.patch
+      git apply -p1 $CRAFT_STAGE/repositories__storage.repository.ts.patch
 
       mkdir -p ${CRAFT_PART_INSTALL}/usr/src/app
 
@@ -263,7 +264,7 @@ parts:
   web:
     plugin: nil
     source: https://github.com/immich-app/immich.git
-    source-tag: v3.2.4
+    source-tag: v3.3.0
     build-environment:
       - COREPACK_ENABLE_DOWNLOAD_PROMPT: "0"
       - CI: "1"
@@ -288,7 +289,7 @@ parts:
   plugins:
     plugin: nil
     source: https://github.com/immich-app/immich.git
-    source-tag: v3.2.4
+    source-tag: v3.3.0
     build-environment:
       - CI: "1"
       - MISE_DATA_DIR: "${CRAFT_PART_BUILD}/mise-data"
@@ -344,7 +345,7 @@ parts:
   machine-learning:
     plugin: uv
     source: https://github.com/immich-app/immich.git
-    source-tag: v3.2.4
+    source-tag: v3.3.0
     source-subdir: machine-learning
     uv-extras:
       - cpu
@@ -429,6 +430,7 @@ parts:
 
       fetch admin1CodesASCII.txt $GEODATA/admin1CodesASCII.txt https://download.geonames.org/export/dump/admin1CodesASCII.txt
       fetch admin2Codes.txt $GEODATA/admin2Codes.txt https://download.geonames.org/export/dump/admin2Codes.txt
+      fetch countryInfo.txt $GEODATA/countryInfo.txt https://download.geonames.org/export/dump/countryInfo.txt
       fetch ne_10m_admin_0_countries.geojson $GEODATA/ne_10m_admin_0_countries.geojson https://raw.githubusercontent.com/nvkelso/natural-earth-vector/v5.1.2/geojson/ne_10m_admin_0_countries.geojson
       echo "239eec57ac17f100a11e2536cffc56752c318b50ae765b0918ff7aab4ce8f255  $GEODATA/ne_10m_admin_0_countries.geojson" | sha256sum -c
     build-packages:

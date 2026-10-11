@@ -30,4 +30,4 @@ def test_extracts_exif_and_location_metadata(immich_url: str, http_client: httpx
     assert heic["type"] == "IMAGE"
     assert heic["exifInfo"]["model"] == "iPhone 7"
     assert heic["exifInfo"]["dateTimeOriginal"] == "2019-03-21T16:04:22.348+00:00"
-    assert heic["exifInfo"]["country"] == "United States of America"
+    assert heic["exifInfo"]["country"] == "United States"
