@@ -36,3 +36,5 @@ __pycache__
 /geodata-cache/
 /.build-host/
 /.playwright-mcp/
+/GRAFANA_LOKI.md
+/.claude/commands/verify-update.md
