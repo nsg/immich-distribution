@@ -33,7 +33,7 @@ jobs:
 
   fresh-install:
     name: Fresh Install Web Checks
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     needs: build-snap
     env:
@@ -78,7 +78,7 @@ jobs:
 
   populated-web:
     name: Populated Instance Web Checks
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     needs: build-snap
     env:
