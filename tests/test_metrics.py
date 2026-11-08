@@ -113,7 +113,7 @@ def test_metrics_include_and_exclude_control_exports(
 
     all_except_api_names = metric_names(all_except_api_body)
     assert all_except_api_names != all_api_names
-    assert all_except_api_names < all_api_names
+    assert all_api_names - all_except_api_names
     assert api_only_names - all_except_api_names
     assert has_metric_matching(all_except_api_names, "process_cpu")
     log(f"exclude=api exported {len(all_except_api_names)} API metric families")

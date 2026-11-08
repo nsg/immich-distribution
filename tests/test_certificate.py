@@ -1,3 +1,4 @@
+import re
 from pathlib import Path
 
 import httpx
@@ -58,7 +59,7 @@ def generate_self_signed_certificate() -> None:
     )
 
     certificate = run(["sudo", "openssl", "x509", "-in", str(CERT_FILE), "-text", "-noout"]).stdout
-    assert "CN = localhost" in certificate
+    assert re.search(r"CN\s*=\s*localhost", certificate)
 
 
 def log(message: str) -> None:
