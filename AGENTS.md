@@ -15,13 +15,19 @@ virtual machine created with the `vm` command (load the `vm` skill first):
    `df -h /workspace` first: with less than about 25GiB free the build fills the
    volume, crashes the VM and breaks the sandbox. Ask the user to free space
    instead of starting it.
-2. `apt-get install snapd` (the image does not ship it), then
+2. `apt-get install snapd build-essential` (the image ships neither; CI's
+   build image has `build-essential`, and sharp needs `make`), then
    `snap install snapcraft --classic` in the guest.
 3. Stream the working tree in with `tar | vm pipe`, excluding `.git`,
-   `.claude-sandbox`, `upstream`, `tests` and any `*.snap` files.
+   `.claude-sandbox`, `upstream`, `tests` and any `*.snap` files. In
+   destructive mode snapcraft keeps its work directories in the project's
+   `parts/`, on top of the `debug` and `manager` part sources there, and a
+   resumed build then fails to stage. In the guest copy, move those two
+   folders to `local-parts/` and point their `source:` there.
 4. Run `snapcraft pack --destructive-mode` (the guest matches the `core22`
    base) as a `systemd-run` unit that writes to a log file, so the build
-   outlives `vm exec` timeouts. Poll the log.
+   outlives `vm exec` timeouts. Pass `-E HOME=/root`: the unit has no `HOME`
+   and the plugins part's mise installer fails without it. Poll the log.
 5. Copy the `.snap` back with `vm pipe ... cat` and `vm delete` the VM.
 
 Run pytest, Playwright, and similar test suites from this sandbox against the
