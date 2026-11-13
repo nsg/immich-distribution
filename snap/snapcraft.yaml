@@ -362,10 +362,6 @@ parts:
       # interpreter directly.
       rm -f ${CRAFT_PART_INSTALL}/opt/python-venv/ml/bin/python*
 
-      cd machine-learning
-      mkdir -p ${CRAFT_PART_INSTALL}/etc
-      cp immich_ml/log_conf.json ${CRAFT_PART_INSTALL}/etc
-
     stage-packages:
       - nsg-mimalloc
       - libgl1
