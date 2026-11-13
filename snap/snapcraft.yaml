@@ -247,6 +247,7 @@ parts:
       - nsg-postgres
       - nsg-pgvector
       - nsg-vectorchord
+      - pigz
     after:
       - jellyfin-ffmpeg
       - parts-server-patches
