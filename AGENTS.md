@@ -4,18 +4,28 @@ Snap package for [Immich](https://github.com/immich-app/immich). Base: `core22` 
 
 ## Building
 
-Do all development work in the current sandbox. Use the configured `build-host`
-skill only to build snaps: copy the inputs needed for the build to the host, run
-the build there, then copy the resulting snap back into this sandbox.
+Do all development work in the current sandbox. Build snaps in a dedicated
+virtual machine created with the `vm` command (load the `vm` skill first):
 
-The build host is shared. Use a build directory dedicated to this repository,
-and reuse that directory for later builds so the retained build state and caches
-can speed them up. Do not clean up the remote build directory, outputs, or
-caches; the build host's regular recreation handles stale state. Never reuse or
-modify a directory belonging to another repository or job.
+1. `vm launch immich-build --image images:ubuntu/22.04`, with as many CPUs and
+   as much memory and disk (20GiB minimum) as the Incus project quota allows. A
+   limit error means another VM holds the quota: tell the user and shrink the
+   request rather than touching VMs you did not create. The VM image lives on
+   the same host volume as `/workspace` and grows as the build writes, so check
+   `df -h /workspace` first: with less than about 25GiB free the build fills the
+   volume, crashes the VM and breaks the sandbox. Ask the user to free space
+   instead of starting it.
+2. `apt-get install snapd` (the image does not ship it), then
+   `snap install snapcraft --classic` in the guest.
+3. Stream the working tree in with `tar | vm pipe`, excluding `.git`,
+   `.claude-sandbox`, `upstream`, `tests` and any `*.snap` files.
+4. Run `snapcraft pack --destructive-mode` (the guest matches the `core22`
+   base) as a `systemd-run` unit that writes to a log file, so the build
+   outlives `vm exec` timeouts. Poll the log.
+5. Copy the `.snap` back with `vm pipe ... cat` and `vm delete` the VM.
 
 Run pytest, Playwright, and similar test suites from this sandbox against the
-Telesnap server. Do not use the build host for those test runs.
+Telesnap server. Do not use the build VM for those test runs.
 
 ## Gotchas
 
@@ -54,7 +64,7 @@ Data-touching operations must run as `snap_daemon`, via `drop_privileges` in `sr
 
 ### Test Installation
 Install and exercise built snaps only on the Telesnap server by following
-`SNAPTEST.md`. Never install a snap on the build host or inside the current
+`SNAPTEST.md`. Never install a snap on the build VM or inside the current
 sandbox.
 
 ### Test Isolation
