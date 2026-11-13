@@ -19,4 +19,4 @@ sudo snap unset immich-distribution ml-model-revision
 sudo snap get immich-distribution ml-model-revision
 ```
 
-The machine learning service restarts automatically when you change the setting, and downloads the models for the selected revision the next time it needs them. Each revision is stored in its own folder under `/var/snap/immich-distribution/common/cache`, so switching back and forth does not download the same models twice.
+The machine learning service restarts automatically when you change the setting, and downloads the models for the selected revision the next time it needs them. The models of each revision are stored separately in `/var/snap/immich-distribution/common/cache`, so switching back and forth does not download the same models twice.
