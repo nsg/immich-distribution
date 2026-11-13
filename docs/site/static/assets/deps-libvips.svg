@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 890 250" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 890 310" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif">
   <title>libvips dependency tree</title>
-  <desc>nsg-cgif, nsg-libheif and nsg-imagemagick feed into nsg-libvips, which sharp inside Immich uses.</desc>
+  <desc>nsg-cgif, nsg-libheif, nsg-libjxl and nsg-imagemagick feed into nsg-libvips, which sharp inside Immich uses.</desc>
   <defs>
     <clipPath id="node"><rect x="0" y="0" width="150" height="40" rx="8"/></clipPath>
   </defs>
@@ -12,6 +12,8 @@
     <path d="M 160 150 C 205 150 205 60 250 60"/>
     <path d="M 160 150 L 250 150"/>
     <path d="M 160 210 C 400 210 565 190 565 140"/>
+    <path d="M 160 270 C 205 270 205 150 250 150"/>
+    <path d="M 160 270 C 420 270 590 230 590 140"/>
     <path d="M 325 80 L 325 130"/>
     <path d="M 400 60 C 445 60 445 120 490 120"/>
     <path d="M 400 150 C 445 150 445 120 490 120"/>
@@ -37,6 +39,11 @@
     <rect width="150" height="40" rx="8" fill="#ffffff" stroke="#dcdcdc"/>
     <rect width="150" height="4" fill="#d40000" clip-path="url(#node)"/>
     <text x="75" y="27" text-anchor="middle" font-size="13" font-weight="600" fill="#333333">nsg-cgif</text>
+  </g>
+  <g id="nsg-libjxl" transform="translate(10,250)">
+    <rect width="150" height="40" rx="8" fill="#ffffff" stroke="#dcdcdc"/>
+    <rect width="150" height="4" fill="#d40000" clip-path="url(#node)"/>
+    <text x="75" y="27" text-anchor="middle" font-size="13" font-weight="600" fill="#333333">nsg-libjxl</text>
   </g>
 
   <g id="nsg-libheif" transform="translate(250,40)">
