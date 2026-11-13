@@ -36,6 +36,7 @@ ALL_TEST_ASSETS = [
     ASSET_DIR / "PXL_20250712_111801796.jpg",
     UPSTREAM_TEST_ASSET_DIR / "formats/heic/IMG_2682.heic",
     UPSTREAM_TEST_ASSET_DIR / "formats/webp/denali.webp",
+    UPSTREAM_TEST_ASSET_DIR / "formats/jxl/8bit-sRGB.jxl",
     UPSTREAM_TEST_ASSET_DIR / "formats/raw/Nikon/D80/glarus.nef",
     UPSTREAM_TEST_ASSET_DIR / "formats/raw/Nikon/D700/philadelphia.nef",
     UPSTREAM_TEST_ASSET_DIR / "formats/raw/Fujifilm/X100V_compressed.RAF",
