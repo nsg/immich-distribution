@@ -73,3 +73,4 @@ fi
 snapctl restart immich-distribution.postgres
 snapctl restart immich-distribution.haproxy
 snapctl restart immich-distribution.immich-server
+snapctl restart immich-distribution.immich-machine-learning
