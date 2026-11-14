@@ -53,6 +53,9 @@ The plugins build seds `extism-js` down to 1.3.0, the last GLIBC 2.35 (Ubuntu 22
 ### Tied to core22 (glibc 2.35)
 The `node/24` snap is built on `core24` (needs glibc ≥2.38) and cannot run on our base; the Node channel is pinned in `snap/snapcraft.yaml`.
 
+### No GNU tar Inside the Snap
+Since a 2026 security update, core22's GNU `tar` opens paths with `openat2`, which the strict-confinement seccomp filter rejects with EPERM, so it can neither read nor extract files under `$SNAP_COMMON`. The asset `backup`/`restore` scripts use `bsdtar` (staged `libarchive-tools`) instead. Watch for other base tools picking up `openat2` the same way.
+
 ### ML is CPU-Only, on uv Python 3.12
 Built with `cpu` extras only (no CUDA), running on a uv-installed CPython 3.12 (`uv-python312` part) — not the core22 system Python. `libmimalloc.so.2` is preloaded via `LD_PRELOAD` — the version in the path must match the `nsg-mimalloc` package.
 

@@ -51,7 +51,8 @@ restore_database() {
 restore_assets() {
     echo "Restoring assets from backup: $1"
     rm -rf $SNAP_COMMON/upload/*
-    tar -C "/" -xf "$1"
+    # GNU tar in core22 opens paths with openat2, which strict confinement blocks
+    bsdtar -C "/" -xf "$1"
 }
 
 root_check
