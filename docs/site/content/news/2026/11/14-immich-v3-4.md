@@ -1,8 +1,8 @@
 +++
 template = "blog-post.html"
 title = "Immich v3.4"
-date = "2026-11-13"
-path = "news/2026/11/13/immich-v3-4"
+date = "2026-11-14"
+path = "news/2026/11/14/immich-v3-4"
 authors = ["nsg"]
 +++
 
