@@ -69,9 +69,12 @@ Data-touching operations must run as `snap_daemon`, via `drop_privileges` in `sr
 `upstream/` is gitignored scratch clones (`immich`, `aptly`). Must be manually cloned and checked out at the right tag for patch generation/validation and `update.sh` to work. Fetching/checking out tags there is always fine.
 
 ### Test Installation
-Install and exercise built snaps only on the Telesnap server by following
-`SNAPTEST.md`. Never install a snap on the build VM or inside the current
-sandbox.
+Install and exercise built snaps on the Telesnap server by following
+`SNAPTEST.md` whenever it can do the job. When troubleshooting needs a real
+machine that Telesnap cannot provide, such as running the snap's commands or
+tracing it, launch a separate test VM with the `vm` command and install the
+snap there; delete the VM when done. Never install a snap on the build VM or
+inside the current sandbox.
 
 ### Test Isolation
 Do not run all pytest files sequentially against one Telesnap installation.
