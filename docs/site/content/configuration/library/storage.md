@@ -26,7 +26,7 @@ Immich Server stores all assets here. This includes **all your media**: original
 
 > "Only move the large original assets, but keep frequently accessed files locally"
 
-If you haven't moved the entire `$C/upload` directory, it might be useful to move just the folders containing your original uploaded media. Where the originals are stored depends on the [storage template](https://immich.app/docs/administration/storage-template) setting in Immich (**Administration → Settings → Storage Template**):
+If you haven't moved the entire `$C/upload` directory, it might be useful to move just the folders containing your original uploaded media. Where the originals are stored depends on the [storage template](https://immich.app/docs/administration/storage-template) setting in Immich (**Administration ➔ Settings ➔ Storage Template**):
 
 - **Storage template disabled (the default):** originals stay in `$C/upload/upload`, and `$C/upload/library` remains empty.
 - **Storage template enabled:** originals are moved into `$C/upload/library`, organized according to the template.
