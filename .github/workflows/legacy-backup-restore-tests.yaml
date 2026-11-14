@@ -4,6 +4,13 @@ on:
   schedule:
     - cron: '37 4 * * 2'
   workflow_dispatch:
+  workflow_call:
+    inputs:
+      snap-artifact-name:
+        description: Snap artifact to test. Builds the snap when empty.
+        required: false
+        type: string
+        default: ''
 
 permissions:
   contents: read
@@ -11,12 +18,14 @@ permissions:
 jobs:
   build-snap:
     name: Build Snap Package
+    if: inputs.snap-artifact-name == ''
     uses: ./.github/workflows/build-snap.yaml
     with:
       artifact-name: legacy-backup-restore-snap-package
 
   backup-restore:
     name: Legacy Snap Backup Restore
+    if: ${{ !failure() && !cancelled() }}
     runs-on: ubuntu-latest
     timeout-minutes: 60
     needs: build-snap
@@ -28,7 +37,7 @@ jobs:
       - name: Install snap
         uses: ./.github/actions/install-snap
         with:
-          artifact-name: legacy-backup-restore-snap-package
+          artifact-name: ${{ inputs.snap-artifact-name || 'legacy-backup-restore-snap-package' }}
 
       - name: Set up tests
         uses: ./.github/actions/setup-tests

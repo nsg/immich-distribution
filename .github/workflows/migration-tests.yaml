@@ -4,6 +4,13 @@ on:
   schedule:
     - cron: '23 3 * * 1'
   workflow_dispatch:
+  workflow_call:
+    inputs:
+      snap-artifact-name:
+        description: Snap artifact to test. Builds the snap when empty.
+        required: false
+        type: string
+        default: ''
 
 permissions:
   contents: read
@@ -11,20 +18,23 @@ permissions:
 jobs:
   build-snap:
     name: Build Snap Package
+    if: inputs.snap-artifact-name == ''
     uses: ./.github/workflows/build-snap.yaml
     with:
       artifact-name: migration-tests-snap-package
 
   prepare-snap-to-docker-data:
     name: Build snap migration data
+    if: ${{ !failure() && !cancelled() }}
     needs: build-snap
     uses: ./.github/workflows/build-snap-migration-data.yaml
     with:
-      snap-artifact-name: migration-tests-snap-package
+      snap-artifact-name: ${{ inputs.snap-artifact-name || 'migration-tests-snap-package' }}
       artifact-name: snap-to-docker-data
 
   snap-to-docker:
     name: Test migration to Docker
+    if: ${{ !failure() && !cancelled() }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     needs: prepare-snap-to-docker-data
@@ -79,6 +89,7 @@ jobs:
 
   docker-to-snap:
     name: Test migration from Docker
+    if: ${{ !failure() && !cancelled() }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     needs: build-snap
@@ -145,7 +156,7 @@ jobs:
       - name: Install snap
         uses: ./.github/actions/install-snap
         with:
-          artifact-name: migration-tests-snap-package
+          artifact-name: ${{ inputs.snap-artifact-name || 'migration-tests-snap-package' }}
 
       - name: Wait for snap to start
         working-directory: tests
