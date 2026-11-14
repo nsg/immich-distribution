@@ -82,6 +82,14 @@ backup_assets() {
 
     echo "Creating assets backup: $backup_as_file"
     tar cJf "$backup_as_file" $SNAP_COMMON/upload
+    local status=$?
+
+    # Exit status 1 only means that files changed while they were read
+    if [ $status -gt 1 ]; then
+        echo "Failed to create assets backup (tar exit status $status): $backup_as_file"
+        rm -f "$backup_as_file"
+        exit 1
+    fi
 }
 
 list_backups() {
