@@ -81,7 +81,12 @@ backup_assets() {
     local backup_as_file="$SNAP_COMMON/backups/immich_assets_${SNAP_VERSION}_${TIME}.tar.xz"
 
     echo "Creating assets backup: $backup_as_file"
-    tar cJf "$backup_as_file" $SNAP_COMMON/upload
+    # GNU tar in core22 opens paths with openat2, which strict confinement blocks
+    if ! bsdtar -cJf "$backup_as_file" $SNAP_COMMON/upload; then
+        echo "Failed to create assets backup: $backup_as_file"
+        rm -f "$backup_as_file"
+        exit 1
+    fi
 }
 
 list_backups() {

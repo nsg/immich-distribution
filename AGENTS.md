@@ -4,23 +4,39 @@ Snap package for [Immich](https://github.com/immich-app/immich). Base: `core22` 
 
 ## Building
 
-Do all development work in the current sandbox. Use the configured `build-host`
-skill only to build snaps: copy the inputs needed for the build to the host, run
-the build there, then copy the resulting snap back into this sandbox.
+Do all development work in the current sandbox. Build snaps in a dedicated
+virtual machine created with the `vm` command (load the `vm` skill first):
 
-The build host is shared. Use a build directory dedicated to this repository,
-and reuse that directory for later builds so the retained build state and caches
-can speed them up. Do not clean up the remote build directory, outputs, or
-caches; the build host's regular recreation handles stale state. Never reuse or
-modify a directory belonging to another repository or job.
+1. `vm launch immich-build --image images:ubuntu/22.04`, with as many CPUs and
+   as much memory and disk (20GiB minimum) as the Incus project quota allows. A
+   limit error means another VM holds the quota: tell the user and shrink the
+   request rather than touching VMs you did not create. The VM image lives on
+   the same host volume as `/workspace` and grows as the build writes, so check
+   `df -h /workspace` first: with less than about 25GiB free the build fills the
+   volume, crashes the VM and breaks the sandbox. Ask the user to free space
+   instead of starting it.
+2. `apt-get install snapd build-essential` (the image ships neither; CI's
+   build image has `build-essential`, and sharp needs `make`), then
+   `snap install snapcraft --classic` in the guest.
+3. Stream the working tree in with `tar | vm pipe`, excluding `.git`,
+   `.claude-sandbox`, `upstream`, `tests` and any `*.snap` files. In
+   destructive mode snapcraft keeps its work directories in the project's
+   `parts/`, on top of the `debug` and `manager` part sources there, and a
+   resumed build then fails to stage. In the guest copy, move those two
+   folders to `local-parts/` and point their `source:` there.
+4. Run `snapcraft pack --destructive-mode` (the guest matches the `core22`
+   base) as a `systemd-run` unit that writes to a log file, so the build
+   outlives `vm exec` timeouts. Pass `-E HOME=/root`: the unit has no `HOME`
+   and the plugins part's mise installer fails without it. Poll the log.
+5. Copy the `.snap` back with `vm pipe ... cat` and `vm delete` the VM.
 
 Run pytest, Playwright, and similar test suites from this sandbox against the
-Telesnap server. Do not use the build host for those test runs.
+Telesnap server. Do not use the build VM for those test runs.
 
 ## Gotchas
 
 ### Custom APT Repository (`nsg-*` packages)
-An externally managed APT repo (`https://nsg.github.io/aptly/deb`) provides `nsg-redis`, `nsg-libvips`, `nsg-postgres`, `nsg-pgvector`, `nsg-vectorchord`, `nsg-mimalloc`, `nsg-haproxy`, `nsg-lego` (plus `nsg-imagemagick`, `nsg-libheif`, `nsg-cgif` pulled in as deps of `nsg-libvips`). These mirror deps from upstream Docker images (`immich-app/base-images`); when upstream bumps deps, the APT packages usually need bumping too. Sources live in the gitignored local clone `upstream/aptly/` (`ARG VERSION=` in each `<package>/Containerfile` is the published version). If the repo is down or the GPG key (`snap/keys/5C61B36E.asc`) expires, builds fail with no fallback.
+An externally managed APT repo (`https://nsg.github.io/aptly/deb`) provides `nsg-redis`, `nsg-libvips`, `nsg-postgres`, `nsg-pgvector`, `nsg-vectorchord`, `nsg-mimalloc`, `nsg-haproxy`, `nsg-lego` (plus `nsg-imagemagick`, `nsg-libheif`, `nsg-libjxl`, `nsg-cgif` pulled in as deps of `nsg-libvips`). These mirror deps from upstream Docker images (`immich-app/base-images`); when upstream bumps deps, the APT packages usually need bumping too. Sources live in the gitignored local clone `upstream/aptly/` (`ARG VERSION=` in each `<package>/Containerfile` is the published version). If the repo is down or the GPG key (`snap/keys/5C61B36E.asc`) expires, builds fail with no fallback.
 
 ### Hardcoded Library Versions in Snap Layouts
 Layout symlinks in `snap/snapcraft.yaml` hardcode versions (`vips-modules-8.18`, `ImageMagick-7.1.2`) that must match the actual `nsg-libvips`/`nsg-imagemagick` versions. A mismatch silently breaks image processing: ImageMagick can't find delegates/coders, vips can't load format plugins, RAW/TIFF thumbnails fail via the vips magick fallback loader. `tests/test_vips_version.py` validates against the APT repo.
@@ -29,13 +45,16 @@ Layout symlinks in `snap/snapcraft.yaml` hardcode versions (`vips-modules-8.18`,
 Sharp prefers its own bundled libvips, which lacks HEIC — breaking photo imports from many phones. It must link against the system `nsg-libvips`. Most historical workarounds have been removed; watch for regressions on upgrades.
 
 ### Patches Against Upstream
-`parts/immich-server/patches/` (applied `git apply -p1`): pg_dumpall path, CLI command for admin API key, log spam removal, disk usage block size on Node 22. There is no standalone patch check — a patch that no longer applies fails the snap build in CI.
+`parts/immich-server/patches/` (applied `git apply -p1`): pg_dumpall path, CLI command for admin API key, log spam removal, disk usage block size on Node 22, Prometheus exporter bound to all interfaces (backport from v3.4.1; drop it when bumping past v3.4.0). There is no standalone patch check — a patch that no longer applies fails the snap build in CI.
 
 ### extism-js GLIBC Pinning
 The plugins build seds `extism-js` down to 1.3.0, the last GLIBC 2.35 (Ubuntu 22.04) compatible version; newer versions need GLIBC ≥2.39. A grep check fails the build if upstream changed the version string and the sed missed.
 
 ### Tied to core22 (glibc 2.35)
 The `node/24` snap is built on `core24` (needs glibc ≥2.38) and cannot run on our base; the Node channel is pinned in `snap/snapcraft.yaml`.
+
+### No GNU tar Inside the Snap
+Since a 2026 security update, core22's GNU `tar` opens paths with `openat2`, which the strict-confinement seccomp filter rejects with EPERM, so it can neither read nor extract files under `$SNAP_COMMON`. The asset `backup`/`restore` scripts use `bsdtar` (staged `libarchive-tools`) instead. Watch for other base tools picking up `openat2` the same way.
 
 ### ML is CPU-Only, on uv Python 3.12
 Built with `cpu` extras only (no CUDA), running on a uv-installed CPython 3.12 (`uv-python312` part) — not the core22 system Python. `libmimalloc.so.2` is preloaded via `LD_PRELOAD` — the version in the path must match the `nsg-mimalloc` package.
@@ -53,9 +72,12 @@ Data-touching operations must run as `snap_daemon`, via `drop_privileges` in `sr
 `upstream/` is gitignored scratch clones (`immich`, `aptly`). Must be manually cloned and checked out at the right tag for patch generation/validation and `update.sh` to work. Fetching/checking out tags there is always fine.
 
 ### Test Installation
-Install and exercise built snaps only on the Telesnap server by following
-`SNAPTEST.md`. Never install a snap on the build host or inside the current
-sandbox.
+Install and exercise built snaps on the Telesnap server by following
+`SNAPTEST.md` whenever it can do the job. When troubleshooting needs a real
+machine that Telesnap cannot provide, such as running the snap's commands or
+tracing it, launch a separate test VM with the `vm` command and install the
+snap there; delete the VM when done. Never install a snap on the build VM or
+inside the current sandbox.
 
 ### Test Isolation
 Do not run all pytest files sequentially against one Telesnap installation.

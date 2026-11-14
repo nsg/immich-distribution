@@ -20,7 +20,7 @@ For more information and available packages, visit: [https://nsg.github.io/aptly
 
 ### libvips
 
-![Dependency tree where nsg-cgif, nsg-libheif and nsg-imagemagick feed into nsg-libvips, used by sharp inside Immich](/assets/deps-libvips.svg)
+![Dependency tree where nsg-cgif, nsg-libheif, nsg-libjxl and nsg-imagemagick feed into nsg-libvips, used by sharp inside Immich](/assets/deps-libvips.svg)
 
 Immich uses sharp for image processing. Sharp uses libvips, and libvips has imagemagick as a backend and uses it as a fallback engine if it can't handle an image format directly.
 

@@ -133,6 +133,20 @@ jobs:
     with:
       snap-artifact-name: tests-snap-package
 
+  migration:
+    name: Migration Tests
+    needs: build-snap
+    uses: ./.github/workflows/migration-tests.yaml
+    with:
+      snap-artifact-name: tests-snap-package
+
+  legacy-backup-restore:
+    name: Legacy Backup Restore Tests
+    needs: build-snap
+    uses: ./.github/workflows/legacy-backup-restore-tests.yaml
+    with:
+      snap-artifact-name: tests-snap-package
+
   metrics:
     name: Metrics Tests
     runs-on: ubuntu-latest
