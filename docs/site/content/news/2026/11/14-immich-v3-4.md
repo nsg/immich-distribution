@@ -37,3 +37,15 @@ If you would like FUTO Backups to work in the snap, [open an issue](https://gith
 ## Symlinks in external libraries
 
 External library scans no longer follow symlinks. This is an upstream security fix. If an external library contains symlinked folders or files, new files behind them are no longer imported, and assets that were imported through a symlink may be marked offline on the next scan. Mount or move the real folders into the library path instead.
+
+## Metrics address in v3.4.2
+
+From v3.4.2, upstream Immich serves Prometheus metrics on the same address as Immich itself. In the snap that is localhost, as Immich runs behind HAProxy, so other machines would no longer reach the metrics. The snap diverges a little from upstream here and keeps `0.0.0.0` (all IPv4 interfaces) as the default, the same as in v3.4.0 and v3.4.1. This is not a breaking change and you do not need to do anything.
+
+The address is now configurable with `metrics-bind-address`, see [Metrics](/configuration/metrics/) for details. For example, to only allow access from the server itself:
+
+```bash
+sudo snap set immich-distribution metrics-bind-address=127.0.0.1
+```
+
+Only IPv4 addresses work for now. Metrics over IPv6, which worked up to v3.3, need an [upstream fix](https://github.com/immich-app/immich/pull/33488) that is not yet released.

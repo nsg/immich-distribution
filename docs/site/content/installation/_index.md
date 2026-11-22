@@ -63,7 +63,7 @@ See [HAProxy](configuration/haproxy.md) if you like to change the http or https 
 | `80`   | all | YES | HAProxy - Reverse proxy (unless disabled) |
 | `443`  | all | YES | HAProxy (only if HTTPS is enabled) |
 | `3001-3003` | lo | NO | Immich Services |
-| `8081-8082` | all | NO | Metrics (Prometheus) |
+| `8081-8082` | all IPv4 | Interface only | Metrics (Prometheus), see [Metrics](@/configuration/metrics.md) |
 | `5432` | lo | NO | Postgres - Relation database |
 | `6379` | lo | NO | Redis - In-memory KV database |
 | `34000-36000` | all | YES | ACME certificate renewals (if enabled) |

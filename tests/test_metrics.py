@@ -1,3 +1,5 @@
+import socket
+
 import httpx
 import pytest
 
@@ -19,6 +21,7 @@ def wait_for_server(immich_url: str, client: httpx.Client) -> None:
 def reset_metrics_config(immich_url: str, client: httpx.Client) -> None:
     unset_value("metrics-telemetry-include")
     unset_value("metrics-telemetry-exclude")
+    unset_value("metrics-bind-address")
     restart()
     wait_for_server(immich_url, client)
 
@@ -65,6 +68,13 @@ def wait_for_metrics_disabled(client: httpx.Client, url: str) -> None:
 
 def has_metric_matching(names: set[str], pattern: str) -> bool:
     return any(pattern in name for name in names)
+
+
+def non_loopback_ipv4() -> str:
+    # Connecting a UDP socket only selects the source address, nothing is sent
+    with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
+        sock.connect(("192.0.2.1", 9))
+        return sock.getsockname()[0]
 
 
 def log(message: str) -> None:
@@ -123,3 +133,27 @@ def test_metrics_include_and_exclude_control_exports(
     wait_for_metrics_disabled(http_client, API_METRICS_URL)
     wait_for_metrics_disabled(http_client, MICROSERVICES_METRICS_URL)
     log("Metrics endpoints are disabled after reset")
+
+
+@pytest.mark.snap
+@pytest.mark.timeout(600)
+def test_metrics_bind_address_controls_exposure(
+    clean_metrics_config,
+    immich_url: str,
+    http_client: httpx.Client,
+) -> None:
+    local_urls = [API_METRICS_URL, MICROSERVICES_METRICS_URL]
+    address = non_loopback_ipv4()
+    external_urls = [url.replace("127.0.0.1", address) for url in local_urls]
+
+    log(f"Verify metrics are served on {address} by default")
+    apply_metrics_config(include="all", exclude=None, immich_url=immich_url, client=http_client)
+    for url in external_urls:
+        wait_for_metrics(http_client, url)
+
+    log("Limit metrics to loopback")
+    set_value("metrics-bind-address", "127.0.0.1")
+    for url in local_urls:
+        wait_for_metrics(http_client, url)
+    for url in external_urls:
+        assert http_status(http_client, url) is None, f"{url} is reachable"

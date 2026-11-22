@@ -1,0 +1,13 @@
+diff --git a/server/src/repositories/telemetry.repository.ts b/server/src/repositories/telemetry.repository.ts
+index 6c8626d3a..a3101fd45 100644
+--- a/server/src/repositories/telemetry.repository.ts
++++ b/server/src/repositories/telemetry.repository.ts
+@@ -68,7 +68,7 @@ export const bootstrapTelemetry = (port: number) => {
+       [ATTR_SERVICE_NAME]: `immich`,
+       [ATTR_SERVICE_VERSION]: serverVersion.toString(),
+     }),
+-    metricReaders: [new PrometheusExporter({ port, host })],
++    metricReaders: [new PrometheusExporter({ port, host: process.env.IMMICH_DISTRIBUTION_METRICS_HOST || host })],
+     contextManager: new AsyncLocalStorageContextManager(),
+     instrumentations: [
+       new HttpInstrumentation({
